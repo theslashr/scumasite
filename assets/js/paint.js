@@ -71,6 +71,9 @@
      ============================================================ */
   function size() {
     var r = hero.getBoundingClientRect();
+    // A zero-width measurement primes the ground at a degenerate size and then
+    // CSS stretches it across the hero. Wait for a real box instead.
+    if (r.width < 2 || r.height < 2) { setTimeout(size, 120); return; }
     W = Math.max(1, Math.round(r.width  + MARGIN * 2));
     H = Math.max(1, Math.round(r.height + MARGIN * 2));
 
@@ -425,6 +428,13 @@
   window.addEventListener('resize', function () {
     clearTimeout(t); t = setTimeout(size, 180);
   });
+  // window resize misses the cases that actually matter here: the hero settling
+  // after fonts land, or being measured before layout. Watch the box itself.
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () {
+      clearTimeout(t); t = setTimeout(size, 180);
+    }).observe(hero);
+  }
 
   /* ============================================================
      PUBLIC API
