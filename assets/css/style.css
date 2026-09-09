@@ -397,43 +397,17 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .manifesto__social{
   min-width:0;
 }
-.feed{
-  display:flex; flex-direction:column; min-width:0;
-  border:1px solid var(--line); border-radius:3px;
-  background:rgba(244,239,230,.72);
-  overflow:hidden;
-  transition:border-color .4s var(--ease);
-}
-.feed:hover{ border-color:rgba(14,36,56,.28); }
-.feed__head{
-  display:flex; align-items:baseline; justify-content:space-between;
-  gap:1rem; padding:1.05rem clamp(1.1rem,2vw,1.5rem);
-  border-bottom:1px solid var(--line);
-}
-.feed__tag{
-  font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--ochre-deep); font-weight:600;
-}
-.feed__handle{
-  font-family:var(--display); font-weight:500; letter-spacing:-.01em;
-  font-size:clamp(1.05rem,1.7vw,1.35rem);
-  text-decoration:none; display:flex; align-items:center; gap:.4rem;
-}
-.feed__handle i{ font-style:normal; transition:transform .4s var(--ease); }
-.feed__handle:hover i{ transform:translateX(4px); }
+/* No frame around it: the panel chrome added height without adding
+   anything, and the player is portrait so a narrower embed is a shorter
+   one - TikTok scales it to the width it is given. */
+.manifesto__social{ min-width:0; max-width:340px; margin-top:-3.1rem; }
 
-.feed__body{
-  padding:clamp(.7rem,1.4vw,1rem);
-  min-height:0; display:block;
-}
 
-/* One embed, sized by its own content. Fixed heights meant either clipping
-   the post or scrolling a letterbox, and neither read well. */
 
-.feed__body .tiktok-embed,
-.feed__body iframe{
-  max-width:100%!important; min-width:0!important; margin:0!important;
-  border-radius:2px;
+.tt-embed{
+  display:block; width:100%; border:0; border-radius:2px;
+  aspect-ratio:9/16;            /* a vertical video, so the box follows it */
+  background:var(--canvas-2);
 }
 
 /* ============================================================

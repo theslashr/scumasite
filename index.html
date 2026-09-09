@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css?v=40">
+<link rel="stylesheet" href="assets/css/style.css?v=44">
 </head>
 <body>
 
@@ -124,17 +124,14 @@
       </div>
 
       <div class="manifesto__social" data-reveal>
-        <article class="feed">
-          <header class="feed__head">
-            <span class="feed__tag">Instagram</span>
-            <a class="feed__handle" href="https://www.instagram.com/burgello_artist/" target="_blank" rel="noopener">@burgello_artist<i aria-hidden="true">&#8594;</i></a>
-          </header>
-          <div class="feed__body">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DE5SkPdI1JO/" data-instgrm-version="14">
-              <a href="https://www.instagram.com/p/DE5SkPdI1JO/" target="_blank" rel="noopener">Post di @burgello_artist</a>
-            </blockquote>
-          </div>
-        </article>
+        <!-- the /embed/ endpoint overlays the caption and track on the video;
+             embed.js builds the v2 player instead, which stacks them below and
+             makes it much taller. A direct iframe also drops their script. -->
+        <iframe class="tt-embed"
+                src="https://www.tiktok.com/embed/7617205469656059159"
+                title="Video di @scuma_art su TikTok"
+                loading="lazy" scrolling="no" allowfullscreen
+                allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
       </div>
     </div>
 
@@ -414,8 +411,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script async src="https://www.instagram.com/embed.js"></script>
-<script src="assets/js/paint.js?v=40"></script>
-<script src="assets/js/main.js?v=40"></script>
+<script src="assets/js/paint.js?v=44"></script>
+<script src="assets/js/main.js?v=44"></script>
 </body>
 </html>
