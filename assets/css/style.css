@@ -341,8 +341,12 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .manifesto__bg{
   position:absolute; inset:0; z-index:0;
   opacity:.32;
-  -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
-  mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
+  -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%),
+                     linear-gradient(to bottom, #000 55%, transparent 92%);
+  mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%),
+             linear-gradient(to bottom, #000 55%, transparent 92%);
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
 }
 /* contain, not cover: the section is much taller than the image once the
    feeds are beside the copy, and cover was slicing the portrait off the
@@ -435,8 +439,10 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .feed__tab:hover{ color:var(--ink); }
 .feed__tab.is-active{ color:var(--ink); background:rgba(14,36,56,.07); }
 
-.feed__panes{ height:600px; }
+.feed__panes{ height:520px; }
 .feed__pane{ height:100%; overflow:hidden; padding:clamp(.7rem,1.4vw,1rem); }
+#paneIg{ display:flex; flex-direction:column; }
+#paneIg .ig-rail{ flex:1 1 auto; min-height:0; }
 .feed__pane[hidden]{ display:none!important; }
 
 /* posts side by side, one per view, snapping as you swipe across */
@@ -452,6 +458,16 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   overflow:hidden;
 }
 .ig-rail__item .instagram-media{ margin:0!important; }
+/* the rail gives no hint that it scrolls, so these say how many there are */
+.ig-dots{ flex:0 0 auto; display:flex; justify-content:center; gap:.45rem; padding-top:.7rem; }
+.ig-dots button{
+  width:7px; height:7px; border-radius:50%; padding:0;
+  background:rgba(14,36,56,.2);
+  transition:background .3s var(--ease), transform .3s var(--ease);
+}
+.ig-dots button:hover{ background:rgba(14,36,56,.4); }
+.ig-dots button.is-active{ background:var(--ochre-deep); transform:scale(1.35); }
+
 .feed__body .tiktok-embed,
 .feed__body iframe{
   max-width:100%!important; min-width:0!important; margin:0!important;
@@ -459,7 +475,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 }
 
 @media (max-width:860px){
-  .feed__panes{ height:560px; }
+  .feed__panes{ height:480px; }
 }
 
 /* ============================================================

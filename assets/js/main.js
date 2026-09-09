@@ -298,6 +298,42 @@
     });
   });
 
+  /* ---------- rail dots ----------
+     Built from the posts present, so adding or removing one needs no
+     change here. Active state follows the scroll rather than the click,
+     which keeps it right when the rail is swiped directly. */
+  var rail = $('.ig-rail'), dots = $('#igDots');
+  if (rail && dots) {
+    var items = $$('.ig-rail__item', rail);
+    items.forEach(function (_, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Post ' + (i + 1) + ' di ' + items.length);
+      if (i === 0) b.classList.add('is-active');
+      b.addEventListener('click', function () {
+        rail.scrollTo({ left: items[i].offsetLeft - rail.offsetLeft, behavior: 'smooth' });
+        // set it here too rather than waiting on the scroll event, so the dot
+        // responds immediately even while the smooth scroll is still running
+        $$('button', dots).forEach(function (d, j) { d.classList.toggle('is-active', j === i); });
+      });
+      dots.appendChild(b);
+    });
+
+    var tick;
+    rail.addEventListener('scroll', function () {
+      clearTimeout(tick);
+      tick = setTimeout(function () {
+        var mid = rail.scrollLeft + rail.clientWidth / 2;
+        var near = 0, best = Infinity;
+        items.forEach(function (it, i) {
+          var c = it.offsetLeft - rail.offsetLeft + it.clientWidth / 2;
+          if (Math.abs(c - mid) < best) { best = Math.abs(c - mid); near = i; }
+        });
+        $$('button', dots).forEach(function (b, i) { b.classList.toggle('is-active', i === near); });
+      }, 60);
+    }, { passive: true });
+  }
+
   /* ============================================================
      10. TIKTOK
      Only loaded if the embed is actually on the page.
