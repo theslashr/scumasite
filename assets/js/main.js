@@ -327,7 +327,46 @@
   }
 
   /* ============================================================
-     8. MISC
+     8. GALLERY PEEK
+     Hovering a gallery link floats one of his paintings beside the cursor.
+     Pointer-driven only: touch just follows the link.
+     ============================================================ */
+  var peek = $('#peek'), peekImg = $('#peekImg');
+  if (peek && fine && !reduced) {
+    var px = 0, py = 0, shown = false;
+
+    $$('[data-peek]').forEach(function (link) {
+      link.addEventListener('pointerenter', function () {
+        peekImg.src = imgSrc(link.dataset.peek);
+        peek.classList.add('is-on');
+        shown = true;
+      });
+      link.addEventListener('pointerleave', function () {
+        peek.classList.remove('is-on');
+        shown = false;
+      });
+    });
+
+    // eased follow, so it trails the cursor rather than snapping to it
+    window.addEventListener('pointermove', function (e) { px = e.clientX; py = e.clientY; }, { passive: true });
+    var cx = 0, cy = 0;
+    (function drift() {
+      if (shown) {
+        cx += (px + 150 - cx) * 0.12;
+        cy += (py - cy) * 0.12;
+        // left/top, not transform: the CSS transform carries the centring and
+        // the scale-in, and writing it here every frame would wipe both
+        peek.style.left = Math.round(cx) + 'px';
+        peek.style.top  = Math.round(cy) + 'px';
+      } else {
+        cx = px + 150; cy = py;
+      }
+      requestAnimationFrame(drift);
+    })();
+  }
+
+  /* ============================================================
+     9. MISC
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 

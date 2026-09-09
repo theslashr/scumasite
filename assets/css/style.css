@@ -600,6 +600,40 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .gal__item p{ color:var(--muted); margin-bottom:0; }
 @media (max-width:860px){ .gal{ grid-template-columns:1fr; } }
 
+/* ---------- gallery links + hover peek ----------
+   The preview is one of Antonio's own paintings rather than a shot of the
+   destination page: neither of those sites exposes an og:image, and hosting
+   their page imagery here would be someone else's asset on his site. */
+.gal__item--link{
+  display:block; text-decoration:none;
+  transition:border-color .35s var(--ease);
+}
+.gal__item--link h3{
+  display:flex; align-items:baseline; gap:.4rem;
+  transition:color .35s var(--ease);
+}
+.gal__item--link h3 i{
+  font-style:normal; font-size:.7em; color:var(--ochre-deep);
+  transition:transform .4s var(--ease);
+}
+.gal__item--link:hover h3 i{ transform:translate(3px,-3px); }
+
+.peek{
+  position:fixed; top:-999px; left:-999px; z-index:130;
+  width:230px; aspect-ratio:4/5;
+  border-radius:3px; overflow:hidden;
+  box-shadow:0 30px 60px -25px rgba(14,36,56,.6);
+  opacity:0; transform:translate(-50%,-50%) scale(.94);
+  transition:opacity .35s var(--ease), transform .45s var(--ease);
+  pointer-events:none;
+}
+.peek img{ width:100%; height:100%; object-fit:cover; }
+.peek.is-on{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+/* no pointer to follow, so it never appears */
+@media (hover:none),(pointer:coarse){ .peek{ display:none; } }
+@media (prefers-reduced-motion:reduce){ .peek{ display:none; } }
+
 /* ============================================================
    CONTATTI
    ============================================================ */

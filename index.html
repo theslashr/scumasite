@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css?v=50">
+<link rel="stylesheet" href="assets/css/style.css?v=52">
 </head>
 <body>
 
@@ -349,23 +349,26 @@
           <p>Un percorso espositivo sul legame fra arte e benessere psicologico, attraverso le opere di artisti che fanno del processo creativo uno strumento di cura, espressione e riflessione.</p>
         </article>
 
-        <article class="gal__item" data-reveal>
+        <a class="gal__item gal__item--link" data-reveal data-peek="img16"
+           href="https://www.museospaziobrizzolari.it/antonio-burgello/" target="_blank" rel="noopener">
           <p class="gal__when">Pagina artista</p>
-          <h3>Museo Spazio Brizzolari</h3>
+          <h3>Museo Spazio Brizzolari<i aria-hidden="true">&#8599;</i></h3>
           <p>Pagina artista.</p>
-        </article>
+        </a>
 
-        <article class="gal__item" data-reveal>
+        <a class="gal__item gal__item--link" data-reveal data-peek="img42"
+           href="https://www.t-affordable.com/en/copy-3-of-artisti-3-3-4-1/pagina-artista" target="_blank" rel="noopener">
           <p class="gal__when">Pagina artista</p>
-          <h3>T-Affordable</h3>
+          <h3>T-Affordable<i aria-hidden="true">&#8599;</i></h3>
           <p>Pagina artista.</p>
-        </article>
+        </a>
 
-        <article class="gal__item" data-reveal>
+        <a class="gal__item gal__item--link" data-reveal data-peek="img19"
+           href="https://sites.google.com/view/burgelloantonio/gallerie/mostra-catanzaro" target="_blank" rel="noopener">
           <p class="gal__when">Aprile 2026 · stampa</p>
-          <h3>Mostra personale a Catanzaro</h3>
+          <h3>Mostra personale a Catanzaro<i aria-hidden="true">&#8599;</i></h3>
           <p>Articolo dedicato su <em>La Ciminiera</em>, rivista del Centro Studi Bruttium di Catanzaro.</p>
-        </article>
+        </a>
       </div>
     </div>
   </div>
@@ -409,6 +412,8 @@
 </main>
 
 <!-- ══════════ LIGHTBOX ══════════ -->
+<div class="peek" id="peek" aria-hidden="true"><img id="peekImg" src="" alt="" decoding="async"></div>
+
 <div class="lb" id="lightbox" hidden>
   <button class="lb__close" id="lbClose" aria-label="Chiudi">&times;</button>
   <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Precedente">&#8249;</button>
@@ -420,7 +425,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="assets/js/paint.js?v=50"></script>
-<script src="assets/js/main.js?v=50"></script>
+<script src="assets/js/paint.js?v=52"></script>
+<script src="assets/js/main.js?v=52"></script>
 </body>
 </html>
