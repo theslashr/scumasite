@@ -265,7 +265,19 @@
   }
 
   /* ============================================================
-     9. MISC
+     9. TIKTOK
+     Loaded only where the embed is actually shown, so phones never pay
+     for a script they will not use.
+     ============================================================ */
+  if (window.matchMedia('(min-width:861px)').matches && $('.tiktok-embed')) {
+    var tk = document.createElement('script');
+    tk.async = true;
+    tk.src = 'https://www.tiktok.com/embed.js';
+    document.body.appendChild(tk);
+  }
+
+  /* ============================================================
+     10. MISC
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 
