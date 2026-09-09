@@ -56,7 +56,7 @@ p,h1,h2,h3,li,figcaption{ overflow-wrap:break-word; }
 
 /* Headings and short intros balance across their lines; body copy just
    avoids leaving a single word stranded on the last line. */
-h1,h2,h3,.hero__lead,.sec-sub,.contact__title,.lede,.tl__lede,.card__body h3,.gal__item h3{
+h1,h2,h3,.sec-sub,.contact__title,.lede,.tl__lede,.card__body h3,.gal__item h3{
   text-wrap:balance;
 }
 p,li{ text-wrap:pretty; }
@@ -170,11 +170,16 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 /* held back until the ground is primed, so the painting never flashes */
 .hero__art{ position:absolute; inset:0; z-index:0; opacity:0; }
 .hero__art.is-ready{ opacity:1; }
+/* The paintings sit stacked; only one is showing at a time. The swap happens
+   while the ground is opaque, so it is never seen changing. */
 .hero__art img{
+  position:absolute; inset:0;
   width:100%; height:100%; object-fit:cover;
   transform:scale(1.06);
   filter:saturate(1.12) contrast(1.04);
+  opacity:0;
 }
+.hero__art img.is-current{ opacity:1; }
 /* The canvases overhang the hero by the margin paint.js reserves, so the
    blur below never softens into a visible edge. .hero clips the overhang. */
 .hero__canvas{
@@ -218,7 +223,11 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .hero__title .word > span{ display:inline-block; }
 .hero__lead{
   font-size:clamp(1rem,1.7vw,1.3rem);
-  max-width:44ch; margin-inline:auto; opacity:.94; font-weight:300;
+  max-width:66ch; margin-inline:auto; opacity:.94; font-weight:300;
+}
+/* Keep the opening sentence whole on one line where there's room for it. */
+@media (min-width:820px){
+  .hero__lead .lead-1{ white-space:nowrap; }
 }
 .hero__actions{ display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap; margin-top:2.4rem; pointer-events:auto; }
 

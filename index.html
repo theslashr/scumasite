@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css?v=3">
+<link rel="stylesheet" href="assets/css/style.css?v=4">
 </head>
 <body>
 
@@ -66,9 +66,15 @@
 <!-- ══════════ HERO ══════════ -->
 <section class="hero" id="top">
 
-  <!-- layer 0 : the painting waiting underneath -->
+  <!-- layer 0 : the paintings waiting underneath. Each time the ground dries
+       back, the next one quietly takes its place, so the following strokes
+       uncover a different picture. -->
   <div class="hero__art" aria-hidden="true">
-    <img src="assets/img/img54.jpg" alt="" id="heroArt" decoding="async" fetchpriority="high">
+    <img src="assets/img/img54.jpg" class="is-current" alt="" id="heroArt" decoding="async" fetchpriority="high">
+    <img data-src="assets/img/img10.jpg" alt="" decoding="async">
+    <img data-src="assets/img/img16.jpg" alt="" decoding="async">
+    <img data-src="assets/img/img37.jpg" alt="" decoding="async">
+    <img data-src="assets/img/img11.jpg" alt="" decoding="async">
   </div>
 
   <!-- layer 1 : primed canvas the visitor scrapes away -->
@@ -84,7 +90,7 @@
     <h1 class="hero__title" data-split>Antonio Burgello</h1>
 
     <p class="hero__lead" data-reveal>
-      Parto dalla pittura, ma è la materia a decidere dove andare.<br>
+      <span class="lead-1">Parto dalla pittura, ma è la materia a decidere dove andare.</span><br>
       Ogni idea cerca il proprio linguaggio: sulla tela, nel muro, negli oggetti, nello spazio.
     </p>
 
@@ -408,7 +414,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="assets/js/paint.js?v=3"></script>
-<script src="assets/js/main.js?v=3"></script>
+<script src="assets/js/paint.js?v=4"></script>
+<script src="assets/js/main.js?v=4"></script>
 </body>
 </html>

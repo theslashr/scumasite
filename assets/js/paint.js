@@ -61,6 +61,10 @@
   var lastMove  = 0;
   var idleT     = 0;
 
+  /* which painting is waiting under the ground */
+  var artFrames = [], artIndex = 0;
+  var paintedSinceSwap = false, settledAt = 0;
+
   /* ============================================================
      SIZING
      ============================================================ */
@@ -173,6 +177,8 @@
     var dist = Math.hypot(dx, dy);
     if (dist < 1) return;
 
+    paintedSinceSwap = true;
+
     var step = 12;
     var n = Math.max(1, Math.ceil(dist / step));
     for (var i = 1; i <= n; i++) {
@@ -255,9 +261,48 @@
     // settle back to the bare ground once the hand has been still a moment
     var settling = !introRunning && (now - Math.max(lastMove, bornAt)) > 700;
 
+    /* Once the ground has fully flooded back the surface is opaque, so this
+       is the moment to slide the next painting in behind it unseen. */
+    if (settling) {
+      if (!settledAt) settledAt = now;
+      if (paintedSinceSwap && now - settledAt > 2400) {
+        nextArtwork();
+        paintedSinceSwap = false;
+      }
+    } else {
+      settledAt = 0;
+    }
+
     bleed();
     dryBack(settling);
     requestAnimationFrame(frame);
+  }
+
+  /* ============================================================
+     ARTWORKS
+     ============================================================ */
+  function nextArtwork() {
+    if (artFrames.length < 2) return;
+    artFrames[artIndex].classList.remove('is-current');
+    artIndex = (artIndex + 1) % artFrames.length;
+    artFrames[artIndex].classList.add('is-current');
+  }
+
+  function setupArtworks() {
+    var wrap = document.querySelector('.hero__art');
+    if (!wrap) return;
+    artFrames = Array.prototype.slice.call(wrap.querySelectorAll('img'));
+    artIndex = Math.max(0, artFrames.indexOf(wrap.querySelector('.is-current')));
+
+    // the first is already loading; fetch the rest once the page has settled
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        artFrames.forEach(function (img) {
+          var src = img.getAttribute('data-src');
+          if (src && !img.getAttribute('src')) img.setAttribute('src', src);
+        });
+      }, 900);
+    });
   }
 
   /* ============================================================
@@ -316,6 +361,7 @@
 
   /* ---------- go ---------- */
   size();
+  setupArtworks();
   var art = document.querySelector('.hero__art');
   if (art) art.classList.add('is-ready');
 

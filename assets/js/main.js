@@ -248,8 +248,8 @@
 
   if (hasGSAP && !reduced) {
 
-    // hero artwork drifts as you leave
-    gsap.to('#heroArt', {
+    // hero artwork drifts as you leave (the whole stack, not one frame)
+    gsap.to('.hero__art', {
       yPercent: 12, scale: 1.14, ease: 'none',
       scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
     });
