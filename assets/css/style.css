@@ -112,12 +112,6 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   box-shadow:0 1px 0 var(--line);
 }
 .nav__brand{ display:flex; align-items:center; gap:.66rem; text-decoration:none; font-weight:600; letter-spacing:.01em; }
-.nav__mark{
-  width:26px; height:26px; border-radius:50%;
-  background:conic-gradient(from 200deg,var(--red),var(--ochre),var(--cyan),var(--violet),var(--magenta),var(--red));
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.35);
-  flex:none;
-}
 .nav__name{ font-family:var(--display); font-size:1.05rem; }
 
 .nav__links{ display:flex; align-items:center; gap:clamp(.9rem,2vw,1.9rem); font-size:.9rem; }

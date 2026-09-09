@@ -149,7 +149,7 @@
   function dab(x, y, speed) {
     // slow hand = a fat loaded pool; quick flick = a thinner, longer wash
     var load = Math.max(0, Math.min(1, 1 - speed / 90));
-    var R = 46 + load * 76;
+    var R = 74 + load * 116;
 
     // satellites break the circle up so the pool spreads unevenly
     var sats = [];
@@ -179,7 +179,7 @@
 
     paintedSinceSwap = true;
 
-    var step = 12;
+    var step = 16;   // the pools are wide enough that they still overlap
     var n = Math.max(1, Math.ceil(dist / step));
     for (var i = 1; i <= n; i++) {
       var t = i / n;
@@ -265,7 +265,7 @@
        is the moment to slide the next painting in behind it unseen. */
     if (settling) {
       if (!settledAt) settledAt = now;
-      if (paintedSinceSwap && now - settledAt > 1500) {
+      if (paintedSinceSwap && now - settledAt > 2200) {
         nextArtwork();
         paintedSinceSwap = false;
       }
