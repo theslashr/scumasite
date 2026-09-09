@@ -247,20 +247,22 @@
   /* ============================================================
      LOOP
      ============================================================ */
-  /* On a mouse the brush paints a short flourish on arrival, then hands over.
-     On touch there is no cursor to follow, so it keeps painting on a slow
-     rhythm of its own — a wash, then a pause long enough for the ground to
-     close and the next painting to take its place. Dragging a finger still
-     paints, and still scrolls, because nothing here swallows the gesture. */
-  var INTRO_MS  = 5200;
-  var CYCLE_MS  = 9000;
-  var PAINT_MS  = 4200;
-  var bornAt    = performance.now();
+  /* The brush paints on a rhythm of its own on every device, because most
+     visitors never think to drag across the hero and would otherwise see one
+     still painting behind a closed ground. A wash, then a pause long enough
+     for the ground to close and the next painting to take its place.
+
+     The moment a hand does take part the brush steps aside, and stays out of
+     the way until the cursor has been still for HAND_OVER_MS. */
+  var CYCLE_MS     = 7000;   // wash + rest
+  var PAINT_MS     = 3300;   // of which this much is the wash
+  var HAND_OVER_MS = 2500;   // how long the brush waits after you paint
+  var bornAt       = performance.now();
 
   function autoPainting(now) {
     if (reduced) return false;
-    if (coarse)  return ((now - bornAt) % CYCLE_MS) < PAINT_MS;
-    return (now - bornAt) < INTRO_MS && lastMove === 0;
+    if (lastMove && now - lastMove < HAND_OVER_MS) return false;
+    return ((now - bornAt) % CYCLE_MS) < PAINT_MS;
   }
 
   var last = bornAt;
