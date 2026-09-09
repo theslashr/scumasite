@@ -319,9 +319,20 @@
      and if this never runs the figures simply stay where they are.
      ============================================================ */
   var frag = $('.frag'), media = $('.tl-media');
-  var wide = window.matchMedia('(min-width:901px)');
 
-  if (frag && media && 'IntersectionObserver' in window && wide.matches) {
+  /* No breakpoint is read here: the CSS owns it. Every rule the sticky column
+     needs is scoped to .has-sticky AND the 901px query, so at narrow widths the
+     column hides itself and the inline figures come back on their own. Building
+     it unconditionally is therefore harmless, and it removes the bug that came
+     of reading the gate once at load: a window widened past the breakpoint kept
+     the narrow layout until a reload, because the class it needed was never
+     added.
+
+     The effect is two-column by nature - a picture holds still in one column
+     while the other scrolls past it. On a phone there is no second column, so
+     the entries keep their own inline figures: the same pictures, in the same
+     order, sitting with the words they belong to. */
+  if (frag && media && 'IntersectionObserver' in window) {
     var entries = $$('.tl', frag);
     var shots = entries.map(function (li) { return $('.tl__fig img', li); });
 
