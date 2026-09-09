@@ -427,55 +427,13 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   min-height:0; display:block;
 }
 
-/* One window, two tabs. Stacking both feeds put ~1000px of iframe beside
-   500px of copy; only one is mounted at a time now. */
-.feed__tabs{ display:flex; gap:.15rem; }
-.feed__tab{
-  font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
-  font-weight:600; color:var(--muted);
-  padding:.35rem .7rem; border-radius:100px;
-  transition:color .3s var(--ease), background .3s var(--ease);
-}
-.feed__tab:hover{ color:var(--ink); }
-.feed__tab.is-active{ color:var(--ink); background:rgba(14,36,56,.07); }
-
-.feed__panes{ height:520px; }
-.feed__pane{ height:100%; overflow:hidden; padding:clamp(.7rem,1.4vw,1rem); }
-#paneIg{ display:flex; flex-direction:column; }
-#paneIg .ig-rail{ flex:1 1 auto; min-height:0; }
-.feed__pane[hidden]{ display:none!important; }
-
-/* posts side by side, one per view, snapping as you swipe across */
-.ig-rail{
-  display:flex; height:100%; gap:clamp(.7rem,1.4vw,1rem);
-  overflow-x:auto; overflow-y:hidden;
-  scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
-  scrollbar-width:none;
-}
-.ig-rail::-webkit-scrollbar{ display:none; }
-.ig-rail__item{
-  flex:0 0 100%; min-width:0; scroll-snap-align:center;
-  overflow:hidden;
-}
-.ig-rail__item .instagram-media{ margin:0!important; }
-/* the rail gives no hint that it scrolls, so these say how many there are */
-.ig-dots{ flex:0 0 auto; display:flex; justify-content:center; gap:.45rem; padding-top:.7rem; }
-.ig-dots button{
-  width:7px; height:7px; border-radius:50%; padding:0;
-  background:rgba(14,36,56,.2);
-  transition:background .3s var(--ease), transform .3s var(--ease);
-}
-.ig-dots button:hover{ background:rgba(14,36,56,.4); }
-.ig-dots button.is-active{ background:var(--ochre-deep); transform:scale(1.35); }
+/* One embed, sized by its own content. Fixed heights meant either clipping
+   the post or scrolling a letterbox, and neither read well. */
 
 .feed__body .tiktok-embed,
 .feed__body iframe{
   max-width:100%!important; min-width:0!important; margin:0!important;
   border-radius:2px;
-}
-
-@media (max-width:860px){
-  .feed__panes{ height:480px; }
 }
 
 /* ============================================================
