@@ -45,7 +45,11 @@ body{
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
-img{ max-width:100%; display:block; }
+/* height:auto is essential now the width/height attributes are present,
+   otherwise the attribute height is used literally while the width scales
+   and every image stretches. Rules that set an explicit height or
+   aspect-ratio below still override this. */
+img{ max-width:100%; display:block; height:auto; }
 /* The UA default is `margin: 1em 40px`, which was eating 80px of width out
    of every grid tile and inset them all inside their own cells. */
 figure{ margin:0; }
@@ -279,10 +283,6 @@ section{ position:relative; }
 .sec-title .word{ display:inline-block; overflow:hidden; vertical-align:top; }
 .sec-title .word > span{ display:inline-block; }
 .sec-sub{ color:var(--muted); font-size:clamp(1rem,1.4vw,1.16rem); max-width:56ch; }
-.sec-sub--tech{
-  font-size:.8rem; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--ochre-deep); margin-top:.4rem;
-}
 
 /* ---------- reveal system ----------
    Driven by IntersectionObserver + CSS, not by the animation loop, so
@@ -338,10 +338,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   border-radius:2px;
   box-shadow:0 30px 70px -30px rgba(14,36,56,.5);
 }
-.manifesto__fig figcaption{
-  margin-top:.8rem; font-size:.82rem; color:var(--muted); letter-spacing:.02em;
-}
-
 .stats{
   list-style:none; margin:clamp(3rem,6vw,5rem) 0 0; padding:2rem 0 0;
   border-top:1px solid var(--line);
@@ -360,15 +356,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
    OPERE
    ============================================================ */
 .works{ padding:clamp(4rem,9vw,7rem) 0 clamp(5rem,11vw,9rem); background:var(--canvas-2); }
-
-.filters{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:2.4rem; }
-.filter{
-  padding:.5rem 1.05rem; border-radius:100px; font-size:.86rem;
-  border:1px solid var(--line); color:var(--muted);
-  transition:.32s var(--ease);
-}
-.filter:hover{ border-color:var(--ink); color:var(--ink); }
-.filter.is-active{ background:var(--ink); border-color:var(--ink); color:var(--canvas); }
 
 /* ---------- bento ----------
    Rows are the same size as a column, so every tile is a whole number of
@@ -402,25 +389,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 }
 .tile:hover img{ transform:scale(1.055); }
 
-.tile__veil{
-  position:absolute; inset:0;
-  background:linear-gradient(to top,rgba(9,22,35,.86) 0%,rgba(9,22,35,.25) 42%,rgba(9,22,35,0) 72%);
-  opacity:0; transition:opacity .5s var(--ease);
-}
-.tile:hover .tile__veil{ opacity:1; }
-
-.tile__cap{
-  position:absolute; left:0; right:0; bottom:0; padding:1.1rem 1.2rem;
-  color:var(--canvas);
-  transform:translateY(12px); opacity:0;
-  transition:transform .55s var(--ease), opacity .55s var(--ease);
-}
-.tile:hover .tile__cap{ transform:none; opacity:1; }
-.tile__cap h3{ font-size:1.12rem; font-weight:500; margin:0 0 .18rem; }
-.tile__cap p{ margin:0; font-size:.78rem; letter-spacing:.09em; text-transform:uppercase; opacity:.75; }
-
-.tile.is-hidden{ display:none; }
-
 /* On a phone the desktop spans turn into a scatter: five of the fourteen
    tiles end up full width, so the grid flips between one-up and two-up and
    never settles. Here every tile is the same square instead, with just two
@@ -431,30 +399,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   .tile,.tile--tall,.tile--wide{ grid-column:span 2; grid-row:span 2; }
   .tile--big { grid-column:span 4; grid-row:span 3; }
   .tile--full{ grid-column:span 4; grid-row:span 2; }
-}
-
-/* Without a hover state the captions would never be readable, so on touch
-   and small screens they simply stay put. They also stop breaking words
-   mid-character — the global break-word rule was turning "viaggio" into
-   "viaggi/o" and "spatola" into "spato/la" in these narrow tiles. */
-@media (hover:none),(max-width:900px){
-  .tile__veil{ opacity:1; }
-  .tile__cap{
-    opacity:1; transform:none;
-    padding:.7rem .75rem;
-    background:linear-gradient(to top,rgba(9,22,35,.9),rgba(9,22,35,0));
-  }
-  .tile__cap h3,.tile__cap p{ overflow-wrap:normal; word-break:normal; hyphens:none; }
-  .tile__cap h3{ font-size:.92rem; line-height:1.2; margin-bottom:.1rem; }
-  .tile__cap p { font-size:.6rem; letter-spacing:.05em; }
-}
-
-/* Below this the tiles are only ~165px wide — the technique line has
-   nowhere to go, so the title carries it alone. */
-@media (max-width:620px){
-  .tile__cap{ padding:.55rem .6rem; }
-  .tile__cap h3{ font-size:.8rem; }
-  .tile__cap p { display:none; }
 }
 
 /* ============================================================
@@ -502,8 +446,10 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .tl__body em{ color:var(--canvas); }
 .tl__meta{ font-size:.82rem!important; letter-spacing:.06em; color:rgba(244,239,230,.45)!important; }
 .tl__fig{ margin:1.6rem 0 0; }
+/* These are documentary photographs of mixed shape, so they keep their own
+   ratio; a fixed 4:3 box was cropping the portrait ones by nearly 2x. */
 .tl__fig img{
-  width:100%; max-width:640px; aspect-ratio:4/3; object-fit:cover; border-radius:2px;
+  width:100%; max-width:640px; border-radius:2px;
   box-shadow:0 30px 60px -30px rgba(0,0,0,.7);
 }
 
@@ -523,7 +469,9 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .card--lg .card__body{ padding:clamp(1.8rem,3.5vw,3rem); align-self:center; }
 
 .card__media{ overflow:hidden; background:var(--ink-2); }
-.card__media img{ width:100%; height:100%; aspect-ratio:4/3; object-fit:cover; transition:transform 1s var(--ease); }
+/* Every image used in these cards is a portrait poster or portrait
+   painting, so a landscape box cropped away most of each one. */
+.card__media img{ width:100%; height:100%; aspect-ratio:3/4; object-fit:cover; transition:transform 1s var(--ease); }
 .card--lg .card__media img{ aspect-ratio:auto; min-height:100%; }
 .card:hover .card__media img{ transform:scale(1.04); }
 
@@ -550,7 +498,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
      flex-shrink:0, pushes the text out of the bottom where overflow:hidden
      slices it. */
   .card--lg .card__media{ flex:0 0 auto; }
-  .card--lg .card__media img{ aspect-ratio:16/10; min-height:0; }
+  .card--lg .card__media img{ aspect-ratio:3/4; min-height:0; }
   .card__list{ grid-template-columns:repeat(2,1fr); }
 }
 
@@ -637,9 +585,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   max-width:100%; max-height:78svh; object-fit:contain; margin-inline:auto;
   box-shadow:0 40px 90px -40px rgba(0,0,0,.9);
 }
-.lb__fig figcaption{ text-align:center; color:var(--canvas); }
-.lb__fig figcaption strong{ display:block; font-family:var(--display); font-size:1.35rem; font-weight:500; }
-.lb__fig figcaption span{ font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(244,239,230,.55); }
 .lb__close,.lb__nav{
   position:absolute; z-index:2; color:var(--canvas);
   width:52px; height:52px; border-radius:50%;
