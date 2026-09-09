@@ -174,10 +174,15 @@
     var cx = window.innerWidth / 2, cy = window.innerHeight / 2, tx = cx, ty = cy;
 
     window.addEventListener('pointermove', function (e) { tx = e.clientX; ty = e.clientY; }, { passive: true });
+    var dot = $('#brushDot');
     (function loop() {
-      cx += (tx - cx) * 0.22;
-      cy += (ty - cy) * 0.22;
+      // Both ride the real pointer. An eased ring read as a stray object while
+      // the mouse moved, and clamping it only parked the dot on the ring's
+      // edge. The life comes from the hover scale instead, which never moves
+      // the ring off the point you are aiming at.
+      cx = tx; cy = ty;
       cur.style.transform = 'translate(' + cx + 'px,' + cy + 'px) translate(-50%,-50%)';
+      if (dot) dot.style.transform = 'translate(' + tx + 'px,' + ty + 'px) translate(-50%,-50%)';
       requestAnimationFrame(loop);
     })();
 
@@ -328,16 +333,28 @@
 
   /* ============================================================
      8. GALLERY PEEK
-     Hovering a gallery link floats one of his paintings beside the cursor.
-     Pointer-driven only: touch just follows the link.
+     Hovering a gallery heading floats a screenshot of that site beside the
+     cursor. Pointer-driven only: touch just follows the link.
      ============================================================ */
-  var peek = $('#peek'), peekImg = $('#peekImg');
+  var SITE_HOSTS = {
+    museo:       'museospaziobrizzolari.it',
+    taffordable: 't-affordable.com',
+    catanzaro:   'lanuovacalabria.it'
+  };
+  function shotSrc(key) { return 'assets/img/site/' + key + '.jpg'; }
+
+  var peek = $('#peek'), peekImg = $('#peekImg'), peekHost = $('#peekHost');
   if (peek && fine && !reduced) {
     var px = 0, py = 0, shown = false;
 
+    // warm them, so the first hover is not a blank frame
+    Object.keys(SITE_HOSTS).forEach(function (k) { new Image().src = shotSrc(k); });
+
     $$('[data-peek]').forEach(function (link) {
       link.addEventListener('pointerenter', function () {
-        peekImg.src = imgSrc(link.dataset.peek);
+        var key = link.dataset.peek;
+        peekImg.src = shotSrc(key);
+        peekHost.textContent = SITE_HOSTS[key] || '';
         peek.classList.add('is-on');
         shown = true;
       });
@@ -350,16 +367,22 @@
     // eased follow, so it trails the cursor rather than snapping to it
     window.addEventListener('pointermove', function (e) { px = e.clientX; py = e.clientY; }, { passive: true });
     var cx = 0, cy = 0;
+    // half the card plus a margin: any less and the card sits over the pointer,
+    // which is exactly when you lose track of where you are
+    var GAP = 200;
+    function restX() {
+      return px + (px + GAP + 180 > window.innerWidth ? -GAP : GAP);
+    }
     (function drift() {
       if (shown) {
-        cx += (px + 150 - cx) * 0.12;
+        cx += (restX() - cx) * 0.12;
         cy += (py - cy) * 0.12;
         // left/top, not transform: the CSS transform carries the centring and
         // the scale-in, and writing it here every frame would wipe both
         peek.style.left = Math.round(cx) + 'px';
         peek.style.top  = Math.round(cy) + 'px';
       } else {
-        cx = px + 150; cy = py;
+        cx = restX(); cy = py;
       }
       requestAnimationFrame(drift);
     })();
