@@ -129,7 +129,7 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   gap:1rem;
   padding:1.05rem var(--pad);
   color:var(--ink);
-  text-shadow:0 0 10px rgba(247,243,235,.95), 0 0 24px rgba(247,243,235,.8);
+  text-shadow:0 0 9px rgba(247,243,235,.68), 0 0 19px rgba(247,243,235,.4);
   transition:background .45s var(--ease), color .45s var(--ease), padding .45s var(--ease), box-shadow .45s;
 }
 .nav.is-stuck{
@@ -277,14 +277,14 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   pointer-events:none;
   /* a halo rather than a drop shadow: it has to work over whatever colour the
      uncovered painting puts behind a given letter */
-  text-shadow:0 0 10px rgba(247,243,235,.95), 0 0 22px rgba(247,243,235,.88), 0 0 46px rgba(247,243,235,.6);
+  text-shadow:0 0 8px rgba(247,243,235,.72), 0 0 19px rgba(247,243,235,.42);
 }
 .hero__eyebrow{
   font-size:.82rem; letter-spacing:.24em; text-transform:uppercase;
   margin:0 0 1.6rem; opacity:.95; font-weight:500;
 }
 .hero__title{
-  text-shadow:0 0 30px rgba(247,243,235,.45);
+  text-shadow:0 0 22px rgba(247,243,235,.24);
   font-size:clamp(3.1rem,12vw,9.5rem);
   font-weight:500;
   letter-spacing:-.045em;
