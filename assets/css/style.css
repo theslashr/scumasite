@@ -178,6 +178,7 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   transform:scale(1.06);
   filter:saturate(1.12) contrast(1.04);
   opacity:0;
+  transition:opacity 1.2s var(--ease);
 }
 .hero__art img.is-current{ opacity:1; }
 /* The canvases overhang the hero by the margin paint.js reserves, so the

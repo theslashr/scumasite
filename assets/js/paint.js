@@ -265,7 +265,7 @@
        is the moment to slide the next painting in behind it unseen. */
     if (settling) {
       if (!settledAt) settledAt = now;
-      if (paintedSinceSwap && now - settledAt > 2400) {
+      if (paintedSinceSwap && now - settledAt > 1500) {
         nextArtwork();
         paintedSinceSwap = false;
       }
@@ -281,11 +281,25 @@
   /* ============================================================
      ARTWORKS
      ============================================================ */
+  /* The incoming painting is stacked ON TOP and faded in while the outgoing
+     one stays fully opaque underneath. A straight crossfade would leave both
+     half transparent at the midpoint and let the background show through. */
+  var artZ = 1;
   function nextArtwork() {
     if (artFrames.length < 2) return;
-    artFrames[artIndex].classList.remove('is-current');
+
+    var prev = artFrames[artIndex];
     artIndex = (artIndex + 1) % artFrames.length;
-    artFrames[artIndex].classList.add('is-current');
+    var next = artFrames[artIndex];
+
+    next.style.zIndex = ++artZ;
+    next.classList.add('is-current');
+
+    // drop the old one only once the new one has fully arrived
+    clearTimeout(next._fadeT);
+    next._fadeT = setTimeout(function () {
+      prev.classList.remove('is-current');
+    }, 1300);
   }
 
   function setupArtworks() {
