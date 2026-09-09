@@ -404,13 +404,15 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 .tile.is-hidden{ display:none; }
 
-/* Four columns on small screens keeps the bento two-across rather than one,
-   which roughly halves how far the section scrolls on a phone. */
+/* On a phone the desktop spans turn into a scatter: five of the fourteen
+   tiles end up full width, so the grid flips between one-up and two-up and
+   never settles. Here every tile is the same square instead, with just two
+   deliberate full-width features, which reads as a tidy two-across column
+   and packs with no holes for `dense` to fill oddly. */
 @media (max-width:900px){
   .grid{ --cols:4; }
-  .tile      { grid-column:span 2; grid-row:span 2; }
-  .tile--tall{ grid-column:span 2; grid-row:span 3; }
-  .tile--wide,.tile--big{ grid-column:span 4; grid-row:span 3; }
+  .tile,.tile--tall,.tile--wide{ grid-column:span 2; grid-row:span 2; }
+  .tile--big { grid-column:span 4; grid-row:span 3; }
   .tile--full{ grid-column:span 4; grid-row:span 2; }
 }
 
