@@ -269,7 +269,9 @@
      A moment after it stops, the ground floods back so the copy over the
      top is easy to read again. */
   function dryBack(settling) {
-    var g = settling ? 0.020 : 0.0009;
+    /* Faster while wet on touch: with no scrim there, anything painted over
+       the copy has to close up on its own rather than be covered. */
+    var g = settling ? 0.020 : (coarse ? 0.0034 : 0.0009);
     var p = settling ? 0.030 : 0.0022;
 
     gesso.globalCompositeOperation = 'destination-over';
@@ -291,14 +293,18 @@
      ============================================================ */
   function idleStep(dt) {
     idleT += dt;
-    var cx = W * 0.5, cy = H * 0.52;
+    /* Centred, the wash clears the ground exactly where the copy sits, which
+       is what forced a veil over the top on a phone. Roam the lower band
+       instead: the painting comes up around and below the words, and the words
+       keep their canvas without anything smeared over them. */
+    var cx = W * 0.5, cy = H * (coarse ? 0.70 : 0.52);
     /* On touch there is no pointer to follow the hero with, and revealing a
        painting a fingertip at a time is not an interaction anyone will finish.
        So the brush roams wider and travels faster there, and the wash below
        runs for most of the cycle: the paintings arrive on their own, and a
        finger only adds to what is already happening. */
     var reach = coarse ? 0.46 : 0.32;
-    var rise  = coarse ? 0.34 : 0.24;
+    var rise  = coarse ? 0.26 : 0.24;
     var sp    = coarse ? 1.6  : 1;
     var ax = W * reach, ay = H * rise;
     var x = cx + Math.sin(idleT * 0.00026 * sp) * ax + Math.sin(idleT * 0.00061 * sp) * ax * 0.2;

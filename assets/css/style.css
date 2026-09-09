@@ -212,6 +212,7 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
     -webkit-user-select:none;
     user-select:none;
   }
+
 }
 /* held back until the ground is primed, so the painting never flashes */
 .hero__art{ position:absolute; inset:0; z-index:0; opacity:0; }
@@ -327,6 +328,33 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .btn--solid:hover{ background:var(--canvas); }
 .btn--ghost{ border-color:rgba(14,36,56,.38); color:var(--ink); background:rgba(245,241,232,.5); }
 .btn--ghost:hover{ background:var(--ink); color:var(--canvas); border-color:var(--ink); }
+
+/* Mobile has no soft glows. These live after the rules they override, because
+   they carry the same specificity and source order is what decides. */
+@media (hover:none){
+  /* The scrim's ellipse is a share of the box, so on a 375x812 screen it is a
+     344x666 blob over nearly the whole hero, and the halo behind the type
+     reads as a smudge at this size. Both go; what needed protecting gets a
+     hard edge instead. */
+  .hero__scrim{ display:none; }
+  .hero__inner,
+  .hero__title{ text-shadow:none; }
+
+  /* a defined bar rather than a light wash under the nav */
+  .nav{
+    text-shadow:none;
+    background:rgba(244,239,230,.92);
+    backdrop-filter:blur(12px) saturate(1.2);
+    -webkit-backdrop-filter:blur(12px) saturate(1.2);
+    box-shadow:0 1px 0 var(--line);
+  }
+
+  /* a button, not a glowing lozenge */
+  .btn--ghost{
+    background:var(--canvas);
+    border-color:rgba(14,36,56,.28);
+  }
+}
 
 
 @media (max-width:640px){
