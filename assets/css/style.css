@@ -344,9 +344,9 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
    under a heavy veil is what read as muddy. */
 .manifesto__bg{
   position:absolute; inset:0; z-index:0;
-  opacity:.45;
-  -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,.31) 0%, rgba(0,0,0,.31) 52%, rgba(0,0,0,.72) 74%, #000 100%);
-  mask-image:linear-gradient(to right, rgba(0,0,0,.31) 0%, rgba(0,0,0,.31) 52%, rgba(0,0,0,.72) 74%, #000 100%);
+  opacity:.32;
+  -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
+  mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
 }
 .manifesto__bg img{ width:100%; height:100%; object-fit:cover; }
 
@@ -409,9 +409,9 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   .manifesto__grid{ grid-template-columns:1fr; }
   /* stacked, the copy runs the full width, so it stays flat and faint */
   .manifesto__bg{
-    opacity:.45;
-    -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,.30));
-    mask-image:linear-gradient(to bottom, rgba(0,0,0,.30), rgba(0,0,0,.30));
+    opacity:.32;
+    -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,.28), rgba(0,0,0,.28));
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,.28), rgba(0,0,0,.28));
   }
   .stats{ grid-template-columns:1fr; gap:1rem; }
   .stats li{ display:flex; align-items:baseline; gap:.8rem; }

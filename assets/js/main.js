@@ -249,9 +249,12 @@
       yPercent: 12, scale: 1.14, ease: 'none',
       scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
     });
+    /* Ends at 42% of the hero rather than its full height, so the copy is
+       gone early in the scroll instead of hanging on, half faded, until the
+       next section arrives. */
     gsap.to('.hero__inner', {
-      yPercent: 26, opacity: 0, ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+      yPercent: 30, opacity: 0, ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: '42% top', scrub: true }
     });
 
     $$('[data-parallax]').forEach(function (el) {
