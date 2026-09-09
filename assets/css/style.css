@@ -269,11 +269,6 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .btn--ghost{ border-color:rgba(244,239,230,.55); color:var(--canvas); }
 .btn--ghost:hover{ background:var(--canvas); color:var(--ink); border-color:var(--canvas); }
 
-.hero__scroll{
-  position:absolute; z-index:5; left:50%; bottom:0;
-  width:1px; height:64px; background:linear-gradient(rgba(244,239,230,0),rgba(244,239,230,.6));
-  transform:translateX(-50%);
-}
 
 @media (max-width:640px){
   .hero__inner{ padding-bottom:11rem; }
@@ -332,7 +327,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 /* ============================================================
    MANIFESTO
    ============================================================ */
-.manifesto{ padding:clamp(5rem,12vw,9rem) 0; position:relative; overflow:hidden; }
+.manifesto{ padding:clamp(3.5rem,7vw,6rem) 0; position:relative; overflow:hidden; }
 
 /* The painting bleeds in from the left and dissolves across the section,
    the way it sits behind the copy on Antonio's own page. It is held well
@@ -425,23 +420,16 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .feed__body{
   padding:clamp(.7rem,1.4vw,1rem);
   min-height:360px;              /* reserves the space before the feed lands */
-  display:flex; align-items:stretch;
+  display:flex; flex-direction:column; gap:.8rem;
 }
-.feed__body > *{ width:100%; min-width:0; }
+/* three posts stacked would run past 1800px, so this panel is a window you
+   scroll rather than a column that swallows the page */
+#igFeed{ max-height:560px; overflow-y:auto; overscroll-behavior:contain; }
 .feed__body .tiktok-embed,
 .feed__body iframe{
   max-width:100%!important; min-width:0!important; margin:0!important;
   border-radius:2px;
 }
-/* stands in until the Instagram feed is connected */
-.feed__empty{
-  display:flex; align-items:center; justify-content:center;
-  text-align:center; padding:2rem 1rem;
-  border:1px dashed var(--line); border-radius:2px;
-  color:var(--muted); font-size:.95rem; text-decoration:none;
-  transition:border-color .35s var(--ease), color .35s var(--ease);
-}
-.feed__empty:hover{ border-color:var(--ink); color:var(--ink); }
 
 @media (max-width:860px){
   .feed__body{ min-height:0; }
@@ -559,15 +547,11 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   transition:transform .6s var(--ease), box-shadow .6s var(--ease);
 }
 .card:hover{ transform:translateY(-6px); box-shadow:0 28px 60px -30px rgba(14,36,56,.45); }
-.card--lg{ grid-column:span 2; flex-direction:row; }
-.card--lg .card__media{ flex:0 0 44%; }
-.card--lg .card__body{ padding:clamp(1.8rem,3.5vw,3rem); align-self:center; }
 
 .card__media{ overflow:hidden; background:var(--ink-2); }
 /* Every image used in these cards is a portrait poster or portrait
    painting, so a landscape box cropped away most of each one. */
 .card__media img{ width:100%; height:100%; aspect-ratio:3/4; object-fit:cover; transition:transform 1s var(--ease); }
-.card--lg .card__media img{ aspect-ratio:auto; min-height:100%; }
 .card:hover .card__media img{ transform:scale(1.04); }
 
 .card__body{ padding:1.6rem 1.7rem 1.9rem; }
@@ -577,24 +561,9 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 }
 .card__body h3{ font-size:clamp(1.25rem,2.2vw,1.75rem); font-weight:500; margin:0 0 .7rem; }
 .card__body p{ color:var(--muted); margin-bottom:0; }
-.card__list{
-  list-style:none; margin:1.3rem 0 0; padding:0;
-  display:grid; grid-template-columns:repeat(3,1fr); gap:.45rem 1rem;
-  font-size:.84rem; color:var(--muted);
-}
-.card__list li{ position:relative; padding-left:.95rem; }
-.card__list li::before{ content:""; position:absolute; left:0; top:.62em; width:5px; height:5px; border-radius:50%; background:var(--ochre); }
 
 @media (max-width:860px){
   .cards{ grid-template-columns:1fr; }
-  .card--lg{ grid-column:span 1; flex-direction:column; }
-  /* flex-basis means WIDTH in the row layout above but HEIGHT once the card
-     stacks. Left at 44% the image locks to 44% of the card and, with
-     flex-shrink:0, pushes the text out of the bottom where overflow:hidden
-     slices it. */
-  .card--lg .card__media{ flex:0 0 auto; }
-  .card--lg .card__media img{ aspect-ratio:3/4; min-height:0; }
-  .card__list{ grid-template-columns:repeat(2,1fr); }
 }
 
 /* ============================================================
