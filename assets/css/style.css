@@ -355,7 +355,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 .manifesto__grid{
   display:grid; gap:clamp(2rem,5vw,4.5rem);
-  grid-template-columns:1.05fr .95fr; align-items:center;
+  grid-template-columns:1.05fr .95fr; align-items:start;
 }
 .manifesto__body .lede{
   font-family:var(--display); font-size:clamp(1.6rem,3.4vw,2.6rem);
@@ -388,16 +388,14 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   .stats li{ display:flex; align-items:baseline; gap:.8rem; }
 }
 
-/* ============================================================
-   IL MIO MONDO  — live feeds in our own frame
-   The embeds are cross-origin, so their interiors belong to the
-   platforms. What we control is the frame around them, which is why
-   both sit in the same panel treatment as the rest of the page.
-   ============================================================ */
-.world{ padding:clamp(4rem,9vw,7rem) 0; background:var(--canvas-2); }
-.world__grid{
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:clamp(1rem,2.2vw,1.9rem); align-items:start;
+/* ---------- the feeds beside the copy ----------
+   The embeds are cross-origin, so their interiors belong to the platforms.
+   What we control is the frame, so both sit in the same panel treatment as
+   the rest of the page. Stacked, because the column is ~490px wide. */
+.manifesto__social{
+  display:flex; flex-direction:column;
+  gap:clamp(.9rem,1.8vw,1.4rem);
+  min-width:0;
 }
 .feed{
   display:flex; flex-direction:column; min-width:0;
@@ -426,7 +424,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 .feed__body{
   padding:clamp(.7rem,1.4vw,1rem);
-  min-height:420px;              /* reserves the space before the feed lands */
+  min-height:360px;              /* reserves the space before the feed lands */
   display:flex; align-items:stretch;
 }
 .feed__body > *{ width:100%; min-width:0; }
@@ -446,7 +444,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 .feed__empty:hover{ border-color:var(--ink); color:var(--ink); }
 
 @media (max-width:860px){
-  .world__grid{ grid-template-columns:1fr; }
   .feed__body{ min-height:0; }
 }
 
