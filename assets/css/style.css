@@ -344,7 +344,10 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   -webkit-mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
   mask-image:linear-gradient(to right, rgba(0,0,0,.28) 0%, rgba(0,0,0,.28) 52%, rgba(0,0,0,.62) 74%, rgba(0,0,0,.85) 100%);
 }
-.manifesto__bg img{ width:100%; height:100%; object-fit:cover; }
+/* contain, not cover: the section is much taller than the image once the
+   feeds are beside the copy, and cover was slicing the portrait off the
+   right-hand side. This keeps the whole diptych, pinned to the top. */
+.manifesto__bg img{ width:100%; height:100%; object-fit:contain; object-position:top center; }
 
 .manifesto > .wrap{ position:relative; z-index:2; }
 
@@ -419,12 +422,16 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 .feed__body{
   padding:clamp(.7rem,1.4vw,1rem);
-  min-height:360px;              /* reserves the space before the feed lands */
-  display:flex; flex-direction:column; gap:.8rem;
+  min-height:0;
+  display:block;                 /* flex children shrink, which squashed the
+                                    posts into strips instead of scrolling */
 }
-/* three posts stacked would run past 1800px, so this panel is a window you
-   scroll rather than a column that swallows the page */
-#igFeed{ max-height:560px; overflow-y:auto; overscroll-behavior:contain; }
+/* Both panels are windows of a fixed height rather than columns that run on.
+   Instagram scrolls through the posts; TikTok is an iframe and cannot be
+   scrolled from out here, so it is clipped below its video row. */
+#igFeed{ height:440px; overflow-y:auto; overscroll-behavior:contain; }
+#igFeed .instagram-media{ margin:0 0 .8rem!important; }
+#ttFeed{ height:440px; overflow:hidden; }
 .feed__body .tiktok-embed,
 .feed__body iframe{
   max-width:100%!important; min-width:0!important; margin:0!important;
