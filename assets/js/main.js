@@ -72,6 +72,42 @@
     }).join('');
   }
 
+  /* ------------------------------------------------------------
+     Tiles track the pointer: the tilt and the highlight both read
+     --mx/--my off the tile, so the CSS does the drawing and this only
+     reports where the hand is. Pointer-driven, so touch is untouched.
+     ------------------------------------------------------------ */
+  if (grid && fine && !reduced) {
+    var tilting = null, tiltRaf = 0, tmx = 50, tmy = 50;
+    function writeTilt() {
+      tiltRaf = 0;
+      if (!tilting) return;
+      tilting.style.setProperty('--mx', String(tmx));
+      tilting.style.setProperty('--my', String(tmy));
+    }
+    // one delegated listener rather than fourteen: only ever one tile is hovered
+    grid.addEventListener('pointermove', function (e) {
+      var tile = e.target.closest ? e.target.closest('.tile') : null;
+      if (!tile) { resetTilt(); return; }   // moved into a gap between tiles
+      if (tile !== tilting) { resetTilt(); tilting = tile; }
+      var r = tile.getBoundingClientRect();
+      tmx = ((e.clientX - r.left) / r.width)  * 100;
+      tmy = ((e.clientY - r.top)  / r.height) * 100;
+      if (!tiltRaf) tiltRaf = requestAnimationFrame(writeTilt);
+    }, { passive: true });
+
+    function resetTilt() {
+      if (tiltRaf) { cancelAnimationFrame(tiltRaf); tiltRaf = 0; }
+      if (!tilting) return;
+      // back to centre, so the panel settles square instead of sticking askew
+      tilting.style.setProperty('--mx', '50');
+      tilting.style.setProperty('--my', '50');
+      tilting = null;
+    }
+    grid.addEventListener('pointerleave', resetTilt);
+    grid.addEventListener('pointerdown', resetTilt);
+  }
+
   /* ============================================================
      2. LIGHTBOX
      ============================================================ */
