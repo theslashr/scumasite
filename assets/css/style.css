@@ -337,17 +337,18 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
      reads as a smudge at this size. Both go; what needed protecting gets a
      hard edge instead. */
   .hero__scrim{ display:none; }
-  .hero__inner,
-  .hero__title{ text-shadow:none; }
 
-  /* a defined bar rather than a light wash under the nav */
-  .nav{
-    text-shadow:none;
-    background:rgba(244,239,230,.92);
-    backdrop-filter:blur(12px) saturate(1.2);
-    -webkit-backdrop-filter:blur(12px) saturate(1.2);
-    box-shadow:0 1px 0 var(--line);
-  }
+  /* A single tight layer rather than the desktop stack. Enough to keep an
+     edge on the letters where a painting shows through, small enough that it
+     never reads as a halo at this size - it was the wide, low-alpha layers
+     that looked like a smudge on a phone, not the presence of a shadow. */
+  .hero__inner{ text-shadow:0 0 6px rgba(247,243,235,.55); }
+  .hero__title{ text-shadow:0 0 12px rgba(247,243,235,.22); }
+
+  /* The bar stays transparent over the hero and keeps only that same tight
+     shadow. Once it sticks it takes its solid background as usual, and
+     .nav.is-stuck outranks this, so that still wins. */
+  .nav{ text-shadow:0 0 6px rgba(247,243,235,.6); }
 
   /* a button, not a glowing lozenge */
   .btn--ghost{
