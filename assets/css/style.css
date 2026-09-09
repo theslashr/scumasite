@@ -368,13 +368,17 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 /* TikTok injects its own inline width, so it needs overriding to stay
    inside the column. */
 .manifesto__social{ min-width:0; }
-/* No radius of our own here: TikTok draws its own card with a much larger
-   one, and a tighter clip cuts across its corners. */
+/* The embed is cross-origin, so TikTok's card is beyond our reach: its
+   content clips square at the iframe edge while the card itself is rounded,
+   which is the overflow at the corners. Clipping the iframe to a matching
+   radius from out here hides it. 2px was simply too small to cover it. */
 .manifesto__social .tiktok-embed,
 .manifesto__social iframe{
   max-width:100%!important;
   min-width:0!important;
   margin:0!important;
+  border-radius:12px;
+  overflow:hidden;
 }
 .social-card{ display:none; }
 .stats{
