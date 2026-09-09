@@ -128,8 +128,19 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   padding-block:.7rem;
   box-shadow:0 1px 0 var(--line);
 }
-.nav__brand{ display:flex; align-items:center; gap:.66rem; text-decoration:none; font-weight:600; letter-spacing:.01em; }
-.nav__name{ font-family:var(--display); font-size:1.05rem; }
+.nav__brand{ display:flex; align-items:center; gap:.66rem; text-decoration:none; letter-spacing:.01em; }
+/* Fraunces carries an optical-size axis and the nav was using the display
+   cut at 17px, which is why it read heavy and a little clumsy. opsz 14 is
+   the small-text design: finer strokes, opener counters, more contrast. */
+.nav__name{
+  font-family:var(--display);
+  font-size:.95rem;          /* caps read larger, so smaller than the mixed-case cut */
+  font-weight:600;
+  font-variation-settings:"opsz" 14;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  margin-right:-.12em;       /* soak up the trailing letter-space */
+}
 
 .nav__links{ display:flex; align-items:center; gap:clamp(.9rem,2vw,1.9rem); font-size:.9rem; }
 .nav__links a{ text-decoration:none; position:relative; padding:.25rem 0; opacity:.9; }
