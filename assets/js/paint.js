@@ -32,9 +32,9 @@
   /* The canvases overhang the hero so the CSS blur never exposes an edge. */
   var MARGIN = 60;
 
-  // A toned ground (imprimatura) — dark enough for cream type to read,
-  // warm enough that multiplied pigment stays chromatic.
-  var GESSO_RGB = [62, 48, 39];
+  // Primed linen: a warm off-white, the colour of gesso over cloth. Pigment
+  // multiplies onto it the way it does on a real primed canvas.
+  var GESSO_RGB = [233, 224, 206];
 
   var PALETTE = [
     [42, 166, 196],   // cyan
@@ -105,15 +105,15 @@
     ground.fillRect(0, 0, W, H);
 
     var g = ground.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0,    'rgba(96, 74, 58, .55)');
-    g.addColorStop(0.45, 'rgba(48, 38, 32, .35)');
-    g.addColorStop(1,    'rgba(28, 30, 34, .6)');
+    g.addColorStop(0,    'rgba(255,250,238,.55)');
+    g.addColorStop(0.45, 'rgba(228,218,198,.30)');
+    g.addColorStop(1,    'rgba(196,186,168,.45)');
     ground.fillStyle = g;
     ground.fillRect(0, 0, W, H);
 
     var v = ground.createRadialGradient(W * .5, H * .45, 0, W * .5, H * .45, Math.max(W, H) * .75);
-    v.addColorStop(0, 'rgba(120,96,74,.20)');
-    v.addColorStop(1, 'rgba(14,18,24,.55)');
+    v.addColorStop(0, 'rgba(255,252,244,.28)');
+    v.addColorStop(1, 'rgba(146,134,116,.42)');
     ground.fillStyle = v;
     ground.fillRect(0, 0, W, H);
 
@@ -133,8 +133,8 @@
     for (i = 0; i < 30; i++) {
       var x = Math.random() * W, y = Math.random() * H;
       var r = Math.max(W, H) * (0.05 + Math.random() * 0.17);
-      var col = Math.random() < 0.55 ? '116,86,60' : '44,44,50';
-      var a = (0.045 + Math.random() * 0.075).toFixed(3);
+      var col = Math.random() < 0.55 ? '196,174,140' : '156,152,144';
+      var a = (0.05 + Math.random() * 0.085).toFixed(3);
       var rg = ground.createRadialGradient(x, y, 0, x, y, r);
       rg.addColorStop(0, 'rgba(' + col + ',' + a + ')');
       rg.addColorStop(1, 'rgba(' + col + ',0)');
@@ -146,9 +146,9 @@
       var hh = H * (0.02 + Math.random() * 0.06);
       var la = (0.028 + Math.random() * 0.035).toFixed(3);
       var lg = ground.createLinearGradient(0, yy, 0, yy + hh);
-      lg.addColorStop(0,  'rgba(124,96,70,0)');
-      lg.addColorStop(.5, 'rgba(124,96,70,' + la + ')');
-      lg.addColorStop(1,  'rgba(124,96,70,0)');
+      lg.addColorStop(0,  'rgba(178,160,132,0)');
+      lg.addColorStop(.5, 'rgba(178,160,132,' + la + ')');
+      lg.addColorStop(1,  'rgba(178,160,132,0)');
       ground.fillStyle = lg;
       ground.fillRect(0, yy, W, hh);
     }
