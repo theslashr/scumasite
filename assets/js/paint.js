@@ -198,7 +198,7 @@
   function dab(x, y, speed) {
     // slow hand = a fat loaded pool; quick flick = a thinner, longer wash
     var load = Math.max(0, Math.min(1, 1 - speed / 90));
-    var R = 74 + load * 116;
+    var R = (74 + load * 116) * (coarse ? 1.35 : 1);
 
     // satellites break the circle up so the pool spreads unevenly
     var sats = [];
@@ -283,9 +283,17 @@
   function idleStep(dt) {
     idleT += dt;
     var cx = W * 0.5, cy = H * 0.52;
-    var ax = W * 0.32, ay = H * 0.24;
-    var x = cx + Math.sin(idleT * 0.00026) * ax + Math.sin(idleT * 0.00061) * ax * 0.2;
-    var y = cy + Math.cos(idleT * 0.00038) * ay + Math.cos(idleT * 0.00083) * ay * 0.24;
+    /* On touch there is no pointer to follow the hero with, and revealing a
+       painting a fingertip at a time is not an interaction anyone will finish.
+       So the brush roams wider and travels faster there, and the wash below
+       runs for most of the cycle: the paintings arrive on their own, and a
+       finger only adds to what is already happening. */
+    var reach = coarse ? 0.46 : 0.32;
+    var rise  = coarse ? 0.34 : 0.24;
+    var sp    = coarse ? 1.6  : 1;
+    var ax = W * reach, ay = H * rise;
+    var x = cx + Math.sin(idleT * 0.00026 * sp) * ax + Math.sin(idleT * 0.00061 * sp) * ax * 0.2;
+    var y = cy + Math.cos(idleT * 0.00038 * sp) * ay + Math.cos(idleT * 0.00083 * sp) * ay * 0.24;
 
     if (!brush.started) { brush.px = x; brush.py = y; brush.started = true; }
     stroke(brush.px, brush.py, x, y);
@@ -302,8 +310,8 @@
 
      The moment a hand does take part the brush steps aside, and stays out of
      the way until the cursor has been still for HAND_OVER_MS. */
-  var CYCLE_MS     = 7000;   // wash + rest
-  var PAINT_MS     = 3300;   // of which this much is the wash
+  var CYCLE_MS     = coarse ? 8200 : 7000;   // wash + rest
+  var PAINT_MS     = coarse ? 5400 : 3300;   // of which this much is the wash
   var HAND_OVER_MS = 2500;   // how long the brush waits after you paint
   var bornAt       = performance.now();
 

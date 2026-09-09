@@ -230,18 +230,20 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .hero__canvas--gesso{ filter:blur(5px); }
 .hero__canvas--paint{ z-index:2; mix-blend-mode:multiply; filter:blur(9px); }
 
-/* The cloth itself. Turbulence stretched hard along one axis gives runs of
-   thread rather than a printed grid, so warp and weft read as woven linen.
-   It sits over the paint, because a painting is on the canvas, not behind it. */
+/* The cloth. A transparent texture whose alpha is driven by the turbulence,
+   so it lays down thread shadow and nothing else. The previous version was
+   opaque grey and, once it lost its blend mode, washed every painting behind
+   it. Turbulence stretched hard along one axis gives runs of thread: once for
+   warp, once for weft. */
 .hero__weave{
   position:absolute; inset:0; z-index:2; pointer-events:none;
-  opacity:.16;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cfilter id='wf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23wp)' opacity='.5'/%3E%3Crect width='150' height='150' filter='url(%23wf)' opacity='.5'/%3E%3C/svg%3E");
+  opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .13 0 0 0 0 .10 0 0 0 0 .07 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Cfilter id='wf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .13 0 0 0 0 .10 0 0 0 0 .07 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23wp)'/%3E%3Crect width='150' height='150' filter='url(%23wf)'/%3E%3C/svg%3E");
   background-size:150px 150px;
 }
 
 .hero__grain{
-  position:absolute; inset:0; z-index:3; pointer-events:none; opacity:.13;
+  position:absolute; inset:0; z-index:3; pointer-events:none; opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
 }
 
@@ -254,18 +256,16 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   background:
     /* the band the nav sits in, so the links never land on bare painting */
     linear-gradient(to bottom,
-      rgba(245,241,232,.86) 0,
-      rgba(245,241,232,.62) 46px,
-      rgba(245,241,232,.34) 84px,
-      rgba(245,241,232,.12) 122px,
-      rgba(245,241,232,0)   158px),
-    radial-gradient(58% 50% at 50% 52%,
-      rgba(245,241,232,.82) 0%,
-      rgba(245,241,232,.68) 28%,
-      rgba(245,241,232,.44) 50%,
-      rgba(245,241,232,.22) 68%,
-      rgba(245,241,232,.07) 82%,
-      rgba(245,241,232,0)   94%);
+      rgba(245,241,232,.44) 0,
+      rgba(245,241,232,.24) 40px,
+      rgba(245,241,232,.08) 72px,
+      rgba(245,241,232,0)   102px),
+    radial-gradient(56% 46% at 50% 52%,
+      rgba(245,241,232,.52) 0%,
+      rgba(245,241,232,.40) 30%,
+      rgba(245,241,232,.24) 52%,
+      rgba(245,241,232,.10) 72%,
+      rgba(245,241,232,0)   90%);
 }
 
 .hero__inner{
@@ -453,7 +453,16 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 /* No frame around it: the panel chrome added height without adding
    anything, and the player is portrait so a narrower embed is a shorter
    one - TikTok scales it to the width it is given. */
-.manifesto__social{ min-width:0; max-width:340px; margin-top:-3.1rem; }
+.manifesto__social{ min-width:0; max-width:340px; }
+/* The lift aligns the embed with the copy beside it, so it only applies while
+   there is something beside it. Stacked, it was cancelling the row gap and
+   putting the player hard against the last line. */
+@media (min-width:861px){
+  .manifesto__social{ margin-top:-3.1rem; }
+}
+@media (max-width:860px){
+  .manifesto__social{ max-width:none; }
+}
 
 
 
