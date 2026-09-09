@@ -228,6 +228,17 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .hero__canvas--gesso{ filter:blur(5px); }
 .hero__canvas--paint{ z-index:2; mix-blend-mode:multiply; filter:blur(9px); }
 
+/* The cloth itself. Turbulence stretched hard along one axis gives runs of
+   thread rather than a printed grid, so warp and weft read as woven linen.
+   It sits over the paint, because a painting is on the canvas, not behind it. */
+.hero__weave{
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  opacity:.4;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cfilter id='wf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23wp)' opacity='.5'/%3E%3Crect width='150' height='150' filter='url(%23wf)' opacity='.5'/%3E%3C/svg%3E");
+  background-size:150px 150px;
+}
+
 .hero__grain{
   position:absolute; inset:0; z-index:3; pointer-events:none; opacity:.28;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");

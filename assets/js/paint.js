@@ -87,26 +87,71 @@
     paint.clearRect(0, 0, W, H);
   }
 
+  /* The toned ground, kept off-screen and rebuilt only on resize. dryBack
+     heals from this rather than from a flat fill, so a patch that has been
+     painted over and dried does not come back smoother than its surroundings. */
+  var groundC = document.createElement('canvas');
+  var ground  = groundC.getContext('2d');
+
   /* A ground brushed on by hand is never flat. */
   function primeGround() {
-    gesso.globalCompositeOperation = 'source-over';
-    gesso.globalAlpha = 1;
+    groundC.width  = Math.max(1, Math.round(W * RES));
+    groundC.height = Math.max(1, Math.round(H * RES));
+    ground.setTransform(RES, 0, 0, RES, 0, 0);
+    ground.globalCompositeOperation = 'source-over';
+    ground.globalAlpha = 1;
 
-    gesso.fillStyle = 'rgb(' + GESSO_RGB.join(',') + ')';
-    gesso.fillRect(0, 0, W, H);
+    ground.fillStyle = 'rgb(' + GESSO_RGB.join(',') + ')';
+    ground.fillRect(0, 0, W, H);
 
-    var g = gesso.createLinearGradient(0, 0, W, H);
+    var g = ground.createLinearGradient(0, 0, W, H);
     g.addColorStop(0,    'rgba(96, 74, 58, .55)');
     g.addColorStop(0.45, 'rgba(48, 38, 32, .35)');
     g.addColorStop(1,    'rgba(28, 30, 34, .6)');
-    gesso.fillStyle = g;
-    gesso.fillRect(0, 0, W, H);
+    ground.fillStyle = g;
+    ground.fillRect(0, 0, W, H);
 
-    var v = gesso.createRadialGradient(W * .5, H * .45, 0, W * .5, H * .45, Math.max(W, H) * .75);
+    var v = ground.createRadialGradient(W * .5, H * .45, 0, W * .5, H * .45, Math.max(W, H) * .75);
     v.addColorStop(0, 'rgba(120,96,74,.20)');
     v.addColorStop(1, 'rgba(14,18,24,.55)');
-    gesso.fillStyle = v;
-    gesso.fillRect(0, 0, W, H);
+    ground.fillStyle = v;
+    ground.fillRect(0, 0, W, H);
+
+    mottle();
+
+    gesso.globalCompositeOperation = 'source-over';
+    gesso.globalAlpha = 1;
+    gesso.clearRect(0, 0, W, H);
+    gesso.drawImage(groundC, 0, 0, W, H);
+  }
+
+  /* Scumbled patches and a few broad drags. Smooth gradients were what made
+     the ground read as a brown fill: real toned canvas is uneven, because it
+     was brushed on and the cloth underneath drinks it unevenly. */
+  function mottle() {
+    var i;
+    for (i = 0; i < 30; i++) {
+      var x = Math.random() * W, y = Math.random() * H;
+      var r = Math.max(W, H) * (0.05 + Math.random() * 0.17);
+      var col = Math.random() < 0.55 ? '116,86,60' : '44,44,50';
+      var a = (0.045 + Math.random() * 0.075).toFixed(3);
+      var rg = ground.createRadialGradient(x, y, 0, x, y, r);
+      rg.addColorStop(0, 'rgba(' + col + ',' + a + ')');
+      rg.addColorStop(1, 'rgba(' + col + ',0)');
+      ground.fillStyle = rg;
+      ground.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    for (i = 0; i < 10; i++) {
+      var yy = Math.random() * H;
+      var hh = H * (0.02 + Math.random() * 0.06);
+      var la = (0.028 + Math.random() * 0.035).toFixed(3);
+      var lg = ground.createLinearGradient(0, yy, 0, yy + hh);
+      lg.addColorStop(0,  'rgba(124,96,70,0)');
+      lg.addColorStop(.5, 'rgba(124,96,70,' + la + ')');
+      lg.addColorStop(1,  'rgba(124,96,70,0)');
+      ground.fillStyle = lg;
+      ground.fillRect(0, yy, W, hh);
+    }
   }
 
   /* ============================================================
@@ -216,9 +261,9 @@
     var p = settling ? 0.030 : 0.0022;
 
     gesso.globalCompositeOperation = 'destination-over';
+    gesso.globalAlpha = g;
+    gesso.drawImage(groundC, 0, 0, W, H);
     gesso.globalAlpha = 1;
-    gesso.fillStyle = 'rgba(' + GESSO_RGB.join(',') + ',' + g + ')';
-    gesso.fillRect(0, 0, W, H);
 
     paint.globalCompositeOperation = 'destination-out';
     paint.globalAlpha = 1;
