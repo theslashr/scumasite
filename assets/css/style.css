@@ -9,7 +9,7 @@
   --canvas:     #F4EFE6;
   --canvas-2:   #EAE2D4;
   --ochre:      #D9A227;
-  --ochre-deep: #B27F14;
+  --ochre-deep: #7E590C;
   --red:        #D8452F;
   --cyan:       #2AA6C4;
   --teal:       #1F7A6C;
@@ -18,8 +18,8 @@
 
   --fg:      var(--ink);
   --bg:      var(--canvas);
-  --muted:   #5A6B7A;
-  --line:    rgba(14,36,56,.14);
+  --muted:   #556474;
+  --line:    rgba(14,36,56,.10);
 
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
   --sans:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -70,6 +70,16 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 .sr-only{ position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0; }
 .skip{ position:absolute; left:-9999px; top:0; z-index:200; background:var(--ink); color:var(--canvas); padding:.7rem 1.1rem; }
 .skip:focus{ left:.6rem; top:.6rem; }
+
+/* The custom cursor hides the pointer on desktop, so a visible keyboard
+   focus ring is doing real work here. */
+:focus-visible{
+  outline:2px solid var(--ochre);
+  outline-offset:3px;
+  border-radius:2px;
+}
+.frag :focus-visible,.contact :focus-visible,.hero :focus-visible{ outline-color:var(--ochre); }
+.tile:focus-visible{ outline-offset:-3px; }
 
 .wrap{ width:min(var(--wrap),100% - var(--pad)*2); margin-inline:auto; }
 
@@ -269,6 +279,10 @@ section{ position:relative; }
 .sec-title .word{ display:inline-block; overflow:hidden; vertical-align:top; }
 .sec-title .word > span{ display:inline-block; }
 .sec-sub{ color:var(--muted); font-size:clamp(1rem,1.4vw,1.16rem); max-width:56ch; }
+.sec-sub--tech{
+  font-size:.8rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ochre-deep); margin-top:.4rem;
+}
 
 /* ---------- reveal system ----------
    Driven by IntersectionObserver + CSS, not by the animation loop, so
@@ -531,7 +545,12 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 @media (max-width:860px){
   .cards{ grid-template-columns:1fr; }
   .card--lg{ grid-column:span 1; flex-direction:column; }
-  .card--lg .card__media img{ aspect-ratio:16/10; }
+  /* flex-basis means WIDTH in the row layout above but HEIGHT once the card
+     stacks. Left at 44% the image locks to 44% of the card and, with
+     flex-shrink:0, pushes the text out of the bottom where overflow:hidden
+     slices it. */
+  .card--lg .card__media{ flex:0 0 auto; }
+  .card--lg .card__media img{ aspect-ratio:16/10; min-height:0; }
   .card__list{ grid-template-columns:repeat(2,1fr); }
 }
 

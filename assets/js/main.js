@@ -15,24 +15,26 @@
 
   /* ============================================================
      1. WORKS
-     Titles and techniques are descriptive placeholders — swap them
-     for the real ones from the catalogue.
+     The original site never titled the individual paintings, so nothing
+     here names them. `alt` only describes what is visible, for screen
+     readers. Real titles, techniques and dimensions should come from
+     Antonio's catalogue.
      ============================================================ */
   var WORKS = [
-    { f:'img10', t:'Il golfo',                    m:'Olio su tela',            c:'paesaggi',        s:'tile--wide' },
-    { f:'logo',  t:'Di tutto un viaggio',         m:'Olio a spatola su tela',  c:'paesaggi',        s:'tile--tall' },
-    { f:'img02', t:'Sera sulla Senna',            m:'Olio a spatola su tela',  c:'citta notturni',  s:'tile--tall' },
-    { f:'img19', t:'Vicolo con lanterna',         m:'Olio a spatola su tela',  c:'citta notturni',  s:'tile--tall' },
-    { f:'img42', t:'La piazza e la palma',        m:'Olio a spatola su tela',  c:'citta',           s:'tile--tall' },
-    { f:'img54', t:'Il sentiero dei girasoli',    m:'Olio su tela',            c:'paesaggi',        s:'tile--full' },
-    { f:'img16', t:'Il ponte',                    m:'Olio su tela',            c:'paesaggi',        s:'tile--wide' },
-    { f:'img13', t:'Notturno viola',              m:'Acrilico su tela',        c:'notturni',        s:'' },
-    { f:'img08', t:'Il tempo che suona',          m:'Olio a spatola su tela',  c:'materia',         s:'tile--big' },
-    { f:'img18', t:'La fontana del danzatore',    m:'Olio a spatola su tela',  c:'citta',           s:'tile--tall' },
-    { f:'img11', t:'Luce nel bosco',              m:'Acrilico su tela',        c:'paesaggi',        s:'tile--wide' },
-    { f:'img37', t:'Campo di papaveri',           m:'Acrilico su tela',        c:'paesaggi',        s:'' },
-    { f:'img48', t:'Il tempo che suona · dettaglio', m:'Olio a spatola',       c:'materia',         s:'' },
-    { f:'img28', t:'La clessidra · dettaglio',    m:'Olio a spatola',          c:'materia',         s:'' }
+    { f:'img10', alt:'Veduta di un golfo, con il vulcano sullo sfondo, le barche e i palazzi sul porto', s:'tile--wide' },
+    { f:'logo',  alt:'Mongolfiera variopinta che sale in un cielo azzurro',                              s:'tile--tall' },
+    { f:'img02', alt:'Veduta notturna di un fiume, con la torre illuminata e dei papaveri in primo piano', s:'tile--tall' },
+    { f:'img19', alt:'Vicolo notturno con una lanterna accesa sui muri ocra',                            s:'tile--tall' },
+    { f:'img42', alt:'Piazza con una palma, una fontana e una figura con l’ombrello',                     s:'tile--tall' },
+    { f:'img54', alt:'Panorama con un sentiero fra i girasoli che scende verso il mare',                  s:'tile--full' },
+    { f:'img16', alt:'Cortile con un ponte e una casa, due figure sedute su una panchina',                s:'tile--wide' },
+    { f:'img13', alt:'Bosco notturno sotto un cielo viola e rosa',                                        s:'' },
+    { f:'img08', alt:'Natura morta con giradischi, clessidra, libri e una tazzina di caffè',              s:'tile--big' },
+    { f:'img18', alt:'Piazza con fontana e la statua di un danzatore',                                    s:'tile--tall' },
+    { f:'img11', alt:'Sentiero nel bosco attraversato dalla luce',                                        s:'tile--wide' },
+    { f:'img37', alt:'Campo di papaveri rossi con le colline sullo sfondo',                               s:'' },
+    { f:'img48', alt:'Dettaglio dei libri dipinti nella natura morta',                                    s:'' },
+    { f:'img28', alt:'Dettaglio della clessidra nella natura morta',                                      s:'' }
   ];
 
   /* Images normally come off disk, but a self-contained build can inline them
@@ -41,49 +43,46 @@
     return (window.__IMG && window.__IMG[name]) || ('assets/img/' + name + '.jpg');
   }
 
+  /* Intrinsic sizes, so the grid reserves the right box before an image
+     arrives and nothing shifts as they load. */
+  var DIMS = {
+    img10:[1100,649], logo:[1043,1468], img02:[1080,1440], img19:[1080,1440],
+    img42:[1080,1200], img54:[1100,558], img16:[1100,904],  img13:[1100,1100],
+    img08:[720,720],   img18:[1100,1497], img11:[559,397],  img37:[1080,851],
+    img48:[720,720],   img28:[720,720]
+  };
+
+  // skipped when the images are inlined — a data URI has no second size
+  function imgAttrs(name) {
+    var d = DIMS[name];
+    var out = d ? ' width="' + d[0] + '" height="' + d[1] + '"' : '';
+    if (!window.__IMG && d) {
+      out += ' srcset="assets/img/sm/' + name + '.jpg 550w, assets/img/' + name + '.jpg ' + d[0] + 'w"' +
+             ' sizes="(max-width:900px) 50vw, 33vw"';
+    }
+    return out;
+  }
+
   var grid = $('#worksGrid');
   if (grid) {
     grid.innerHTML = WORKS.map(function (w, i) {
-      return '<figure class="tile ' + w.s + '" data-cat="' + w.c + '" data-i="' + i + '" data-reveal style="--i:' + (i % 5) + '" tabindex="0" role="button" aria-label="Apri: ' + w.t + '">' +
-               '<img src="' + imgSrc(w.f) + '" alt="' + w.t + ' — ' + w.m + '" loading="lazy" decoding="async">' +
-               '<span class="tile__veil"></span>' +
-               '<figcaption class="tile__cap"><h3>' + w.t + '</h3><p>' + w.m + '</p></figcaption>' +
+      return '<figure class="tile ' + w.s + '" data-i="' + i + '" data-reveal style="--i:' + (i % 5) + '" tabindex="0" role="button" aria-label="Ingrandisci: ' + w.alt + '">' +
+               '<img src="' + imgSrc(w.f) + '" alt="' + w.alt + '" loading="lazy" decoding="async"' + imgAttrs(w.f) + '>' +
              '</figure>';
     }).join('');
   }
 
-  /* ---------- filters ---------- */
-  $$('.filter').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var f = btn.dataset.filter;
-      $$('.filter').forEach(function (b) {
-        var on = b === btn;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
-      $$('.tile').forEach(function (tile) {
-        var show = f === 'all' || tile.dataset.cat.indexOf(f) !== -1;
-        tile.classList.toggle('is-hidden', !show);
-      });
-      // make sure anything revealed by the filter is marked visible
-      $$('.tile:not(.is-hidden)').forEach(function (t) { t.classList.add('in'); });
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
-    });
-  });
-
   /* ============================================================
      2. LIGHTBOX
      ============================================================ */
-  var lb = $('#lightbox'), lbImg = $('#lbImg'), lbTitle = $('#lbTitle'), lbMeta = $('#lbMeta');
+  var lb = $('#lightbox'), lbImg = $('#lbImg');
   var lbIndex = 0, lastFocus = null;
 
   function openLB(i) {
     lbIndex = (i + WORKS.length) % WORKS.length;
     var w = WORKS[lbIndex];
     lbImg.src = imgSrc(w.f);
-    lbImg.alt = w.t + ' — ' + w.m;
-    lbTitle.textContent = w.t;
-    lbMeta.textContent  = w.m;
+    lbImg.alt = w.alt;
 
     lastFocus = document.activeElement;
     lb.hidden = false;
