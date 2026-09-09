@@ -391,8 +391,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
    What we control is the frame, so both sit in the same panel treatment as
    the rest of the page. Stacked, because the column is ~490px wide. */
 .manifesto__social{
-  display:flex; flex-direction:column;
-  gap:clamp(.9rem,1.8vw,1.4rem);
   min-width:0;
 }
 .feed{
@@ -422,16 +420,38 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 .feed__body{
   padding:clamp(.7rem,1.4vw,1rem);
-  min-height:0;
-  display:block;                 /* flex children shrink, which squashed the
-                                    posts into strips instead of scrolling */
+  min-height:0; display:block;
 }
-/* Both panels are windows of a fixed height rather than columns that run on.
-   Instagram scrolls through the posts; TikTok is an iframe and cannot be
-   scrolled from out here, so it is clipped below its video row. */
-#igFeed{ height:440px; overflow-y:auto; overscroll-behavior:contain; }
-#igFeed .instagram-media{ margin:0 0 .8rem!important; }
-#ttFeed{ height:440px; overflow:hidden; }
+
+/* One window, two tabs. Stacking both feeds put ~1000px of iframe beside
+   500px of copy; only one is mounted at a time now. */
+.feed__tabs{ display:flex; gap:.15rem; }
+.feed__tab{
+  font-size:.72rem; letter-spacing:.18em; text-transform:uppercase;
+  font-weight:600; color:var(--muted);
+  padding:.35rem .7rem; border-radius:100px;
+  transition:color .3s var(--ease), background .3s var(--ease);
+}
+.feed__tab:hover{ color:var(--ink); }
+.feed__tab.is-active{ color:var(--ink); background:rgba(14,36,56,.07); }
+
+.feed__panes{ height:600px; }
+.feed__pane{ height:100%; overflow:hidden; padding:clamp(.7rem,1.4vw,1rem); }
+.feed__pane[hidden]{ display:none!important; }
+
+/* posts side by side, one per view, snapping as you swipe across */
+.ig-rail{
+  display:flex; height:100%; gap:clamp(.7rem,1.4vw,1rem);
+  overflow-x:auto; overflow-y:hidden;
+  scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
+  scrollbar-width:none;
+}
+.ig-rail::-webkit-scrollbar{ display:none; }
+.ig-rail__item{
+  flex:0 0 100%; min-width:0; scroll-snap-align:center;
+  overflow:hidden;
+}
+.ig-rail__item .instagram-media{ margin:0!important; }
 .feed__body .tiktok-embed,
 .feed__body iframe{
   max-width:100%!important; min-width:0!important; margin:0!important;
@@ -439,7 +459,7 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 }
 
 @media (max-width:860px){
-  .feed__body{ min-height:0; }
+  .feed__panes{ height:560px; }
 }
 
 /* ============================================================

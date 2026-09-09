@@ -271,7 +271,35 @@
   }
 
   /* ============================================================
-     9. TIKTOK
+     9. FEED TABS
+     Only one embed is shown at a time; the handle beside the tabs
+     follows whichever is active.
+     ============================================================ */
+  var HANDLES = {
+    ig: ['https://www.instagram.com/burgello_artist/', '@burgello_artist'],
+    tt: ['https://www.tiktok.com/@scuma_art', '@scuma_art']
+  };
+  $$('.feed__tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var want = tab.dataset.pane;
+      $$('.feed__tab').forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      $$('.feed__pane').forEach(function (pane) {
+        pane.hidden = pane.id !== (want === 'ig' ? 'paneIg' : 'paneTt');
+      });
+      var h = $('#feedHandle');
+      if (h && HANDLES[want]) {
+        h.setAttribute('href', HANDLES[want][0]);
+        h.innerHTML = HANDLES[want][1] + '<i aria-hidden="true">&#8594;</i>';
+      }
+    });
+  });
+
+  /* ============================================================
+     10. TIKTOK
      Only loaded if the embed is actually on the page.
      ============================================================ */
   if ($('.tiktok-embed')) {
@@ -282,7 +310,7 @@
   }
 
   /* ============================================================
-     10. MISC
+     11. MISC
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 
