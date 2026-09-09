@@ -271,7 +271,63 @@
   }
 
   /* ============================================================
-     7. MISC
+     7. FRAMMENTI STICKY MEDIA
+     The entries scroll past a picture that holds still and crossfades as
+     each one takes its turn. Built from the inline figures, so the images
+     are the same files already in the markup and cost no extra requests,
+     and if this never runs the figures simply stay where they are.
+     ============================================================ */
+  var frag = $('.frag'), media = $('.tl-media');
+  var wide = window.matchMedia('(min-width:901px)');
+
+  if (frag && media && 'IntersectionObserver' in window && wide.matches) {
+    var entries = $$('.tl', frag);
+    var shots = entries.map(function (li) { return $('.tl__fig img', li); });
+
+    if (shots.every(Boolean)) {
+      shots.forEach(function (src, i) {
+        var img = document.createElement('img');
+        img.src = src.currentSrc || src.src;
+        img.alt = '';
+        img.decoding = 'async';
+        if (i === 0) img.className = 'is-current';
+        media.appendChild(img);
+      });
+      frag.classList.add('has-sticky');
+
+      var frames = $$('img', media);
+      var show = function (i) {
+        frames.forEach(function (f, j) { f.classList.toggle('is-current', j === i); });
+      };
+
+      /* An entry takes over once it reaches the middle of the screen. Long
+         entries can straddle that band together, so rather than trusting
+         whichever callback lands last, pick the one sitting nearest the
+         centre - that stays right whichever direction you scroll. */
+      var live = [];
+      var watcher = new IntersectionObserver(function (obs) {
+        obs.forEach(function (o) {
+          var i = entries.indexOf(o.target);
+          var at = live.indexOf(i);
+          if (o.isIntersecting && at === -1) live.push(i);
+          else if (!o.isIntersecting && at !== -1) live.splice(at, 1);
+        });
+        if (!live.length) return;
+        var mid = window.innerHeight / 2, best = live[0], dist = Infinity;
+        live.forEach(function (i) {
+          var r = entries[i].getBoundingClientRect();
+          var d = Math.abs((r.top + r.bottom) / 2 - mid);
+          if (d < dist) { dist = d; best = i; }
+        });
+        show(best);
+      }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+
+      entries.forEach(function (li) { watcher.observe(li); });
+    }
+  }
+
+  /* ============================================================
+     8. MISC
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 
