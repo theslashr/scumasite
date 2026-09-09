@@ -58,7 +58,8 @@
   };
 
   var pointer   = { has: false };
-  var lastMove  = 0;
+  var lastMove  = 0;   // last cursor movement
+  var lastPaint = 0;   // last stroke laid down, by hand or by the brush itself
   var idleT     = 0;
 
   /* which painting is waiting under the ground */
@@ -178,6 +179,7 @@
     if (dist < 1) return;
 
     paintedSinceSwap = true;
+    lastPaint = performance.now();
 
     var step = 16;   // the pools are wide enough that they still overlap
     var n = Math.max(1, Math.ceil(dist / step));
@@ -245,21 +247,32 @@
   /* ============================================================
      LOOP
      ============================================================ */
-  /* The brush paints a short flourish on arrival so the effect is
-     discoverable, then hands over and leaves the surface alone. */
-  var INTRO_MS = 5200;
-  var bornAt = performance.now();
+  /* On a mouse the brush paints a short flourish on arrival, then hands over.
+     On touch there is no cursor to follow, so it keeps painting on a slow
+     rhythm of its own — a wash, then a pause long enough for the ground to
+     close and the next painting to take its place. Dragging a finger still
+     paints, and still scrolls, because nothing here swallows the gesture. */
+  var INTRO_MS  = 5200;
+  var CYCLE_MS  = 9000;
+  var PAINT_MS  = 4200;
+  var bornAt    = performance.now();
+
+  function autoPainting(now) {
+    if (reduced) return false;
+    if (coarse)  return ((now - bornAt) % CYCLE_MS) < PAINT_MS;
+    return (now - bornAt) < INTRO_MS && lastMove === 0;
+  }
 
   var last = bornAt;
   function frame(now) {
     var dt = Math.min(now - last, 48);
     last = now;
 
-    var introRunning = (now - bornAt) < INTRO_MS && lastMove === 0;
-    if (introRunning && !reduced) idleStep(dt);
+    if (autoPainting(now)) idleStep(dt);
 
-    // settle back to the bare ground once the hand has been still a moment
-    var settling = !introRunning && (now - Math.max(lastMove, bornAt)) > 700;
+    /* Keyed to the last stroke rather than the last cursor move, so the
+       self-painting rhythm on touch settles between washes too. */
+    var settling = (now - Math.max(lastPaint, bornAt)) > 700;
 
     /* Once the ground has fully flooded back the surface is opaque, so this
        is the moment to slide the next painting in behind it unseen. */
@@ -348,7 +361,17 @@
   }, { passive: true });
 
   window.addEventListener('pointerleave', function () { pointer.has = false; });
-  hero.addEventListener('pointerdown', function () { document.body.classList.add('painting'); });
+  hero.addEventListener('pointerdown', function (e) {
+    document.body.classList.add('painting');
+    // a tap should leave a mark too, not just a drag
+    var p = toLocal(e);
+    if (p.inside) {
+      brush.px = p.x; brush.py = p.y; brush.started = true;
+      dab(p.x, p.y, 0);
+      lastPaint = performance.now();
+      paintedSinceSwap = true;
+    }
+  });
   window.addEventListener('pointerup',  function () { document.body.classList.remove('painting'); });
 
   var t;

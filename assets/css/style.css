@@ -239,18 +239,6 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 .btn--ghost{ border-color:rgba(244,239,230,.55); color:var(--canvas); }
 .btn--ghost:hover{ background:var(--canvas); color:var(--ink); border-color:var(--canvas); }
 
-/* palette */
-.palette{
-  position:absolute; z-index:5; left:50%; bottom:2.2rem; transform:translateX(-50%);
-  display:flex; flex-direction:column; align-items:center; gap:.7rem;
-  color:var(--canvas);
-}
-.palette__hint{
-  margin:0; font-size:.74rem; letter-spacing:.18em; text-transform:uppercase;
-  opacity:.72; transition:opacity .6s;
-}
-.palette__hint strong{ color:var(--ochre); font-weight:600; }
-.palette.is-quiet .palette__hint{ opacity:0; }
 .hero__scroll{
   position:absolute; z-index:5; left:50%; bottom:0;
   width:1px; height:64px; background:linear-gradient(rgba(244,239,230,0),rgba(244,239,230,.6));
@@ -259,8 +247,7 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 
 @media (max-width:640px){
   .hero__inner{ padding-bottom:11rem; }
-  .palette{ bottom:1.4rem; }
-}
+  }
 
 /* ============================================================
    SHARED SECTION FURNITURE
@@ -305,18 +292,11 @@ section{ position:relative; }
 [data-split].in .word > span{ transform:none; }
 
 /* hero copy comes in on load, again without needing the loop */
-.hero__eyebrow,.hero__lead,.hero__actions,.palette{
-  opacity:0; transform:translateY(18px);
-  transition:opacity .9s var(--ease), transform .9s var(--ease);
-}
-body.ready .hero__eyebrow{ opacity:.85; transform:none; transition-delay:.15s; }
+.hero__eyebrow,.hero__lead,.hero__actions,body.ready .hero__eyebrow{ opacity:.85; transform:none; transition-delay:.15s; }
 body.ready .hero__lead   { opacity:.94; transform:none; transition-delay:.5s; }
 body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
-body.ready .palette      { opacity:1;   transform:none; transition-delay:.8s; }
-
 @media (prefers-reduced-motion:reduce){
-  [data-reveal],.hero__eyebrow,.hero__lead,.hero__actions,.palette{ opacity:1!important; transform:none!important; }
-  .word > span{ transform:none!important; }
+  [data-reveal],.hero__eyebrow,.hero__lead,.hero__actions,.word > span{ transform:none!important; }
 }
 
 /* ============================================================
@@ -435,11 +415,27 @@ body.ready .palette      { opacity:1;   transform:none; transition-delay:.8s; }
 }
 
 /* Without a hover state the captions would never be readable, so on touch
-   and small screens they simply stay put. */
+   and small screens they simply stay put. They also stop breaking words
+   mid-character — the global break-word rule was turning "viaggio" into
+   "viaggi/o" and "spatola" into "spato/la" in these narrow tiles. */
 @media (hover:none),(max-width:900px){
   .tile__veil{ opacity:1; }
-  .tile__cap { opacity:1; transform:none; }
-  .tile__cap h3{ font-size:1rem; }
+  .tile__cap{
+    opacity:1; transform:none;
+    padding:.7rem .75rem;
+    background:linear-gradient(to top,rgba(9,22,35,.9),rgba(9,22,35,0));
+  }
+  .tile__cap h3,.tile__cap p{ overflow-wrap:normal; word-break:normal; hyphens:none; }
+  .tile__cap h3{ font-size:.92rem; line-height:1.2; margin-bottom:.1rem; }
+  .tile__cap p { font-size:.6rem; letter-spacing:.05em; }
+}
+
+/* Below this the tiles are only ~165px wide — the technique line has
+   nowhere to go, so the title carries it alone. */
+@media (max-width:620px){
+  .tile__cap{ padding:.55rem .6rem; }
+  .tile__cap h3{ font-size:.8rem; }
+  .tile__cap p { display:none; }
 }
 
 /* ============================================================

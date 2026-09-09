@@ -167,16 +167,7 @@
   });
 
   /* ============================================================
-     4. HERO HINT
-     ============================================================ */
-  // once they have painted a little, retire the hint
-  var painted = 0;
-  window.addEventListener('pointermove', function () {
-    if (++painted === 70) $('#palette').classList.add('is-quiet');
-  }, { passive: true });
-
-  /* ============================================================
-     5. CUSTOM CURSOR
+     4. CUSTOM CURSOR
      ============================================================ */
   if (fine && !reduced) {
     document.body.classList.add('has-cursor');
