@@ -244,17 +244,20 @@
 
   if (hasGSAP && !reduced) {
 
-    // hero artwork drifts as you leave (the whole stack, not one frame)
+    // hero artwork drifts as you leave (the whole stack, not one frame).
+    // No scale: growing a full-bleed image while two blurred canvases sit
+    // over it is the expensive part of this scroll, and it wasn't earning it.
     gsap.to('.hero__art', {
-      yPercent: 12, scale: 1.14, ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true }
+      yPercent: 8, ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 }
     });
-    /* Ends at 42% of the hero rather than its full height, so the copy is
-       gone early in the scroll instead of hanging on, half faded, until the
-       next section arrives. */
+    /* Clears by half the hero, so the copy is gone early instead of hanging
+       on until the next section. scrub takes a number rather than true: it
+       eases toward the scroll position over 0.6s instead of snapping to it,
+       which is what made the short fade feel steppy. */
     gsap.to('.hero__inner', {
-      yPercent: 30, opacity: 0, ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: '42% top', scrub: true }
+      yPercent: 24, opacity: 0, ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: '50% top', scrub: 0.6 }
     });
 
     $$('[data-parallax]').forEach(function (el) {

@@ -225,6 +225,7 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 
 .hero__inner{
   position:relative; z-index:4;
+  will-change:transform,opacity;   /* keeps the scrub off the main thread */
   text-align:center; color:var(--canvas);
   padding:7rem var(--pad) 9rem;
   max-width:1000px;
