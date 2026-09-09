@@ -64,7 +64,16 @@
 
   /* which painting is waiting under the ground */
   var artFrames = [], artIndex = 0;
-  var paintedSinceSwap = false, settledAt = 0;
+  var paintedSinceSwap = false;
+
+  /* How long the surface has to be still before the next painting slides in.
+     This used to wait for the ground to be completely opaque again: 700ms to
+     start settling and 2200ms on top, and the count restarted on every stroke,
+     so it took three seconds of doing nothing and never happened at all if you
+     kept painting. It now goes while the ground is still flooding back, about
+     two thirds of the way closed, so the picture changes under a returning
+     veil rather than behind a shut one. */
+  var SWAP_AFTER_MS = 1500;
 
   /* ============================================================
      SIZING
@@ -332,16 +341,11 @@
        self-painting rhythm on touch settles between washes too. */
     var settling = (now - Math.max(lastPaint, bornAt)) > 700;
 
-    /* Once the ground has fully flooded back the surface is opaque, so this
-       is the moment to slide the next painting in behind it unseen. */
-    if (settling) {
-      if (!settledAt) settledAt = now;
-      if (paintedSinceSwap && now - settledAt > 2200) {
-        nextArtwork();
-        paintedSinceSwap = false;
-      }
-    } else {
-      settledAt = 0;
+    /* The flood-back is the cover for the change, so the change rides it
+       rather than waiting it out. */
+    if (paintedSinceSwap && now - Math.max(lastPaint, bornAt) > SWAP_AFTER_MS) {
+      nextArtwork();
+      paintedSinceSwap = false;
     }
 
     bleed();
