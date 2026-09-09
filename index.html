@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antonio Burgello — Artista, Pittore, Muralista</title>
+<meta name="description" content="Luoghi, incontri e materia diventano arte. Opere, murales e progetti di Antonio “Scuma” Burgello — pittura a spatola, acrilico e acquerello dallo Scuma Lab, Calabria.">
+<meta name="theme-color" content="#0E2438">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Antonio Burgello — Artista, Pittore, Muralista">
+<meta property="og:description" content="Luoghi, incontri e materia diventano arte.">
+<meta property="og:image" content="assets/img/logo.jpg">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230E2438'/><path d='M20 70 Q40 20 50 45 T80 30' stroke='%23D9A227' stroke-width='12' fill='none' stroke-linecap='round'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/style.css?v=3">
+</head>
+<body>
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ══════════ CURSOR ══════════ -->
+<div class="brush-cursor" id="brushCursor" aria-hidden="true">
+  <svg viewBox="0 0 40 40" width="40" height="40">
+    <circle class="bc-ring" cx="20" cy="20" r="14"/>
+    <circle class="bc-dot" cx="20" cy="20" r="3.5"/>
+  </svg>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#top">
+    <span class="nav__mark" aria-hidden="true"></span>
+    <span class="nav__name">Antonio&nbsp;Burgello</span>
+  </a>
+
+  <nav class="nav__links" aria-label="Principale">
+    <a href="#opere">Opere</a>
+    <a href="#frammenti">Frammenti</a>
+    <a href="#progetti">Progetti</a>
+    <a href="#gallerie">Gallerie</a>
+    <a href="#contatti" class="nav__cta">Contatti</a>
+  </nav>
+
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span>
+    <em class="sr-only">Apri il menu</em>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="#opere">Opere</a>
+  <a href="#frammenti">Frammenti di vita</a>
+  <a href="#progetti">Progetti ed eventi</a>
+  <a href="#gallerie">Gallerie</a>
+  <a href="#contatti">Contatti</a>
+</div>
+
+<main id="main">
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" id="top">
+
+  <!-- layer 0 : the painting waiting underneath -->
+  <div class="hero__art" aria-hidden="true">
+    <img src="assets/img/img54.jpg" alt="" id="heroArt" decoding="async" fetchpriority="high">
+  </div>
+
+  <!-- layer 1 : primed canvas the visitor scrapes away -->
+  <canvas class="hero__canvas hero__canvas--gesso" id="gessoCanvas" aria-hidden="true"></canvas>
+  <!-- layer 2 : the colour the brush leaves behind -->
+  <canvas class="hero__canvas hero__canvas--paint" id="paintCanvas" aria-hidden="true"></canvas>
+
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <p class="hero__eyebrow" data-reveal>Luoghi, incontri e materia diventano arte.</p>
+
+    <h1 class="hero__title" data-split>Antonio Burgello</h1>
+
+    <p class="hero__lead" data-reveal>
+      Parto dalla pittura, ma è la materia a decidere dove andare.<br>
+      Ogni idea cerca il proprio linguaggio: sulla tela, nel muro, negli oggetti, nello spazio.
+    </p>
+
+    <div class="hero__actions" data-reveal>
+      <a class="btn btn--solid" href="#opere">Guarda le opere</a>
+      <a class="btn btn--ghost" href="#contatti">Lavoriamo insieme</a>
+    </div>
+  </div>
+
+  <div class="palette" id="palette">
+    <p class="palette__hint">Muovi il cursore — <strong>dipingi tu</strong></p>
+  </div>
+
+  <div class="hero__scroll" aria-hidden="true"><span></span></div>
+</section>
+
+<!-- ══════════ MANIFESTO ══════════ -->
+<section class="manifesto" id="manifesto">
+  <div class="wrap">
+    <p class="kicker" data-reveal>Un viaggio dentro il mio mondo</p>
+
+    <div class="manifesto__grid">
+      <div class="manifesto__body">
+        <p class="lede" data-reveal>Non troverai soltanto opere da guardare.<br><em>Troverai ciò che le ha fatte nascere.</em></p>
+        <p data-reveal>Un luogo, un incontro, un'esperienza, una ricerca possono diventare un'idea. L'idea diventa materia, la materia diventa opera, e l'opera torna poi nel mondo — attraverso una mostra, una strada, un borgo, un progetto o un incontro.</p>
+        <p data-reveal>Non è un archivio di ciò che ho fatto. <strong>È la traccia di ciò che sta diventando.</strong></p>
+      </div>
+
+      <figure class="manifesto__fig" data-parallax>
+        <img src="assets/img/img24.jpg" alt="Dittico: la mongolfiera dipinta a spatola accanto a un ritratto dell'artista nel suo studio" loading="lazy" decoding="async">
+        <figcaption>Lo studio, e ciò che ne esce.</figcaption>
+      </figure>
+    </div>
+
+    <ul class="stats" data-reveal>
+      <li><b>2007</b><span>nasce la baracca</span></li>
+      <li><b>2012–19</b><span>gli anni di Londra</span></li>
+      <li><b>∞</b><span>Scuma Lab, tuttora aperto</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ OPERE ══════════ -->
+<section class="works" id="opere">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker" data-reveal>Opere</p>
+      <h2 class="sec-title" data-split>Scuma production</h2>
+      <p class="sec-sub" data-reveal>Olio a spatola, acrilico, acquerello. Paesaggi che ho attraversato, notturni che non mi hanno lasciato dormire, oggetti che hanno insistito per essere dipinti.</p>
+    </header>
+
+    <div class="filters" data-reveal role="tablist" aria-label="Filtra le opere">
+      <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">Tutte</button>
+      <button class="filter" data-filter="paesaggi" role="tab" aria-selected="false">Paesaggi</button>
+      <button class="filter" data-filter="citta" role="tab" aria-selected="false">Città e vicoli</button>
+      <button class="filter" data-filter="notturni" role="tab" aria-selected="false">Notturni</button>
+      <button class="filter" data-filter="materia" role="tab" aria-selected="false">Nature morte</button>
+    </div>
+
+    <div class="grid" id="worksGrid"><!-- injected by main.js --></div>
+  </div>
+</section>
+
+<!-- ══════════ FRAMMENTI ══════════ -->
+<section class="frag" id="frammenti">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker" data-reveal>Frammenti di vita</p>
+      <h2 class="sec-title" data-split>Come si arriva a dipingere</h2>
+      <p class="sec-sub" data-reveal>Nessun racconto fiabesco. Soltanto ciò che il vortice della vita ha portato, finché la pittura non è diventata il modo migliore per parlare col mondo.</p>
+    </header>
+
+    <ol class="timeline" id="timeline">
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">Maggio 2018 · Londra</p>
+          <h3>Somerset House</h3>
+          <p>Prima della prima mostra personale, nel castello di Somerset House.</p>
+          <p class="tl__meta">Scatto di Sama Yahyazadeh</p>
+          <figure class="tl__fig">
+            <img src="assets/img/img25.jpg" alt="Il cortile di Somerset House illuminato di notte, con le fontane accese" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">2012 — 2019</p>
+          <h3>Si inizia a dipingere</h3>
+          <p>Ero a Londra e lavoravo spesso: alcune volte facevo dalle dieci alle undici ore al giorno, più quelle per tornare a casa. Non mi restava molto per cenare la sera, però ricordo che durante le ore diurne il mio cervello si caricava di pensieri, idee e immaginazioni.</p>
+          <p>Iniziai a scrivere, prima di tutto diari: in un anno son diventati tre, poi quattro, fino a che a un certo punto avevo bisogno di visualizzare anche ciò che scrivevo. Avevo bisogno di materializzare tutto, e non solo metterlo a parole.</p>
+          <p>In quei primi anni avevo fatto tantissime fotografie e avevo scritto parecchio, ma per questioni di spazio e di soldi non avevo mai messo nulla al computer. Quando i miei guadagni migliorarono e potei permettermi strumenti e materiali, cominciai a dare forma a qualcosa che avevo dentro da tempo.</p>
+          <p>Sentivo che non mi bastava raccogliere e organizzare. <strong>Avevo bisogno di creare.</strong></p>
+          <p>Così, con pochi soldi in tasca, entrai in un art shop a Covent Garden. Ricordo ancora quella sensazione: avevo voglia di ricominciare a dipingere, ma allo stesso tempo avevo paura che colori, tele e materiali costassero troppo. Poi scoprii che il rapporto tra il costo della vita e quello dei materiali artistici a Londra mi permetteva realmente di farlo.</p>
+          <p>Fu una svolta. Non avevo ancora un progetto artistico preciso: avevo semplicemente ricominciato a creare. E forse è proprio da lì che è iniziato il mio vero percorso.</p>
+          <figure class="tl__fig">
+            <img src="assets/img/img12.jpg" alt="Un girasole in una bottiglia sulla scrivania, fra i materiali di lavoro" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">La prima tela</p>
+          <h3>Scuma</h3>
+          <p>Dopo una notte insonne, alle tre del mattino mi piazzai il cavalletto piccolino da scrivania, presi i colori e decisi di rappresentare il sogno che avevo appena fatto.</p>
+          <p>Era un periodo difficile, e i pensieri nella notte non mi davano pace. Ho sempre messo da parte me stesso purché gli altri stessero bene; eppure mi sono ritrovato in faccia l'incontrastabile realtà che, per quanto tu ci voglia provare, non potrai mai piacere a tutti — semplicemente perché non tutti vogliono essere aiutati per come tu intendi.</p>
+          <p>In quei sogni mi si presentò questo mondo, queste figure. Un viso pallido e freddo, una benda volutamente posta sugli occhi per dormire o per non vedere, solo un piccolo spiraglio per accendersi una sigaretta — sempre in bocca, unica parte calda del corpo per il fumo che riempiva i polmoni e usciva per le labbra, lentamente, strisciando tra le curve del viso: quasi un sorriso, quasi in disprezzo. <strong>Non voleva vedere.</strong></p>
+          <p><em>Scuma</em> era un mio modo di dire per indicare cose inutili, bizzarre, che apparentemente non hanno motivo di esistere se non per indicare che qualcosa sta avvenendo o è avvenuto.</p>
+          <p class="tl__meta">Acrilico su tela · 30&times;40 cm</p>
+          <figure class="tl__fig">
+            <img src="assets/img/img07.jpg" alt="Scuma: volto con benda sugli occhi e sigaretta, acrilico su tela" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">La mia Londra</p>
+          <h3>Posto giusto al momento giusto</h3>
+          <p>Gli ultimi anni a Londra sono stati per me qualcosa di più di un periodo di vita all'estero. Sono arrivato in un momento in cui avevo bisogno di crescere, di cercare nuove possibilità e, soprattutto, di capire cosa volessi davvero fare.</p>
+          <p>Londra mi ha dato l'occasione di incontrare persone, ambienti e situazioni che hanno lentamente riacceso in me una passione che avevo sempre avuto: l'arte. Ho iniziato a guardarla con occhi diversi: non più soltanto come qualcosa da ammirare, ma come un mondo da conoscere, sperimentare e, un giorno, abitare.</p>
+          <p>Il castello di Somerset House era come un posto incantato dove avvenivano magie tutti i giorni, ed io incredibilmente ne gestivo alcune: creavo per gli artisti e di conseguenza assorbivo da loro ciò che amavo. Era uno scambio continuo, giorni intensi e intrinsechi di tutto.</p>
+          <p>Io osservavo, ascoltavo, imparavo. E poi cercavo di portare tutto a casa. La curiosità è diventata studio, lo studio è diventato sperimentazione, la sperimentazione è diventata sempre più necessità di creare.</p>
+          <p>Forse non avevo ancora trovato la mia strada. <strong>Ma avevo finalmente iniziato a percorrerla.</strong></p>
+          <figure class="tl__fig">
+            <img src="assets/img/img05.jpg" alt="Un parco londinese sul lago, con salice e betulla" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">2007</p>
+          <h3>Lo Scuma Lab</h3>
+          <p class="tl__lede">Prima è stata una baracca. Poi un rifugio. Oggi è un laboratorio. Ma in fondo, è sempre stato un luogo dove costruire qualcosa.</p>
+          <p>Questa piccola baracca nasce e cresce negli anni del periodo universitario, nel 2007. Erano le classiche estati in cui il prurito alle mani di chi ama creare diventa quasi impossibile da fermare.</p>
+          <p>La costruimmo io e i miei fratelli utilizzando quasi esclusivamente materiale di recupero: parti di un vecchio tetto smontato, pali del telefono caduti e lamiere di scarto. Dopo circa due mesi di lavoro, durante l'estate, avevamo tirato su quello che sarebbe diventato un piccolo centro di incontro nel mezzo della campagna.</p>
+          <p>All'inizio era soprattutto il nostro rifugio per bische, grigliate e party. Poi, poco alla volta, tutto intorno iniziò a cambiare: la campagna divenne un giardino, comparvero un piccolo laghetto, piante e fiori, e quella che era nata quasi per gioco iniziò ad assumere una propria identità.</p>
+          <figure class="tl__fig">
+            <img src="assets/img/img33.jpg" alt="Lo Scuma Lab visto da fuori: la baracca in legno col tetto verde, circondata da fiori e ulivi" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+      <li class="tl" data-reveal>
+        <div class="tl__rail" aria-hidden="true"></div>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <div class="tl__body">
+          <p class="tl__year">2019 — oggi</p>
+          <h3>Da baracchina a Scuma Lab</h3>
+          <p>Nel 2019, al mio ritorno da Londra, e successivamente durante il periodo del Covid, quello spazio cambiò completamente funzione. Avevo finalmente tempo, voglia di sperimentare e soprattutto la possibilità di lasciare strumenti e opere sempre pronti.</p>
+          <p>La piccola baracchina diventò così, a tutti gli effetti, il Laboratorio Scuma. Poi semplicemente <strong>Scuma Lab</strong>: il luogo in cui potevo entrare e iniziare a creare senza dover ogni volta preparare tutto da zero. Ci sono stati giorni in cui riuscivo a realizzare sei o sette opere, completamente immerso nel lavoro. Avevo persino un lettino e un lavandino e, qualche volta, finivo per dormirci dentro.</p>
+          <p>Scuma Lab è ancora lì, tuttora operativo, e continua a cambiare insieme a me. D'inverno diventa il mio laboratorio a tutti gli effetti. Ma non è soltanto uno spazio dove dipingo: nel tempo si è trasformato anche in un luogo per workshop, incontri, riunioni strategiche e sperimentazioni.</p>
+          <p>Un piccolo spazio nato da materiali di recupero, costruito con i miei fratelli quasi per gioco, che negli anni è diventato qualcosa di molto più importante. Non è semplicemente il luogo dove realizzo le mie opere: <strong>è il luogo dove le idee prendono forma.</strong></p>
+          <figure class="tl__fig">
+            <img src="assets/img/img22.jpg" alt="Il banco di lavoro dello Scuma Lab: pennelli, tubetti e tele appese alla parete" loading="lazy" decoding="async">
+          </figure>
+        </div>
+      </li>
+
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════ PROGETTI ══════════ -->
+<section class="projects" id="progetti">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker" data-reveal>Progetti ed eventi</p>
+      <h2 class="sec-title" data-split>Quando l'opera incontra il mondo</h2>
+    </header>
+
+    <div class="cards">
+
+      <article class="card card--lg" data-reveal>
+        <div class="card__media"><img src="assets/img/img14.jpg" alt="Locandina dei murales di Antonio Burgello: un murale marino con tartaruga e pesci, e murales su scuole e spazi pubblici" loading="lazy" decoding="async"></div>
+        <div class="card__body">
+          <p class="card__tag">Murales</p>
+          <h3>Trasformo muro, spazio e colore in storie che restano</h3>
+          <p>Ogni murale nasce da un ascolto del luogo, delle persone e della sua identità. Un'opera unica che parla alla comunità e valorizza il territorio — sempre in stile diverso, con ricerca iconografica e storica.</p>
+          <ul class="card__list">
+            <li>Comuni e città</li><li>Scuole e istituti</li><li>Associazioni e Pro Loco</li>
+            <li>Attività commerciali</li><li>Spazi pubblici</li><li>Eventi e festival</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="card" data-reveal>
+        <div class="card__media"><img src="assets/img/img21.jpg" alt="Locandina del Sentiero Porte d'Artista, Vena di Maida, con Antonio “Scuma” Burgello come guest artist" loading="lazy" decoding="async"></div>
+        <div class="card__body">
+          <p class="card__tag">Progetto itinerante</p>
+          <h3>Porte d'Artista</h3>
+          <p>Rigenerazione urbana nei vecchi borghi in decadenza: le porte in disuso vengono recuperate, ammodernate e trasformate in opera d'arte.</p>
+        </div>
+      </article>
+
+      <article class="card" data-reveal>
+        <div class="card__media"><img src="assets/img/img19.jpg" alt="Vicolo notturno dipinto a spatola, con lanterna accesa e muri ocra" loading="lazy" decoding="async"></div>
+        <div class="card__body">
+          <p class="card__tag">Progetto personale</p>
+          <h3>Cromie nei Borghi</h3>
+          <p>Un'analisi in stile antico dei borghi visitati: studio e produzione <em>en plein air</em> sul posto, workshop, e a chiusura una mostra personale con le opere che raccontano l'identità del paese.</p>
+        </div>
+      </article>
+
+      <article class="card" data-reveal>
+        <div class="card__media"><img src="assets/img/img09.jpg" alt="Veduta dall'alto dell'artista seduto al centro di centinaia di piccoli dipinti disposti in cerchi concentrici" loading="lazy" decoding="async"></div>
+        <div class="card__body">
+          <p class="card__tag">Curatela</p>
+          <h3>Burgello's Exhibition</h3>
+          <p>Oltre che artista mi cimento nell'organizzazione e nella cura degli eventi: mostre collettive, estemporanee, workshop, interviste e dirette.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GALLERIE ══════════ -->
+<section class="galleries" id="gallerie">
+  <div class="wrap">
+    <header class="sec-head">
+      <p class="kicker" data-reveal>Gallerie</p>
+      <h2 class="sec-title" data-split>Dove trovarmi</h2>
+    </header>
+
+    <div class="gal">
+      <article class="gal__feature" data-reveal>
+        <img src="assets/img/img01.jpg" alt="Locandina della mostra “L'arte che cura — arte, benessere e salute mentale” allo Spazio Brizzolari" loading="lazy" decoding="async">
+      </article>
+
+      <div class="gal__list">
+        <article class="gal__item" data-reveal>
+          <p class="gal__when">24 ottobre — 22 novembre 2025</p>
+          <h3>L'arte che cura</h3>
+          <p class="gal__where">Spazio Brizzolari · Viale Kennedy 188, Scarperia e San Piero (Firenze)</p>
+          <p>Un percorso espositivo sul legame fra arte e benessere psicologico, attraverso le opere di artisti che fanno del processo creativo uno strumento di cura, espressione e riflessione.</p>
+        </article>
+
+        <article class="gal__item" data-reveal>
+          <p class="gal__when">Pagina artista</p>
+          <h3>Museo Spazio Brizzolari</h3>
+          <p>Profilo permanente con una selezione di opere in collezione.</p>
+        </article>
+
+        <article class="gal__item" data-reveal>
+          <p class="gal__when">Pagina artista</p>
+          <h3>T-Affordable</h3>
+          <p>Opere disponibili in vendita attraverso la piattaforma.</p>
+        </article>
+
+        <article class="gal__item" data-reveal>
+          <p class="gal__when">Aprile 2026 · stampa</p>
+          <h3>Mostra personale a Catanzaro</h3>
+          <p>Articolo dedicato su <em>La Ciminiera</em>, rivista del Centro Studi Bruttium di Catanzaro.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONTATTI ══════════ -->
+<section class="contact" id="contatti">
+  <div class="marquee" aria-hidden="true"><div class="marquee__track" id="marqueeTrack"></div></div>
+
+  <div class="wrap contact__wrap">
+    <p class="kicker" data-reveal>Contatti</p>
+    <h2 class="contact__title" data-split>Ogni luogo ha una storia. Raccontiamola a colori.</h2>
+
+    <div class="contact__grid">
+      <div class="contact__col" data-reveal>
+        <p class="contact__label">Scrivimi</p>
+        <a class="contact__big" href="mailto:burgello.artist@gmail.com">burgello.artist@gmail.com</a>
+        <a class="contact__big" href="tel:+393280287606">+39 328 028 7606</a>
+      </div>
+
+      <div class="contact__col" data-reveal>
+        <p class="contact__label">Seguimi</p>
+        <a class="contact__big" href="https://www.instagram.com/burgello_artist/" target="_blank" rel="noopener">Instagram — @burgello_artist</a>
+        <a class="contact__big" href="https://www.facebook.com/scuma.art" target="_blank" rel="noopener">Facebook — scuma.art</a>
+      </div>
+
+      <div class="contact__col" data-reveal>
+        <p class="contact__label">Lo studio</p>
+        <p class="contact__addr">Scuma Lab<br>Sellia Marina (CZ)<br>Calabria, Italia</p>
+        <p class="contact__note">Per collaborazioni, murales su commissione, workshop e progetti di rigenerazione urbana.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p>© <span id="year"></span> Antonio Burgello · Scuma Lab — Arte · Sperimentazione · Identità</p>
+    <a href="#top">Torna su ↑</a>
+  </footer>
+</section>
+
+</main>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div class="lb" id="lightbox" hidden>
+  <button class="lb__close" id="lbClose" aria-label="Chiudi">&times;</button>
+  <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Precedente">&#8249;</button>
+  <button class="lb__nav lb__nav--next" id="lbNext" aria-label="Successiva">&#8250;</button>
+  <figure class="lb__fig">
+    <img id="lbImg" src="" alt="">
+    <figcaption><strong id="lbTitle"></strong><span id="lbMeta"></span></figcaption>
+  </figure>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="assets/js/paint.js?v=3"></script>
+<script src="assets/js/main.js?v=3"></script>
+</body>
+</html>
