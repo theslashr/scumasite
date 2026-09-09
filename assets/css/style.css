@@ -373,22 +373,30 @@ body.ready .palette      { opacity:1;   transform:none; transition-delay:.8s; }
 .filter:hover{ border-color:var(--ink); color:var(--ink); }
 .filter.is-active{ background:var(--ink); border-color:var(--ink); color:var(--canvas); }
 
+/* ---------- bento ----------
+   Rows are the same size as a column, so every tile is a whole number of
+   square cells and the spans below produce real bento rectangles. `dense`
+   lets later tiles back-fill any hole the packing leaves. */
 .grid{
+  --cols:6;
+  --gap:clamp(.55rem,1vw,1rem);
+  --unit:calc((min(var(--wrap), 100vw - var(--pad) * 2) - (var(--cols) - 1) * var(--gap)) / var(--cols));
   display:grid;
-  grid-template-columns:repeat(12,1fr);
-  gap:clamp(.7rem,1.4vw,1.15rem);
+  grid-template-columns:repeat(var(--cols),1fr);
+  grid-auto-rows:var(--unit);
+  grid-auto-flow:dense;
+  gap:var(--gap);
 }
 .tile{
-  position:relative; overflow:hidden; border-radius:2px;
+  position:relative; overflow:hidden; border-radius:3px;
   background:var(--ink-2);
-  grid-column:span 4;
-  aspect-ratio:3/4;
+  grid-column:span 2; grid-row:span 2;
   cursor:pointer;
 }
-.tile--wide{ grid-column:span 8; aspect-ratio:16/10; }
-.tile--tall{ grid-column:span 4; aspect-ratio:2/3; }
-.tile--full{ grid-column:span 12; aspect-ratio:21/9; }
-.tile--half{ grid-column:span 6; aspect-ratio:4/3; }
+.tile--wide{ grid-column:span 4; grid-row:span 2; }
+.tile--tall{ grid-column:span 2; grid-row:span 3; }
+.tile--big { grid-column:span 4; grid-row:span 3; }
+.tile--full{ grid-column:span 6; grid-row:span 2; }
 
 .tile img{
   width:100%; height:100%; object-fit:cover;
@@ -416,13 +424,22 @@ body.ready .palette      { opacity:1;   transform:none; transition-delay:.8s; }
 
 .tile.is-hidden{ display:none; }
 
+/* Four columns on small screens keeps the bento two-across rather than one,
+   which roughly halves how far the section scrolls on a phone. */
 @media (max-width:900px){
-  .tile,.tile--tall{ grid-column:span 6; }
-  .tile--wide,.tile--half{ grid-column:span 12; }
-  .tile--full{ grid-column:span 12; aspect-ratio:16/9; }
+  .grid{ --cols:4; }
+  .tile      { grid-column:span 2; grid-row:span 2; }
+  .tile--tall{ grid-column:span 2; grid-row:span 3; }
+  .tile--wide,.tile--big{ grid-column:span 4; grid-row:span 3; }
+  .tile--full{ grid-column:span 4; grid-row:span 2; }
 }
-@media (max-width:560px){
-  .tile,.tile--tall,.tile--wide,.tile--half,.tile--full{ grid-column:span 12; aspect-ratio:4/3; }
+
+/* Without a hover state the captions would never be readable, so on touch
+   and small screens they simply stay put. */
+@media (hover:none),(max-width:900px){
+  .tile__veil{ opacity:1; }
+  .tile__cap { opacity:1; transform:none; }
+  .tile__cap h3{ font-size:1rem; }
 }
 
 /* ============================================================

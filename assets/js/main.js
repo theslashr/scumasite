@@ -21,25 +21,31 @@
   var WORKS = [
     { f:'img10', t:'Il golfo',                    m:'Olio su tela',            c:'paesaggi',        s:'tile--wide' },
     { f:'logo',  t:'Di tutto un viaggio',         m:'Olio a spatola su tela',  c:'paesaggi',        s:'tile--tall' },
-    { f:'img02', t:'Sera sulla Senna',            m:'Olio a spatola su tela',  c:'citta notturni',  s:'' },
-    { f:'img19', t:'Vicolo con lanterna',         m:'Olio a spatola su tela',  c:'citta notturni',  s:'' },
-    { f:'img42', t:'La piazza e la palma',        m:'Olio a spatola su tela',  c:'citta',           s:'' },
+    { f:'img02', t:'Sera sulla Senna',            m:'Olio a spatola su tela',  c:'citta notturni',  s:'tile--tall' },
+    { f:'img19', t:'Vicolo con lanterna',         m:'Olio a spatola su tela',  c:'citta notturni',  s:'tile--tall' },
+    { f:'img42', t:'La piazza e la palma',        m:'Olio a spatola su tela',  c:'citta',           s:'tile--tall' },
     { f:'img54', t:'Il sentiero dei girasoli',    m:'Olio su tela',            c:'paesaggi',        s:'tile--full' },
-    { f:'img16', t:'Il ponte',                    m:'Olio su tela',            c:'paesaggi',        s:'tile--half' },
-    { f:'img13', t:'Notturno viola',              m:'Acrilico su tela',        c:'notturni',        s:'tile--half' },
-    { f:'img08', t:'Il tempo che suona',          m:'Olio a spatola su tela',  c:'materia',         s:'tile--wide' },
+    { f:'img16', t:'Il ponte',                    m:'Olio su tela',            c:'paesaggi',        s:'tile--wide' },
+    { f:'img13', t:'Notturno viola',              m:'Acrilico su tela',        c:'notturni',        s:'' },
+    { f:'img08', t:'Il tempo che suona',          m:'Olio a spatola su tela',  c:'materia',         s:'tile--big' },
     { f:'img18', t:'La fontana del danzatore',    m:'Olio a spatola su tela',  c:'citta',           s:'tile--tall' },
-    { f:'img11', t:'Luce nel bosco',              m:'Acrilico su tela',        c:'paesaggi',        s:'tile--half' },
-    { f:'img37', t:'Campo di papaveri',           m:'Acrilico su tela',        c:'paesaggi',        s:'tile--half' },
-    { f:'img48', t:'Il tempo che suona · dettaglio', m:'Olio a spatola',       c:'materia',         s:'tile--half' },
-    { f:'img28', t:'La clessidra · dettaglio',    m:'Olio a spatola',          c:'materia',         s:'tile--half' }
+    { f:'img11', t:'Luce nel bosco',              m:'Acrilico su tela',        c:'paesaggi',        s:'tile--wide' },
+    { f:'img37', t:'Campo di papaveri',           m:'Acrilico su tela',        c:'paesaggi',        s:'' },
+    { f:'img48', t:'Il tempo che suona · dettaglio', m:'Olio a spatola',       c:'materia',         s:'' },
+    { f:'img28', t:'La clessidra · dettaglio',    m:'Olio a spatola',          c:'materia',         s:'' }
   ];
+
+  /* Images normally come off disk, but a self-contained build can inline them
+     and hand them over through window.__IMG instead. */
+  function imgSrc(name) {
+    return (window.__IMG && window.__IMG[name]) || ('assets/img/' + name + '.jpg');
+  }
 
   var grid = $('#worksGrid');
   if (grid) {
     grid.innerHTML = WORKS.map(function (w, i) {
       return '<figure class="tile ' + w.s + '" data-cat="' + w.c + '" data-i="' + i + '" data-reveal style="--i:' + (i % 5) + '" tabindex="0" role="button" aria-label="Apri: ' + w.t + '">' +
-               '<img src="assets/img/' + w.f + '.jpg" alt="' + w.t + ' — ' + w.m + '" loading="lazy" decoding="async">' +
+               '<img src="' + imgSrc(w.f) + '" alt="' + w.t + ' — ' + w.m + '" loading="lazy" decoding="async">' +
                '<span class="tile__veil"></span>' +
                '<figcaption class="tile__cap"><h3>' + w.t + '</h3><p>' + w.m + '</p></figcaption>' +
              '</figure>';
@@ -74,7 +80,7 @@
   function openLB(i) {
     lbIndex = (i + WORKS.length) % WORKS.length;
     var w = WORKS[lbIndex];
-    lbImg.src = 'assets/img/' + w.f + '.jpg';
+    lbImg.src = imgSrc(w.f);
     lbImg.alt = w.t + ' — ' + w.m;
     lbTitle.textContent = w.t;
     lbMeta.textContent  = w.m;
