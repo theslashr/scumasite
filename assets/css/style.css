@@ -203,6 +203,16 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
   background:var(--canvas-2);
   isolation:isolate;
 }
+/* Holding a finger down is how you paint on touch, so the long press must not
+   raise the selection handles or the callout menu instead. Desktop keeps its
+   selectable text. */
+@media (hover:none){
+  .hero{
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+  }
+}
 /* held back until the ground is primed, so the painting never flashes */
 .hero__art{ position:absolute; inset:0; z-index:0; opacity:0; }
 .hero__art.is-ready{ opacity:1; }

@@ -407,7 +407,40 @@
     };
   }
 
+  /* Touch and the mouse want opposite things here. A mouse has no pressed
+     state to wait for, so it paints as it passes. A finger that is moving is
+     almost always scrolling: pointermove keeps arriving throughout, and
+     because toLocal reads the hero's rect, the surface slides under a finger
+     that is not moving at all. That is where the stray colour came from, and
+     every stray stroke refreshed lastPaint, so the swap timer never ran out
+     and the painting never changed. On touch, moving scrolls and holding
+     paints; nothing is painted from pointermove at all. */
+  var holdAt = null, holdTimer = 0, holdFrom = null;
+
+  function holdTick() {
+    if (!holdAt) return;
+    dab(holdAt.x, holdAt.y, 0);
+    lastPaint = performance.now();
+    paintedSinceSwap = true;
+  }
+  function startHold(p) {
+    holdAt = p;
+    clearInterval(holdTimer);
+    // slow enough that the pool spreads instead of punching a hole
+    holdTimer = setInterval(holdTick, 95);
+  }
+  function endHold() {
+    holdAt = null; holdFrom = null;
+    clearInterval(holdTimer); holdTimer = 0;
+    document.body.classList.remove('painting');
+  }
+
   window.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') {
+      // past this the gesture is a scroll, so stop painting and let it go
+      if (holdFrom && Math.hypot(e.clientX - holdFrom.cx, e.clientY - holdFrom.cy) > 12) endHold();
+      return;
+    }
     var p = toLocal(e);
     if (!p.inside) { pointer.has = false; return; }
 
@@ -432,9 +465,16 @@
       dab(p.x, p.y, 0);
       lastPaint = performance.now();
       paintedSinceSwap = true;
+      if (e.pointerType === 'touch') {
+        holdFrom = { cx: e.clientX, cy: e.clientY };
+        startHold(p);
+      }
     }
   });
-  window.addEventListener('pointerup',  function () { document.body.classList.remove('painting'); });
+  window.addEventListener('pointerup',     endHold);
+  window.addEventListener('pointercancel', endHold);
+  // a long press is how you paint here, so it must not raise the callout menu
+  hero.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
   var t;
   window.addEventListener('resize', function () {
