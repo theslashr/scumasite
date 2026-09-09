@@ -271,7 +271,18 @@
   }
 
   /* ============================================================
-     9. MISC
+     9. TIKTOK
+     Only loaded if the embed is actually on the page.
+     ============================================================ */
+  if ($('.tiktok-embed')) {
+    var tk = document.createElement('script');
+    tk.async = true;
+    tk.src = 'https://www.tiktok.com/embed.js';
+    document.body.appendChild(tk);
+  }
+
+  /* ============================================================
+     10. MISC
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 

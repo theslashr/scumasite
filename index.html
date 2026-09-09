@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css?v=32">
+<link rel="stylesheet" href="assets/css/style.css?v=33">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <nav class="nav__links" aria-label="Principale">
     <a href="#opere">Opere</a>
+    <a href="#mondo">Mondo</a>
     <a href="#frammenti">Frammenti</a>
     <a href="#progetti">Progetti</a>
     <a href="#gallerie">Gallerie</a>
@@ -54,6 +55,7 @@
 
 <div class="mobile-menu" id="mobileMenu" hidden>
   <a href="#opere">Opere</a>
+  <a href="#mondo">Il mio mondo</a>
   <a href="#frammenti">Frammenti di vita</a>
   <a href="#progetti">Progetti ed eventi</a>
   <a href="#gallerie">Gallerie</a>
@@ -124,13 +126,6 @@
         <p data-reveal>È la traccia di ciò che sta diventando.</p>
       </div>
 
-      <div class="manifesto__social" data-reveal>
-        <a class="social-card" href="https://www.tiktok.com/@scuma_art" target="_blank" rel="noopener">
-          <span class="social-card__tag">TikTok</span>
-          <strong class="social-card__handle">@scuma_art</strong>
-          <span class="social-card__go">Guarda i video<i aria-hidden="true">&#8594;</i></span>
-        </a>
-      </div>
     </div>
 
     <ul class="stats" data-reveal>
@@ -138,6 +133,44 @@
       <li><b>2012–19</b><span>gli anni di Londra</span></li>
       <li><b>∞</b><span>Scuma Lab, tuttora aperto</span></li>
     </ul>
+  </div>
+</section>
+
+<!-- ══════════ IL MIO MONDO ══════════ -->
+<section class="world" id="mondo">
+  <div class="wrap">
+    <p class="kicker" data-reveal>Il mio mondo</p>
+
+    <div class="world__grid">
+      <article class="feed" data-reveal>
+        <header class="feed__head">
+          <span class="feed__tag">Instagram</span>
+          <a class="feed__handle" href="https://www.instagram.com/burgello_artist/" target="_blank" rel="noopener">@burgello_artist<i aria-hidden="true">&#8594;</i></a>
+        </header>
+        <div class="feed__body" id="igFeed">
+          <!-- Paste the Instagram feed embed here once the account is connected.
+               Meta shut off the Basic Display API in Dec 2024, so a live feed
+               needs a Professional account plus a feed provider or a Graph API
+               token. Until then this falls through to the link below. -->
+          <a class="feed__empty" href="https://www.instagram.com/burgello_artist/" target="_blank" rel="noopener">
+            <span>Apri il profilo su Instagram</span>
+          </a>
+        </div>
+      </article>
+
+      <article class="feed" data-reveal>
+        <header class="feed__head">
+          <span class="feed__tag">TikTok</span>
+          <a class="feed__handle" href="https://www.tiktok.com/@scuma_art" target="_blank" rel="noopener">@scuma_art<i aria-hidden="true">&#8594;</i></a>
+        </header>
+        <div class="feed__body">
+          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@scuma_art"
+                      data-unique-id="scuma_art" data-embed-type="creator">
+            <section><a target="_blank" rel="noopener" href="https://www.tiktok.com/@scuma_art?refer=creator_embed">@scuma_art</a></section>
+          </blockquote>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -413,7 +446,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="assets/js/paint.js?v=32"></script>
-<script src="assets/js/main.js?v=32"></script>
+<script src="assets/js/paint.js?v=33"></script>
+<script src="assets/js/main.js?v=33"></script>
 </body>
 </html>

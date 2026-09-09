@@ -368,36 +368,6 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 /* TikTok injects its own inline width, so it needs overriding to stay
    inside the column. */
 .manifesto__social{ min-width:0; }
-/* Our own block rather than TikTok's widget: the embed is cross-origin, so
-   its card could never be made to sit with the rest of the page. */
-.social-card{
-  display:flex; flex-direction:column; gap:.45rem;
-  padding:clamp(1.4rem,2.4vw,2rem) clamp(1.5rem,2.6vw,2.2rem);
-  border:1px solid var(--line); border-radius:3px;
-  background:rgba(244,239,230,.72);
-  backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
-  text-decoration:none;
-  transition:border-color .4s var(--ease), background .4s var(--ease), transform .4s var(--ease);
-}
-.social-card:hover{
-  border-color:var(--ink);
-  background:rgba(244,239,230,.9);
-  transform:translateY(-3px);
-}
-.social-card__tag{
-  font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
-  color:var(--ochre-deep); font-weight:600;
-}
-.social-card__handle{
-  font-family:var(--display); font-weight:500; letter-spacing:-.01em;
-  font-size:clamp(1.5rem,2.6vw,2.1rem);
-}
-.social-card__go{
-  font-size:.9rem; color:var(--muted);
-  display:flex; align-items:center; gap:.45rem;
-}
-.social-card__go i{ font-style:normal; transition:transform .4s var(--ease); }
-.social-card:hover .social-card__go i{ transform:translateX(4px); }
 .stats{
   list-style:none; margin:clamp(3rem,6vw,5rem) 0 0; padding:2rem 0 0;
   border-top:1px solid var(--line);
@@ -416,6 +386,68 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
   }
   .stats{ grid-template-columns:1fr; gap:1rem; }
   .stats li{ display:flex; align-items:baseline; gap:.8rem; }
+}
+
+/* ============================================================
+   IL MIO MONDO  — live feeds in our own frame
+   The embeds are cross-origin, so their interiors belong to the
+   platforms. What we control is the frame around them, which is why
+   both sit in the same panel treatment as the rest of the page.
+   ============================================================ */
+.world{ padding:clamp(4rem,9vw,7rem) 0; background:var(--canvas-2); }
+.world__grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:clamp(1rem,2.2vw,1.9rem); align-items:start;
+}
+.feed{
+  display:flex; flex-direction:column; min-width:0;
+  border:1px solid var(--line); border-radius:3px;
+  background:rgba(244,239,230,.72);
+  overflow:hidden;
+  transition:border-color .4s var(--ease);
+}
+.feed:hover{ border-color:rgba(14,36,56,.28); }
+.feed__head{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:1rem; padding:1.05rem clamp(1.1rem,2vw,1.5rem);
+  border-bottom:1px solid var(--line);
+}
+.feed__tag{
+  font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--ochre-deep); font-weight:600;
+}
+.feed__handle{
+  font-family:var(--display); font-weight:500; letter-spacing:-.01em;
+  font-size:clamp(1.05rem,1.7vw,1.35rem);
+  text-decoration:none; display:flex; align-items:center; gap:.4rem;
+}
+.feed__handle i{ font-style:normal; transition:transform .4s var(--ease); }
+.feed__handle:hover i{ transform:translateX(4px); }
+
+.feed__body{
+  padding:clamp(.7rem,1.4vw,1rem);
+  min-height:420px;              /* reserves the space before the feed lands */
+  display:flex; align-items:stretch;
+}
+.feed__body > *{ width:100%; min-width:0; }
+.feed__body .tiktok-embed,
+.feed__body iframe{
+  max-width:100%!important; min-width:0!important; margin:0!important;
+  border-radius:2px;
+}
+/* stands in until the Instagram feed is connected */
+.feed__empty{
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:2rem 1rem;
+  border:1px dashed var(--line); border-radius:2px;
+  color:var(--muted); font-size:.95rem; text-decoration:none;
+  transition:border-color .35s var(--ease), color .35s var(--ease);
+}
+.feed__empty:hover{ border-color:var(--ink); color:var(--ink); }
+
+@media (max-width:860px){
+  .world__grid{ grid-template-columns:1fr; }
+  .feed__body{ min-height:0; }
 }
 
 /* ============================================================
