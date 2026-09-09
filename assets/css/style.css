@@ -327,7 +327,9 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 /* ============================================================
    MANIFESTO
    ============================================================ */
-.manifesto{ padding:clamp(3.5rem,7vw,6rem) 0; position:relative; overflow:hidden; }
+/* Less at the foot than the head: the works section brings its own ~84px of
+   top padding, so a matching bottom here read as a gap twice the size. */
+.manifesto{ padding:clamp(3.5rem,7vw,6rem) 0 clamp(1.5rem,3vw,2.5rem); position:relative; overflow:hidden; }
 
 /* The painting bleeds in from the left and dissolves across the section,
    the way it sits behind the copy on Antonio's own page. It is held well
@@ -404,16 +406,23 @@ body.ready .hero__actions{ opacity:1;   transform:none; transition-delay:.65s; }
 
 
 
-.tt-embed{
-  display:block; width:100%; border:0; border-radius:2px;
-  aspect-ratio:9/16;            /* a vertical video, so the box follows it */
+/* The frame is the visible box: it rounds the corners and crops TikTok's
+   bottom bar away in one go, so nothing is left half cut. */
+.tt-frame{
+  position:relative; width:100%; aspect-ratio:9/16;
+  overflow:hidden; border-radius:10px;
   background:var(--canvas-2);
+}
+.tt-embed{
+  position:absolute; top:0; left:0;
+  width:100%; height:calc(100% + 76px);   /* the bar sits below the crop */
+  border:0; display:block;
 }
 
 /* ============================================================
    OPERE
    ============================================================ */
-.works{ padding:clamp(4rem,9vw,7rem) 0 clamp(5rem,11vw,9rem); background:var(--canvas-2); }
+.works{ padding:clamp(2.75rem,5.5vw,4.5rem) 0 clamp(5rem,11vw,9rem); background:var(--canvas-2); }
 
 /* ---------- bento ----------
    Rows are the same size as a column, so every tile is a whole number of
