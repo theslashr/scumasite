@@ -1,0 +1,48 @@
+/* ============================================================
+   opere.js — the selected works, as a collection
+
+   The same component the bomboniere use, given different data. The list
+   and the descriptions are the ones main.js has always carried; the
+   thumbnail sizes are the w550 derivatives scaled from each original, so
+   the grid reserves the right box before an image arrives.
+
+   These paintings have never been titled. `alt` describes what is visible,
+   for screen readers, and is not a title — real titles, techniques and
+   dimensions should come from Antonio's catalogue.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var mount = document.getElementById('colls');
+  if (!mount || !window.Collection || !window.Relief) return;
+
+  var items = [
+    { id:'img10', w:550, h:324, alt:'Veduta di un golfo, con il vulcano sullo sfondo, le barche e i palazzi sul porto' },
+    { id:'logo', w:550, h:774, alt:'Mongolfiera variopinta che sale in un cielo azzurro' },
+    { id:'img02', w:550, h:733, alt:'Veduta notturna di un fiume, con la torre illuminata e dei papaveri in primo piano' },
+    { id:'img19', w:550, h:733, alt:'Vicolo notturno con una lanterna accesa sui muri ocra' },
+    { id:'img42', w:550, h:611, alt:'Piazza con una palma, una fontana e una figura con l’ombrello' },
+    { id:'img54', w:550, h:279, alt:'Panorama con un sentiero fra i girasoli che scende verso il mare' },
+    { id:'img16', w:550, h:452, alt:'Cortile con un ponte e una casa, due figure sedute su una panchina' },
+    { id:'img13', w:550, h:550, alt:'Bosco notturno sotto un cielo viola e rosa' },
+    { id:'img08', w:550, h:550, alt:'Natura morta con giradischi, clessidra, libri e una tazzina di caffè' },
+    { id:'img18', w:550, h:748, alt:'Piazza con fontana e la statua di un danzatore' },
+    { id:'img11', w:550, h:391, alt:'Sentiero nel bosco attraversato dalla luce' },
+    { id:'img37', w:550, h:433, alt:'Campo di papaveri rossi con le colline sullo sfondo' },
+    { id:'img48', w:550, h:550, alt:'Dettaglio dei libri dipinti nella natura morta' },
+    { id:'img28', w:550, h:550, alt:'Dettaglio della clessidra nella natura morta' }
+  ];
+
+  new window.Collection({
+    mount: mount,
+    items: items,
+    thumb: function (id) { return 'assets/img/sm/' + id + '.jpg'; },
+    full:  function (id) { return 'assets/img/' + id + '.jpg'; },
+    title: 'Scuma production',
+    blurb: 'Olio a spatola, acrilico, acquerello. Paesaggi attraversati, notturni che non hanno lasciato dormire, oggetti che hanno insistito per essere dipinti.',
+    cover: 'img54',
+    itemLabel: 'Opera ',
+    chooseLabel: "Scegli un'opera",
+    sheetTitle: 'Scuma production'
+  });
+})();

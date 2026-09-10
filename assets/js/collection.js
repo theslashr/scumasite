@@ -1,19 +1,23 @@
 /* ============================================================
    collection.js — a collection of paintings you can look through
 
-   Builds the arc, the rail, the sheet and the relief plate into a section,
-   and wires them to each other. relief.js does the lighting; this does the
-   choosing.
-
      new Collection({ mount: el, items: [...], thumb: fn, full: fn })
+
+   Three layers, and you only ever pay for the one you are looking at:
+
+     a card in the page  ->  the grid, every piece  ->  one painting, lit
+
+   The card is an image and a count. Opening it builds the grid; picking
+   from the grid builds the viewer, which is where WebGL and the relief
+   extraction finally happen. A visitor who never opens a collection pays
+   nothing for it beyond one cover image, which matters when one of these
+   holds 126 paintings.
 
    `items` is [{ id, w, h }] — the id is what the file is named and what
    the cache is keyed on, w and h are the thumbnail's real pixels so the
-   sheet can reserve the right box before anything loads.
+   grid can reserve the right box before anything loads.
 
-   Nothing starts until the section is near the viewport. A WebGL context
-   and a half-second of extraction are a lot to spend on a section that
-   may never be scrolled to, and this one sits well down a long page.
+   relief.js does the lighting; this does the choosing.
    ============================================================ */
 (function (root) {
   'use strict';
@@ -35,6 +39,10 @@
     if (html != null) n.innerHTML = html;
     return n;
   }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 
   function Collection(opts) {
     if (!(this instanceof Collection)) return new Collection(opts);
@@ -45,51 +53,155 @@
     this.current = -1;
     this.started = false;
 
-    this._build();
-
-    this._watch();
+    this._buildCard();
   }
 
-  /* Near, not visible: the extraction wants a head start on the scroll.
+  /* ---------------- the card in the page ---------------- */
+  Collection.prototype._buildCard = function () {
+    var o = this.o, self = this;
+    var cover = o.cover || this.items[Math.floor(this.items.length / 2)].id;
 
-     Two triggers rather than one. IntersectionObserver is the right tool
-     and is what fires in a real browser, but its delivery is tied to the
-     frame lifecycle, so anything that throttles rendering can withhold it
-     - and a section that silently never starts is a worse failure than
-     starting a little eagerly. The scroll check costs a bounding rect on
-     a passive listener and stops as soon as either one wins. */
-  Collection.prototype._watch = function () {
-    var self = this, io = null;
+    var card = el('button', 'coll-card');
+    card.type = 'button';
+    card.setAttribute('aria-label', 'Apri: ' + (o.title || '') + ', ' + this.total + ' opere');
+    card.innerHTML =
+      '<span class="coll-card__media">' +
+        '<img src="' + esc(o.thumb(cover)) + '" alt="" loading="lazy" decoding="async">' +
+      '</span>' +
+      '<span class="coll-card__body">' +
+        '<span class="coll-card__count">' + this.total + ' opere</span>' +
+        '<span class="coll-card__title">' + esc(o.title || '') + '</span>' +
+        '<span class="coll-card__sub">' + esc(o.blurb || '') + '</span>' +
+      '</span>';
 
-    function go() {
-      if (self.started) return;
-      if (io) io.disconnect();
-      root.removeEventListener('scroll', check);
-      root.removeEventListener('resize', check);
-      self.start();
-    }
-    function check() {
-      if (self.started) return;
-      var r = self.mount.getBoundingClientRect();
-      if (r.top < (root.innerHeight || 0) + 400 && r.bottom > -400) go();
-    }
-
-    if (root.IntersectionObserver) {
-      io = new IntersectionObserver(function (es) {
-        if (es[0].isIntersecting) go();
-      }, { rootMargin: '400px' });
-      io.observe(this.mount);
-    }
-    root.addEventListener('scroll', check, { passive: true });
-    root.addEventListener('resize', check, { passive: true });
-    check();
+    card.addEventListener('click', function () { self.openSheet(); });
+    this.card = card;
+    this.mount.appendChild(card);
   };
 
-  /* ---------------- markup ---------------- */
-  Collection.prototype._build = function () {
-    var o = this.o;
-    var viewer = el('div', 'viewer');
+  Collection.prototype._fail = function (msg) {
+    if (!this.errEl) {
+      this.errEl = el('p', 'coll__err');
+      this.errEl.style.cssText = 'text-align:center;color:#b9403a;font-size:.8rem';
+      (this.view || this.mount).appendChild(this.errEl);
+    }
+    this.errEl.textContent = msg;
+  };
 
+  /* ---------------- the grid, every piece ----------------
+     126 thumbnails is a lot to put in the document for a collection that
+     may never be opened, so it is built the first time it is asked for. */
+  Collection.prototype._buildSheet = function () {
+    if (this.sheet) return;
+    var self = this;
+    this.sheet = el('div', 'coll-sheet');
+    this.sheet.hidden = true;
+
+    var head = el('div', 'coll-sheet__head');
+    head.appendChild(el('h4', null, esc(this.o.sheetTitle || this.o.title || '')));
+    var close = el('button', null, '&times;');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Chiudi');
+    close.addEventListener('click', function () { self.closeSheet(); });
+    head.appendChild(close);
+
+    var scroll = el('div', 'coll-sheet__scroll');
+    this.sheetGrid = el('div', 'coll-sheet__grid');
+
+    var html = '';
+    for (var i = 0; i < this.items.length; i++) {
+      var it = this.items[i], n = i + 1;
+      html += '<button type="button" data-i="' + i + '" aria-current="false"' +
+              ' aria-label="' + esc(it.alt || ((this.o.itemLabel || 'Quadro ') + n)) + '">' +
+              '<img src="' + esc(this.o.thumb(it.id)) + '" alt="' + esc(it.alt || '') +
+              '" loading="lazy" decoding="async"' +
+              ' width="' + it.w + '" height="' + it.h + '">' +
+              '<b>' + (n < 10 ? '0' + n : n) + '</b></button>';
+    }
+    this.sheetGrid.innerHTML = html;
+    this.sheetGrid.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button') : null;
+      if (!b) return;
+      self.openViewer(parseInt(b.dataset.i, 10));
+    });
+
+    scroll.appendChild(this.sheetGrid);
+    this.sheet.appendChild(head);
+    this.sheet.appendChild(scroll);
+    document.body.appendChild(this.sheet);
+    this.sheetScroll = scroll;
+    this.sheetBtns = this.sheetGrid.querySelectorAll('button');
+
+    this.sheet.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') self.closeSheet();
+    });
+  };
+
+  Collection.prototype._markSheet = function (i) {
+    if (!this.sheetBtns) return;
+    for (var j = 0; j < this.sheetBtns.length; j++) {
+      this.sheetBtns[j].setAttribute('aria-current', String(i === j));
+    }
+  };
+
+  Collection.prototype.openSheet = function () {
+    this._buildSheet();
+    var self = this;
+    if (!this.viewOpen) this._lastFocus = document.activeElement;
+    this.sheet.hidden = false;
+    this._markSheet(this.current);
+    /* Reflow, then the class - not rAF. A frame callback is the usual way
+       to let a transition see the starting value, but it only arrives when
+       the page is being painted, and anything that throttles rendering
+       (a background tab, a preview pane) leaves the panel mounted and
+       never faded in. Reading offsetHeight forces the style to settle
+       synchronously, which is all the transition actually needs. */
+    void self.sheet.offsetHeight;
+    this.sheet.classList.add('in');
+    document.documentElement.style.overflow = 'hidden';
+    this._measure();
+    this._startLit();
+    this.sheet.tabIndex = -1;
+    this.sheet.focus();
+    var cur = this.sheetBtns && this.sheetBtns[this.current];
+    if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'center' });
+  };
+
+  Collection.prototype.closeSheet = function (keepScroll) {
+    if (!this.sheet || this.sheet.hidden) return;
+    var self = this;
+    this.sheet.classList.remove('in');
+    if (!keepScroll) document.documentElement.style.overflow = '';
+    this._stopLit();
+    setTimeout(function () { self.sheet.hidden = true; }, 300);
+    if (!keepScroll && this._lastFocus && this._lastFocus.focus) this._lastFocus.focus();
+  };
+
+  /* ---------------- one painting, lit ----------------
+     The viewer is an overlay, not a band in the page. It is the only place
+     WebGL is created and the only place the relief extraction runs, and it
+     is built the first time a painting is picked. */
+  Collection.prototype._buildViewer = function () {
+    if (this.view) return;
+    var o = this.o, self = this;
+
+    this.view = el('div', 'coll coll-view');
+    this.view.hidden = true;
+
+    var head = el('div', 'coll-view__head');
+    this.backBtn = el('button', 'coll-view__back', '&larr; <span>Tutte le opere</span>');
+    this.backBtn.type = 'button';
+    this.backBtn.addEventListener('click', function () { self.backToSheet(); });
+    var title = el('span', 'coll-view__title', esc(o.title || ''));
+    var close = el('button', 'coll-view__close', '&times;');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'Chiudi');
+    close.addEventListener('click', function () { self.closeViewer(); });
+    head.appendChild(this.backBtn);
+    head.appendChild(title);
+    head.appendChild(close);
+
+    var viewer = el('div', 'viewer');
     this.reel = el('div', 'reel');
     this.reel.tabIndex = 0;
     this.reel.setAttribute('role', 'listbox');
@@ -99,7 +211,7 @@
     this.stage = el('div', 'stage');
     this.plate = el('div', 'plate');
     this.cv = el('canvas');
-    this.sub = el('p', 'sub', o.hint || 'Muovi il puntatore sul quadro');
+    this.sub = el('p', 'sub', esc(o.hint || 'Muovi il puntatore sul quadro'));
     this.plate.appendChild(this.cv);
     this.plate.appendChild(this.sub);
     this.stage.appendChild(this.plate);
@@ -110,7 +222,7 @@
     this.edition.appendChild(this.edNum);
     this.edition.appendChild(el('span', 'sep', '/'));
     this.edition.appendChild(el('span', 'tot', String(this.total)));
-    this.edition.appendChild(el('span', 'uniq', o.uniqLabel || 'pezzo unico'));
+    if (o.uniqLabel) this.edition.appendChild(el('span', 'uniq', esc(o.uniqLabel)));
 
     show.appendChild(this.stage);
     show.appendChild(this.edition);
@@ -118,19 +230,27 @@
     viewer.appendChild(show);
 
     this.strip = el('div', 'strip');
-    this.allBtn = el('button', 'allBtn', (o.allLabel || 'Vedi tutte le ') + this.total);
-    this.allBtn.type = 'button';
 
-    this.mount.appendChild(viewer);
-    this.mount.appendChild(this.strip);
-    this.mount.appendChild(this.allBtn);
+    this.view.appendChild(head);
+    this.view.appendChild(viewer);
+    this.view.appendChild(this.strip);
+    document.body.appendChild(this.view);
 
     if (root.matchMedia && matchMedia('(hover: none)').matches) {
       this.sub.textContent = o.touchHint || 'Trascina il dito sul quadro';
     }
+
+    this.view.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { self.backToSheet(); return; }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault(); self.select(self._wrap(self.current + 1));
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault(); self.select(self._wrap(self.current - 1));
+      }
+    });
   };
 
-  Collection.prototype.start = function () {
+  Collection.prototype._start = function () {
     if (this.started) return;
     this.started = true;
     var self = this;
@@ -151,18 +271,53 @@
 
     this._buildStrip();
     this._buildReel();
-    this._keys();
-    this.allBtn.addEventListener('click', function () { self.openSheet(); });
-    this.select(0);
   };
 
-  Collection.prototype._fail = function (msg) {
-    if (!this.errEl) {
-      this.errEl = el('p', 'coll__err');
-      this.errEl.style.cssText = 'text-align:center;color:#b9403a;font-size:.8rem';
-      this.mount.appendChild(this.errEl);
-    }
-    this.errEl.textContent = msg;
+  Collection.prototype.openViewer = function (i) {
+    this._buildViewer();
+    var self = this;
+    this.view.hidden = false;
+    this.viewOpen = true;
+    document.documentElement.style.overflow = 'hidden';
+    // the grid stays mounted underneath, so going back is instant
+    this.closeSheet(true);
+    // see openSheet: reflow rather than a frame callback
+    void this.view.offsetHeight;
+    this.view.classList.add('in');
+    /* Everything below is the work, not the fade, and none of it may wait
+       on a frame: a viewer that opens blank because rAF was withheld is
+       the failure this whole path exists to avoid. */
+    this._start();
+    /* Put the arc where it belongs before anything is shown, rather than
+       letting select() ease it there. Opening painting 13 should not spin
+       through twelve others to reach it, and the ease runs on rAF, so a
+       frame withheld would leave the arc parked at the wrong painting
+       under a picture that is already correct. */
+    this._jumpTo(i);
+    this.select(i);
+    this.view.tabIndex = -1;
+    this.view.focus();
+  };
+
+  Collection.prototype.backToSheet = function () {
+    if (!this.viewOpen) return;
+    this._hideViewer();
+    this.openSheet();
+  };
+
+  Collection.prototype.closeViewer = function () {
+    if (!this.viewOpen) return;
+    this._hideViewer();
+    document.documentElement.style.overflow = '';
+    if (this._lastFocus && this._lastFocus.focus) this._lastFocus.focus();
+  };
+
+  Collection.prototype._hideViewer = function () {
+    var self = this;
+    this.viewOpen = false;
+    this.view.classList.remove('in');
+    if (this.relief) this.relief.stop && this.relief.stop();
+    setTimeout(function () { if (!self.viewOpen) self.view.hidden = true; }, 300);
   };
 
   /* ---------------- the rail ---------------- */
@@ -171,7 +326,7 @@
     this.items.forEach(function (it, i) {
       var b = el('button');
       b.type = 'button';
-      b.setAttribute('aria-label', (self.o.itemLabel || 'Quadro ') + (i + 1));
+      b.setAttribute('aria-label', it.alt || ((self.o.itemLabel || 'Quadro ') + (i + 1)));
       b.setAttribute('aria-current', 'false');
       var im = el('img');
       im.src = self.o.thumb(it.id);
@@ -278,10 +433,17 @@
       e.style.zIndex = String(Math.round(sc * 1000));
       var t = (c + 1) / 2;
       e.style.opacity = (0.32 + 0.68 * t).toFixed(3);
-      // the same idea as the sheet: what you are not looking at keeps less colour
+      // the same idea as the grid: what you are not looking at keeps less colour
       e.style.filter = 'saturate(' + (0.34 + 0.66 * t).toFixed(3) + ')';
       e.setAttribute('aria-current', String(Math.abs(th) < step / 2));
     }
+  };
+
+  /* No ease, no frame: land on it. */
+  Collection.prototype._jumpTo = function (i) {
+    if (!this.cards || !this.cards.length) return;
+    this.pos = this.posTarget = i;
+    this._layout();
   };
 
   Collection.prototype.spinTo = function (target) {
@@ -381,7 +543,7 @@
        background tab and the load would sit there until it came forward. */
     clearTimeout(this._pending);
     this._pending = setTimeout(function () {
-      if (self.current !== i) return;
+      if (self.current !== i || !self.relief) return;
       self.relief.onload = function () {
         if (self.current === i) self.plate.classList.remove('busy');
       };
@@ -389,102 +551,15 @@
     }, warm ? 180 : 300);
   };
 
-  Collection.prototype._keys = function () {
-    var self = this;
-    this.reel.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        e.preventDefault(); self.select(self._wrap(self.current + 1));
-      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-        e.preventDefault(); self.select(self._wrap(self.current - 1));
-      }
-    });
-  };
+  /* ---------------- the light on the grid ----------------
+     Nothing is painted over it. Every painting carries how lit it is, 0 to
+     1, and the CSS turns that into saturation and brightness. Light comes
+     from the pointer and from three drifts, so the grid keeps moving when
+     nobody is touching it.
 
-  /* ---------------- all of them, on demand ----------------
-     126 thumbnails is a lot to put in the document for a sheet that may
-     never be opened, so it is built the first time it is asked for. */
-  Collection.prototype._buildSheet = function () {
-    if (this.sheet) return;
-    var self = this;
-    this.sheet = el('div', 'coll-sheet');
-    this.sheet.hidden = true;
-
-    var head = el('div', 'coll-sheet__head');
-    head.appendChild(el('h4', null, this.o.sheetTitle || ''));
-    var close = el('button', null, '&times;');
-    close.type = 'button';
-    close.setAttribute('aria-label', 'Chiudi');
-    close.addEventListener('click', function () { self.closeSheet(); });
-    head.appendChild(close);
-
-    var scroll = el('div', 'coll-sheet__scroll');
-    this.sheetGrid = el('div', 'coll-sheet__grid');
-
-    var html = '';
-    for (var i = 0; i < this.items.length; i++) {
-      var it = this.items[i], n = i + 1;
-      html += '<button type="button" data-i="' + i + '" aria-current="false"' +
-              ' aria-label="' + (this.o.itemLabel || 'Quadro ') + n + '">' +
-              '<img src="' + this.o.thumb(it.id) + '" alt="" loading="lazy" decoding="async"' +
-              ' width="' + it.w + '" height="' + it.h + '">' +
-              '<b>' + (n < 10 ? '0' + n : n) + '</b></button>';
-    }
-    this.sheetGrid.innerHTML = html;
-    this.sheetGrid.addEventListener('click', function (e) {
-      var b = e.target.closest ? e.target.closest('button') : null;
-      if (!b) return;
-      self.select(parseInt(b.dataset.i, 10));
-      self.closeSheet();
-    });
-
-    scroll.appendChild(this.sheetGrid);
-    this.sheet.appendChild(head);
-    this.sheet.appendChild(scroll);
-    document.body.appendChild(this.sheet);
-    this.sheetScroll = scroll;
-    this.sheetBtns = this.sheetGrid.querySelectorAll('button');
-  };
-
-  Collection.prototype._markSheet = function (i) {
-    if (!this.sheetBtns) return;
-    for (var j = 0; j < this.sheetBtns.length; j++) {
-      this.sheetBtns[j].setAttribute('aria-current', String(i === j));
-    }
-  };
-
-  Collection.prototype.openSheet = function () {
-    this._buildSheet();
-    var self = this;
-    this._lastFocus = document.activeElement;
-    this.sheet.hidden = false;
-    this._markSheet(this.current);
-    requestAnimationFrame(function () { self.sheet.classList.add('in'); });
-    document.documentElement.style.overflow = 'hidden';
-    this._measure();
-    this._startLit();
-    var cur = this.sheetBtns && this.sheetBtns[this.current];
-    if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'center' });
-  };
-
-  Collection.prototype.closeSheet = function () {
-    if (!this.sheet || this.sheet.hidden) return;
-    var self = this;
-    this.sheet.classList.remove('in');
-    document.documentElement.style.overflow = '';
-    this._stopLit();
-    setTimeout(function () { self.sheet.hidden = true; }, 300);
-    if (this._lastFocus && this._lastFocus.focus) this._lastFocus.focus();
-  };
-
-  /* ---------------- the light on the sheet ----------------
-     Nothing is painted over the grid. Every painting carries how lit it is,
-     0 to 1, and the CSS turns that into saturation and brightness. Light
-     comes from the pointer and from three drifts, so the sheet keeps moving
-     when nobody is touching it.
-
-     Positions are measured once from offsetLeft/offsetTop and only adjusted
-     by scroll afterwards; reading getBoundingClientRect on 126 elements a
-     frame would force a layout each time. */
+     Positions are measured once from offsetLeft/offsetTop and only
+     adjusted by scroll afterwards; reading getBoundingClientRect on 126
+     elements a frame would force a layout each time. */
   Collection.prototype._measure = function () {
     this.boxes = [];
     if (!this.sheetBtns) return;

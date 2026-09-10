@@ -17,11 +17,105 @@
    redefined here.
    ============================================================ */
 
+/* ---------- the cards in the page ----------
+   Opere is a shelf of collections rather than a wall of paintings. A card
+   is a cover and a count; opening one is what builds its grid, and picking
+   from that grid is what builds the viewer. A visitor who opens nothing
+   pays for one cover image per collection - which is the point, when one
+   of them holds 126.
+
+   These sit on the site's own ground, in the site's own type. Only the
+   viewer goes dark. */
+.colls{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));
+  gap:clamp(1rem,2.2vw,1.9rem);
+}
+.coll-card{
+  --mx:50; --my:50;
+  display:flex; flex-direction:column; text-align:left;
+  padding:0; border:0; background:var(--canvas); cursor:pointer;
+  font:inherit; color:inherit;
+  border-radius:3px; overflow:hidden; position:relative;
+  box-shadow:0 18px 40px -26px rgba(14,36,56,.5);
+  /* the same tilt the bento tiles have, so opening a collection feels like
+     the same kind of object as the paintings did */
+  transform:perspective(900px)
+    rotateY(calc((var(--mx) - 50) * .05deg))
+    rotateX(calc((var(--my) - 50) * -.05deg))
+    translateY(0);
+  transition:transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.coll-card:hover{
+  transform:perspective(900px)
+    rotateY(calc((var(--mx) - 50) * .05deg))
+    rotateX(calc((var(--my) - 50) * -.05deg))
+    translateY(-6px);
+  box-shadow:0 28px 60px -30px rgba(14,36,56,.55);
+}
+.coll-card__media{ display:block; overflow:hidden; background:var(--ink-2); }
+.coll-card__media img{
+  display:block; width:100%; height:100%; aspect-ratio:4/3; object-fit:cover;
+  transition:transform 1s var(--ease);
+}
+.coll-card:hover .coll-card__media img{ transform:scale(1.04); }
+/* the highlight follows the hand across the cover, as it does on a tile */
+.coll-card__media::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(58% 58% at calc(var(--mx) * 1%) calc(var(--my) * 1%),
+             rgba(255,252,244,.16), transparent 70%);
+  opacity:0; transition:opacity .5s var(--ease);
+}
+.coll-card:hover .coll-card__media::after{ opacity:1; }
+.coll-card__body{ display:block; padding:1.4rem 1.5rem 1.6rem; }
+.coll-card__count{
+  display:block; font-size:.66rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ochre-deep); margin-bottom:.5rem;
+}
+.coll-card__title{
+  display:block; font-family:var(--display); font-weight:400;
+  font-size:clamp(1.2rem,2.2vw,1.65rem); margin-bottom:.4rem;
+}
+.coll-card__sub{ display:block; color:var(--muted); font-size:.92rem; line-height:1.55; }
+
+/* ---------- the viewer, as an overlay ----------
+   A room you step into. The relief highlight is a small bright thing on a
+   dark surface; on primed linen it has almost no contrast to spend and the
+   effect it exists for stops reading. The page stays light and the viewer
+   goes dark, so the shift happens on a click and reads as intentional
+   rather than as a seam mid-scroll. */
+/* .coll.coll-view, not .coll-view: the overlay wears both classes, and at
+   equal specificity source order decides - so a bare .coll-view lost
+   position:fixed to the .coll block below it and the overlay laid itself
+   out in the page instead of over it. Specificity rather than ordering,
+   so moving these blocks around cannot break it again. */
+.coll.coll-view[hidden]{ display:none!important; }
+.coll.coll-view{
+  position:fixed; inset:0; z-index:70;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:clamp(1.2rem,3vw,2.4rem);
+  opacity:0; transition:opacity .3s var(--ease);
+}
+.coll.coll-view.in{ opacity:1; }
+.coll-view__head{
+  position:absolute; top:0; left:0; right:0; z-index:4;
+  display:flex; align-items:center; justify-content:space-between; gap:1rem;
+  padding:clamp(.9rem,3vw,1.4rem) clamp(1rem,4vw,2.2rem);
+  font-size:.7rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--coll-muted);
+}
+.coll-view__head button{
+  font:inherit; letter-spacing:inherit; text-transform:inherit;
+  color:var(--coll-muted); background:none; border:0; cursor:pointer;
+  padding:.4rem .2rem; transition:color .3s var(--ease);
+}
+.coll-view__head button:hover{ color:var(--canvas); }
+.coll-view__close{ font-size:1.5rem!important; line-height:1; letter-spacing:0!important; }
+.coll-view__title{ color:var(--coll-dim); }
+@media (max-width:640px){
+  .coll-view__back span, .coll-view__title{ display:none; }
+}
+
 .coll{
-  /* A room you step into. The relief highlight is a small bright thing on
-     a dark surface; on primed linen it has almost no contrast to spend
-     and the effect it exists for stops reading. So the section commits to
-     its own ground rather than matching the page. */
   --wall:#16181d;
   --wall-2:#0c0d10;
   --coll-muted:#8b8f96;
@@ -32,24 +126,8 @@
   position:relative;
   background:radial-gradient(130% 95% at 50% 0%, var(--wall) 0%, var(--wall-2) 72%);
   color:var(--canvas);
-  padding:clamp(2.5rem,6vw,5rem) clamp(1rem,4vw,2.4rem) clamp(2.5rem,6vw,4.5rem);
+  font-family:var(--sans);
 }
-
-/* Full-bleed out of the site's wrapper without needing a wrapper of its
-   own: the section is the width of the viewport wherever it is placed. */
-.coll--bleed{
-  width:100vw;
-  margin-left:calc(50% - 50vw);
-  margin-right:calc(50% - 50vw);
-}
-
-.coll__head{ text-align:center; margin:0 auto clamp(1.6rem,4vw,2.8rem); max-width:46rem; }
-.coll__head .kicker{ color:var(--ochre); }
-.coll__head h3{
-  font-family:var(--display); font-weight:400;
-  font-size:clamp(1.6rem,3.4vw,2.5rem); margin:.3rem 0 .7rem; color:var(--canvas);
-}
-.coll__head p{ color:var(--coll-muted); margin:0; }
 
 /* ---------- the plate ---------- */
 .coll .stage{
@@ -71,7 +149,7 @@
 .coll .plate.busy{ opacity:0; }
 .coll .plate canvas{
   display:block; max-width:100%;
-  max-height:min(62svh, calc(100svh - 300px));
+  max-height:min(70svh, calc(100svh - 250px));
   width:auto; height:auto;
 }
 .coll .plate::after{
@@ -138,7 +216,7 @@
 .coll .reel{
   position:relative; overflow:hidden;
   flex:0 0 auto; width:clamp(190px,21vw,300px);
-  height:min(62svh,660px);
+  height:min(70svh,700px);
   cursor:grab; touch-action:pan-y;
   outline:none;
   /* Two fades, not one. The vertical lets the ends of the arc fall away

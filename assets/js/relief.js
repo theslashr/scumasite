@@ -447,6 +447,13 @@
       ' rotateX(' + (-this.ly * this.tilt).toFixed(2) + 'deg)';
   };
 
+  /* Park the loop without tearing anything down. The viewer is an overlay
+     that gets hidden and shown again, and a hidden overlay has no business
+     holding a frame callback. */
+  Relief.prototype.stop = function () {
+    if (this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }
+  };
+
   Relief.prototype.dispose = function () {
     this.dead = true;
     if (this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }

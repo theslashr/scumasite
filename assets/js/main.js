@@ -77,7 +77,15 @@
      --mx/--my off the tile, so the CSS does the drawing and this only
      reports where the hand is. Pointer-driven, so touch is untouched.
      ------------------------------------------------------------ */
-  if (grid && fine && !reduced) {
+  /* The collection cards get the same treatment as the tiles did: one
+     delegated listener per container, reporting where the hand is so the
+     CSS can do the drawing. */
+  var tiltHosts = [];
+  if (grid) tiltHosts.push({ host: grid, sel: '.tile' });
+  var colls = $('#colls');
+  if (colls) tiltHosts.push({ host: colls, sel: '.coll-card' });
+
+  if (tiltHosts.length && fine && !reduced) {
     var tilting = null, tiltRaf = 0, tmx = 50, tmy = 50;
     function writeTilt() {
       tiltRaf = 0;
@@ -85,10 +93,11 @@
       tilting.style.setProperty('--mx', String(tmx));
       tilting.style.setProperty('--my', String(tmy));
     }
-    // one delegated listener rather than fourteen: only ever one tile is hovered
-    grid.addEventListener('pointermove', function (e) {
-      var tile = e.target.closest ? e.target.closest('.tile') : null;
-      if (!tile) { resetTilt(); return; }   // moved into a gap between tiles
+    // one delegated listener rather than one per card: only ever one is hovered
+    tiltHosts.forEach(function (h) {
+    h.host.addEventListener('pointermove', function (e) {
+      var tile = e.target.closest ? e.target.closest(h.sel) : null;
+      if (!tile) { resetTilt(); return; }   // moved into a gap between them
       if (tile !== tilting) { resetTilt(); tilting = tile; }
       var r = tile.getBoundingClientRect();
       tmx = ((e.clientX - r.left) / r.width)  * 100;
@@ -104,8 +113,9 @@
       tilting.style.setProperty('--my', '50');
       tilting = null;
     }
-    grid.addEventListener('pointerleave', resetTilt);
-    grid.addEventListener('pointerdown', resetTilt);
+    h.host.addEventListener('pointerleave', resetTilt);
+    h.host.addEventListener('pointerdown', resetTilt);
+    });
   }
 
   /* ============================================================

@@ -19,7 +19,8 @@ GitHub Pages, Aruba…) — just upload the folder.
 index.html            all sections; anchors #opere #frammenti #progetti #gallerie #contatti
 assets/css/style.css  design tokens at the top (:root) — colours, fonts, spacing
 assets/js/paint.js       the hero painting surface
-assets/js/main.js        works grid, filters, lightbox, nav, reveals
+assets/js/main.js        card tilt, nav, reveals, GSAP choreography
+assets/js/opere.js       the 14 selected works, as a collection
 assets/js/relief.js      the impasto viewer — light over a painting's surface
 assets/js/collection.js  arc, rail and sheet; the thing that does the choosing
 assets/js/bomboniere.js  the 126 small oils: their data, and one instantiation
@@ -47,29 +48,48 @@ Tuning lives at the top of `paint.js`: `GESSO_RGB` (the ground) and `PALETTE`
 Swap the hero painting in `index.html` (`#heroArt`). A **wide, bright, high
 chroma** painting works best — it has to fight its way out of a dark ground.
 
-## Bomboniere
+## Collections
 
-A second collection inside **Opere**, brought over from the standalone
-bomboniere prototype. Two ways of interacting with a painting now sit on the
-same page and they are deliberately different: in the hero **you paint the
-work**, here **you light it**.
+**Opere** is a shelf of collections rather than a wall of paintings. There
+are two — *Scuma production* (the 14 selected works) and *Bomboniere* (126
+small oils) — and both are the same component with different data.
 
-The section is dark on purpose. The relief highlight is a small bright thing
-on a dark surface, and on primed linen it has almost no contrast to spend —
-the effect stops reading. So it commits to its own ground and becomes a room
-you step into rather than more of the same wall.
+Three layers, and a visitor only pays for the one they are looking at:
 
-### Three files, three jobs
+```
+a card in the page  ->  the grid, every piece  ->  one painting, lit
+```
+
+A card is a cover and a count. Opening it builds that collection's grid;
+picking from the grid builds the viewer, which is where WebGL and the relief
+extraction finally happen. Open nothing and you have downloaded two cover
+images — which is the point, when one collection holds 126 paintings.
+
+The viewer is an overlay and it is dark. The relief highlight is a small
+bright thing on a dark surface, and on primed linen it has almost no contrast
+to spend, so the effect stops reading. Making it an overlay rather than a
+band in the page means that shift happens on a click and reads as
+intentional, instead of as a seam mid-scroll.
+
+Two ways of handling a painting now sit on this site and they are
+deliberately different: in the hero **you paint the work**, in a collection
+**you light it**.
+
+### Four files, four jobs
 
 - `relief.js` — the lighting. Give it a canvas; it takes image URLs.
 - `collection.js` — the choosing. The arc, the rail, the sheet, the edition
   mark, and the wiring between them.
-- `bomboniere.js` — the data. What these paintings are called and how big
-  their thumbnails are, and one `new Collection({...})`.
+- `bomboniere.js`, `opere.js` — the data. What each set is called and how
+  big its thumbnails are, and one `new Collection({...})` apiece.
 
-Nothing about the 126 is baked into the first two, so a second collection is
-a data file. The site's own works could become one; they have not, because
-the bento grid is doing editorial work that a uniform sheet would undo.
+Nothing about any particular set is baked into the first two, so a third
+collection is a data file and nothing else.
+
+The bento grid of 14 tiles that used to sit here is gone, replaced by its
+card. Its tilt is not: the collection cards carry the same `--mx`/`--my`
+treatment, from the same delegated listener in `main.js`, so opening a
+collection still feels like handling an object.
 
 ### Where the relief comes from
 
@@ -88,10 +108,23 @@ serve, and the same source doubles as the inline fallback — one copy of the
 algorithm, whichever thread it lands on. Worker and inline output were
 checked byte-for-byte identical across a full 4.35MB map.
 
-Nothing starts until the section is near the viewport, on two triggers rather
-than one: an IntersectionObserver, and a scroll check behind it. The observer
-is the right tool, but its delivery rides the frame lifecycle, and a section
-that silently never starts is a worse failure than one that starts early.
+### Two things not to reintroduce
+
+**Nothing that has to happen may wait on a frame.** Opening a panel used to
+do its work inside `requestAnimationFrame` — the usual way to let a
+transition see its starting value. But a frame callback only arrives when the
+page is being painted, so anything that throttles rendering left the viewer
+mounted, blank and never faded in. Reading `offsetHeight` forces the style to
+settle synchronously, which is all the transition needed; the building
+happens outside any callback. The arc lands on its painting by assignment
+rather than by easing there, for the same reason and because opening
+painting 41 should not spin through forty others to reach it.
+
+**The overlay is `.coll.coll-view`, not `.coll-view`.** It wears both
+classes, and at equal specificity source order decides, so a bare
+`.coll-view` lost `position:fixed` to the `.coll` block below it and the
+overlay laid itself out *in* the page rather than over it. Specificity rather
+than ordering, so moving the blocks around cannot break it again.
 
 ### What this cannot do
 
