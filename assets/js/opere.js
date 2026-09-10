@@ -13,8 +13,6 @@
 (function () {
   'use strict';
 
-  var mount = document.getElementById('colls');
-  if (!mount || !window.Collection || !window.Relief) return;
 
   var items = [
     { id:'img10', w:550, h:324, alt:'Veduta di un golfo, con il vulcano sullo sfondo, le barche e i palazzi sul porto' },
@@ -33,16 +31,15 @@
     { id:'img28', w:550, h:550, alt:'Dettaglio della clessidra nella natura morta' }
   ];
 
-  new window.Collection({
-    mount: mount,
+  window.COLLECTIONS = window.COLLECTIONS || {};
+  window.COLLECTIONS.opere = {
     items: items,
     thumb: function (id) { return 'assets/img/sm/' + id + '.jpg'; },
     full:  function (id) { return 'assets/img/' + id + '.jpg'; },
-    title: 'Scuma production',
-    blurb: 'Olio a spatola, acrilico, acquerello. Paesaggi attraversati, notturni che non hanno lasciato dormire, oggetti che hanno insistito per essere dipinti.',
+    title: 'Opere Sparse',
     cover: 'img54',
     itemLabel: 'Opera ',
     chooseLabel: "Scegli un'opera",
-    sheetTitle: 'Scuma production'
-  });
+    sheetTitle: 'Opere Sparse'
+  };
 })();

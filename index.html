@@ -18,8 +18,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css?v=77">
-<link rel="stylesheet" href="assets/css/collection.css?v=77">
+<link rel="stylesheet" href="assets/css/style.css?v=78">
+<link rel="stylesheet" href="assets/css/collection.css?v=78">
 </head>
 <body>
 
@@ -168,9 +168,28 @@
     </header>
 
     <!-- Opere is a shelf of collections rather than a wall of paintings.
-         A card is a cover and a count; opening one shows every piece in
-         that collection, and picking one opens it lit. -->
-    <div class="colls" id="colls"><!-- injected by opere.js and bomboniere.js --></div>
+         Each is a page of its own, so it has a URL to link and to share,
+         and these are plain links: no script has to run for them to work. -->
+    <div class="colls" id="colls">
+      <a class="coll-card" href="collezione.html?c=opere" data-reveal>
+        <span class="coll-card__media">
+          <img src="assets/img/sm/img54.jpg" alt="" loading="lazy" decoding="async" width="550" height="279">
+        </span>
+        <span class="coll-card__body">
+          <span class="coll-card__count">14 opere</span>
+          <span class="coll-card__title">Opere Sparse</span>
+        </span>
+      </a>
+      <a class="coll-card" href="collezione.html?c=bomboniere" data-reveal>
+        <span class="coll-card__media">
+          <img src="assets/img/bomb/thumb/n047.jpg" alt="" loading="lazy" decoding="async" width="220" height="145">
+        </span>
+        <span class="coll-card__body">
+          <span class="coll-card__count">126 opere</span>
+          <span class="coll-card__title">Bomboniere</span>
+        </span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -443,11 +462,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="assets/js/paint.js?v=77"></script>
-<script src="assets/js/main.js?v=77"></script>
-<script src="assets/js/relief.js?v=77"></script>
-<script src="assets/js/collection.js?v=77"></script>
-<script src="assets/js/opere.js?v=77"></script>
-<script src="assets/js/bomboniere.js?v=77"></script>
+<script src="assets/js/paint.js?v=78"></script>
+<script src="assets/js/main.js?v=78"></script>
 </body>
 </html>

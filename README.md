@@ -57,13 +57,22 @@ small oils) — and both are the same component with different data.
 Three layers, and a visitor only pays for the one they are looking at:
 
 ```
-a card in the page  ->  the grid, every piece  ->  one painting, lit
+a card on the home page  ->  collezione.html  ->  one painting, lit
 ```
 
-A card is a cover and a count. Opening it builds that collection's grid;
-picking from the grid builds the viewer, which is where WebGL and the relief
-extraction finally happen. Open nothing and you have downloaded two cover
-images — which is the point, when one collection holds 126 paintings.
+The cards are plain `<a>` links to `collezione.html?c=opere` and
+`?c=bomboniere`. **A collection is a page, not a panel**: it has a URL to
+link and to share, the back button behaves, and no script has to run for the
+links to work. The home page loads none of this code — no `relief.js`, no
+`collection.js`, no data — and the only canvases in it are the hero's two.
+
+`collezione.html` reads the `c=` parameter, looks the set up in
+`window.COLLECTIONS`, and lands on the grid, because on that page the grid
+*is* the collection. Picking from it builds the viewer, which is where WebGL
+and the relief extraction finally happen.
+
+The cards are small and carry a cover, a count and a name — no description.
+They are a way in, not the work itself.
 
 The viewer is an overlay and it is dark. The relief highlight is a small
 bright thing on a dark surface, and on primed linen it has almost no contrast

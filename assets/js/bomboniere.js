@@ -8,8 +8,6 @@
 (function () {
   'use strict';
 
-  var mount = document.getElementById('colls');
-  if (!mount || !window.Collection || !window.Relief) return;
 
   var TOTAL = 126;
 
@@ -47,13 +45,12 @@
     items.push({ id: id, w: TW, h: TH[k - 1] });
   }
 
-  new window.Collection({
-    mount: mount,
+  window.COLLECTIONS = window.COLLECTIONS || {};
+  window.COLLECTIONS.bomboniere = {
     items: items,
     thumb: function (id) { return 'assets/img/bomb/thumb/' + id + '.jpg'; },
     full:  function (id) { return 'assets/img/bomb/full/'  + id + '.jpg'; },
     title: 'Bomboniere',
-    blurb: 'Centoventisei piccoli olii, ognuno dipinto una volta sola. Aprine uno e la luce attraversa la trama della tela e i rilievi del colore.',
     cover: 'n047',
     itemLabel: 'Bomboniera ',
     chooseLabel: 'Scegli una bomboniera',
@@ -61,5 +58,5 @@
     touchHint: 'Trascina il dito sul quadro',
     uniqLabel: 'pezzo unico',
     sheetTitle: 'Bomboniere · 126 pezzi unici'
-  });
+  };
 })();

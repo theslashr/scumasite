@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collezione · Antonio Burgello</title>
+<meta name="description" content="Le collezioni di Antonio “Scuma” Burgello: opere sparse e bomboniere, ognuna da guardare da vicino, con la luce che attraversa la materia del colore.">
+<!-- a collection is its own page, so it has its own URL to link and to share -->
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Inter:wght@300;350;400&display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=78">
+<link rel="stylesheet" href="assets/css/collection.css?v=78">
+<style>
+  /* The page is the collection. Nothing sits behind the grid, so the body
+     is just the ground it stands on. */
+  body{ background:#0c0d10; color:var(--canvas); min-height:100svh; }
+  .coll-page__fallback{
+    max-width:38rem; margin:0 auto; padding:22vh 1.5rem;
+    text-align:center; color:#8b8f96; font-family:var(--sans);
+  }
+  .coll-page__fallback a{ color:var(--ochre); }
+  /* main.js scales the ring through GSAP; here it is a class and a
+     transition, which is the same effect without the dependency */
+  .brush-cursor svg{ transition:transform .3s cubic-bezier(.22,.61,.36,1); }
+  .brush-cursor.is-over svg{ transform:scale(1.7); }
+</style>
+</head>
+<body>
+
+<!-- Shown only if the collection in the URL is not one we have, and
+     replaced by the grid otherwise. Without JS it is what remains, which is
+     why it carries a way back rather than an error. -->
+<div class="coll-page__fallback" id="fallback">
+  <p>Questa collezione non è disponibile.</p>
+  <p><a href="index.html#opere">Torna alle opere</a></p>
+</div>
+
+<script src="assets/js/relief.js?v=78"></script>
+<script src="assets/js/collection.js?v=78"></script>
+<script src="assets/js/opere.js?v=78"></script>
+<script src="assets/js/bomboniere.js?v=78"></script>
+<script>
+(function () {
+  'use strict';
+  var which = (location.search.match(/[?&]c=([\w-]+)/) || [])[1] || 'bomboniere';
+  var data = window.COLLECTIONS && window.COLLECTIONS[which];
+  if (!data || !window.Collection || !window.Relief) return;
+
+  document.getElementById('fallback').hidden = true;
+  document.title = data.title + ' · Antonio Burgello';
+
+  var opts = { page: true, backHref: 'index.html#opere' };
+  for (var k in data) opts[k] = data[k];
+  new window.Collection(opts);
+})();
+</script>
+
+<!-- The site's cursor, so the two feel like one thing. main.js owns the
+     version on the home page and it is tangled up with GSAP and the tiles;
+     this is the same markup driven plainly, which is all it ever needed -
+     both halves ride the real pointer and the ring grows over anything
+     clickable. -->
+<div class="brush-cursor" id="brushCursor" aria-hidden="true">
+  <svg viewBox="0 0 40 40" width="40" height="40">
+    <circle class="bc-ring" cx="20" cy="20" r="14"/>
+  </svg>
+</div>
+<div class="brush-dot" id="brushDot" aria-hidden="true">
+  <svg viewBox="0 0 12 12" width="12" height="12">
+    <circle class="bc-dot" cx="6" cy="6" r="3.5"/>
+  </svg>
+</div>
+<script>
+(function () {
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  document.body.classList.add('has-cursor');
+  var ring = document.getElementById('brushCursor'), dot = document.getElementById('brushDot');
+  addEventListener('pointermove', function (e) {
+    var t = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
+    ring.style.transform = t;
+    if (dot) dot.style.transform = t;
+  }, { passive: true });
+  // delegated, because most of what is clickable here does not exist yet
+  addEventListener('pointerover', function (e) {
+    var on = e.target.closest && e.target.closest('a, button');
+    ring.classList.toggle('is-over', !!on);
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>

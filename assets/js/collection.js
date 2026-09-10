@@ -53,7 +53,11 @@
     this.current = -1;
     this.started = false;
 
-    this._buildCard();
+    /* On a page of its own there is no card: the grid is what you land on,
+       because the page *is* the collection. Closing it goes back to where
+       the visitor came from rather than hiding an overlay. */
+    if (opts.page) this.openSheet();
+    else this._buildCard();
   }
 
   /* ---------------- the card in the page ---------------- */
@@ -170,6 +174,11 @@
   Collection.prototype.closeSheet = function (keepScroll) {
     if (!this.sheet || this.sheet.hidden) return;
     var self = this;
+    if (this.o.page && !keepScroll) {
+      // nothing behind it to go back to on this page
+      if (this.o.backHref) location.href = this.o.backHref;
+      return;
+    }
     this.sheet.classList.remove('in');
     if (!keepScroll) document.documentElement.style.overflow = '';
     this._stopLit();
@@ -307,6 +316,7 @@
 
   Collection.prototype.closeViewer = function () {
     if (!this.viewOpen) return;
+    if (this.o.page) { this.backToSheet(); return; }
     this._hideViewer();
     document.documentElement.style.overflow = '';
     if (this._lastFocus && this._lastFocus.focus) this._lastFocus.focus();
