@@ -1,0 +1,342 @@
+/* ============================================================
+   collection.css — a collection of paintings you can look through
+
+   The grid, the arc, the rail and the relief plate, lifted out of the
+   bomboniere prototype so any collection on this site can use them.
+
+   Everything is scoped under .coll. The prototype was its own page and
+   could take names like .grid, .stage and .plate for itself; here it is a
+   section inside a site that already owns .grid and .card, so the scope
+   is what keeps the two apart. The cursor is the exception and is
+   deliberately not scoped: it is the site's own, and both were always the
+   same code.
+
+   The palette needs no translation. The prototype was built on this
+   site's tokens - --ink, --canvas, --ochre, --sans and --ease are
+   identical in both - so only the greys that assume a dark ground are
+   redefined here.
+   ============================================================ */
+
+.coll{
+  /* A room you step into. The relief highlight is a small bright thing on
+     a dark surface; on primed linen it has almost no contrast to spend
+     and the effect it exists for stops reading. So the section commits to
+     its own ground rather than matching the page. */
+  --wall:#16181d;
+  --wall-2:#0c0d10;
+  --coll-muted:#8b8f96;
+  --coll-dim:#666a71;
+  /* the same above the picture as below it, so centring reads as centred */
+  --breathe:clamp(.9rem,2.2vw,1.5rem);
+
+  position:relative;
+  background:radial-gradient(130% 95% at 50% 0%, var(--wall) 0%, var(--wall-2) 72%);
+  color:var(--canvas);
+  padding:clamp(2.5rem,6vw,5rem) clamp(1rem,4vw,2.4rem) clamp(2.5rem,6vw,4.5rem);
+}
+
+/* Full-bleed out of the site's wrapper without needing a wrapper of its
+   own: the section is the width of the viewport wherever it is placed. */
+.coll--bleed{
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+}
+
+.coll__head{ text-align:center; margin:0 auto clamp(1.6rem,4vw,2.8rem); max-width:46rem; }
+.coll__head .kicker{ color:var(--ochre); }
+.coll__head h3{
+  font-family:var(--display); font-weight:400;
+  font-size:clamp(1.6rem,3.4vw,2.5rem); margin:.3rem 0 .7rem; color:var(--canvas);
+}
+.coll__head p{ color:var(--coll-muted); margin:0; }
+
+/* ---------- the plate ---------- */
+.coll .stage{
+  position:relative;
+  perspective:1200px; width:100%; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  min-height:0;
+  /* a drag across the picture is aiming the light, not scrolling */
+  touch-action:none;
+}
+.coll .plate{
+  position:relative; border-radius:2px; overflow:hidden;
+  transform-style:preserve-3d;
+  transition:transform .18s var(--ease), box-shadow .4s var(--ease), opacity .34s var(--ease);
+  box-shadow:0 34px 60px -26px rgba(0,0,0,.85), 0 6px 16px -8px rgba(0,0,0,.6);
+  cursor:grab; max-width:100%;
+}
+.coll .plate:active{ cursor:grabbing; }
+.coll .plate.busy{ opacity:0; }
+.coll .plate canvas{
+  display:block; max-width:100%;
+  max-height:min(62svh, calc(100svh - 300px));
+  width:auto; height:auto;
+}
+.coll .plate::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+  box-shadow:inset 0 0 0 1px rgba(255,252,244,.10); border-radius:inherit;
+}
+
+/* The hint has a job exactly once. It floats under the painting rather
+   than taking a row of its own, and retires the moment the hand arrives -
+   so it costs no height, and the gap it used to leave behind goes too. */
+.coll .sub{
+  position:absolute; left:0; right:0; bottom:0; z-index:2;
+  margin:0; padding:2.2rem .8rem .7rem;
+  color:rgba(244,239,230,.92); font-size:.68rem; letter-spacing:.12em;
+  text-transform:uppercase; text-align:center; line-height:1.4;
+  pointer-events:none;
+  /* a scrim, because it has to be readable over whichever painting it
+     happens to land on */
+  background:linear-gradient(to top, rgba(6,8,11,.78), rgba(6,8,11,0));
+  transition:opacity .6s var(--ease);
+}
+.coll .sub.gone{ opacity:0; }
+
+/* ---------- edition mark ---------- */
+.coll .edition{
+  /* centred, not baseline: the number is 2.15rem and the rest under .9rem,
+     so a shared baseline left them visibly stepped against each other */
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  margin:var(--breathe) 0 0;
+  font-variant-numeric:tabular-nums; line-height:1;
+  opacity:0; transform:translateY(4px);
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
+}
+.coll .edition.in{ opacity:1; transform:none; }
+.coll .edition .n{
+  font-size:clamp(1.5rem,3.4vw,2.15rem); font-weight:300;
+  letter-spacing:.02em; color:var(--canvas);
+}
+.coll .edition .sep{ font-size:1rem; color:#4a4e55; font-weight:300; }
+.coll .edition .tot{ font-size:.82rem; color:var(--coll-muted); letter-spacing:.13em; }
+.coll .edition .uniq{
+  margin-left:.4rem; padding-left:.8rem; font-size:.62rem; letter-spacing:.18em;
+  text-transform:uppercase; color:#5f646b; border-left:1px solid rgba(255,255,255,.13);
+  line-height:1.6;
+}
+
+/* ---------- the arc ----------
+   A card sits at theta = i*step + rotation on an ellipse, and cos(theta)
+   places it, sizes it and stacks it. One number driving all three is why a
+   card that looks nearer is nearer: the stacking cannot disagree with the
+   perspective, because it is derived from it.
+
+   With a painting whose width changes you cannot have the arc fixed, the
+   composition centred and the gap constant all at once. Centring the pair
+   let the painting's width slide the arc sideways; anchoring the pair left
+   kept the arc still but emptied half the screen. So the painting gets a
+   box of its own at constant width and the pair is centred: the arc never
+   moves, the composition stays balanced, and what gives is the gap. */
+.coll .viewer{
+  display:flex; align-items:center; justify-content:center;
+  gap:clamp(.4rem,1.2vw,1.1rem);
+  width:100%;
+}
+.coll .reel{
+  position:relative; overflow:hidden;
+  flex:0 0 auto; width:clamp(190px,21vw,300px);
+  height:min(62svh,660px);
+  cursor:grab; touch-action:pan-y;
+  outline:none;
+  /* Two fades, not one. The vertical lets the ends of the arc fall away
+     instead of being sliced. But the ellipse is centred on the box's left
+     edge, which sits mid-page, so every card on the far side was also cut
+     in half down a hard vertical line - a seam the eye reads as a mistake.
+     The second gradient dissolves that half instead of cutting it. */
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent),
+    linear-gradient(to right, transparent, rgba(0,0,0,.55) 12%, #000 34%);
+  mask-image:
+    linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent),
+    linear-gradient(to right, transparent, rgba(0,0,0,.55) 12%, #000 34%);
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
+}
+.coll .reel:active{ cursor:grabbing; }
+.coll .reel button{
+  position:absolute; left:0; top:50%;
+  padding:0; border:0; background:none; cursor:pointer;
+  line-height:0; border-radius:2px; overflow:hidden;
+  will-change:transform;
+  box-shadow:0 16px 30px -14px rgba(0,0,0,.85);
+}
+.coll .reel img{ display:block; width:100%; height:100%; object-fit:cover; }
+.coll .reel button::after{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(255,252,244,.14);
+  transition:box-shadow .35s var(--ease);
+}
+.coll .reel button[aria-current="true"]::after{ box-shadow:inset 0 0 0 2px var(--ochre); }
+.coll .show{
+  display:flex; flex-direction:column; align-items:center;
+  flex:0 0 auto; width:min(48vw,720px);
+}
+.coll .show .stage{ justify-content:center; width:100%; max-width:none; }
+.coll .show .edition{ justify-content:center; }
+
+/* ---------- rail ---------- */
+.coll .strip{
+  display:flex; gap:.55rem; align-items:center;
+  width:max-content; max-width:100%;
+  margin:var(--breathe) auto 0;
+  overflow-x:auto; overflow-y:hidden;
+  padding:.5rem .9rem;
+  scrollbar-width:none;
+  /* the ends fall away rather than being sliced off mid-thumbnail */
+  -webkit-mask-image:linear-gradient(to right, transparent, #000 34px, #000 calc(100% - 34px), transparent);
+  mask-image:linear-gradient(to right, transparent, #000 34px, #000 calc(100% - 34px), transparent);
+}
+.coll .strip::-webkit-scrollbar{ display:none; }
+.coll .strip button{
+  flex:0 0 auto; padding:0; border:0; background:none; cursor:pointer;
+  border-radius:2px; line-height:0; position:relative;
+  opacity:.5; filter:saturate(.7); transform:scale(.92);
+  transition:opacity .45s var(--ease), transform .45s var(--ease),
+             filter .45s var(--ease), box-shadow .45s var(--ease);
+}
+.coll .strip button:hover{ opacity:.85; filter:saturate(.95); transform:scale(.97); }
+.coll .strip button[aria-current="true"]{
+  opacity:1; filter:none; transform:scale(1.1);
+  box-shadow:0 12px 22px -10px rgba(0,0,0,.9);
+}
+/* a hairline only the current one wears */
+.coll .strip button::after{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  box-shadow:inset 0 0 0 1px rgba(255,252,244,.16);
+  opacity:0; transition:opacity .45s var(--ease);
+}
+.coll .strip button[aria-current="true"]::after{ opacity:1; box-shadow:inset 0 0 0 1px var(--ochre); }
+.coll .strip img{ display:block; height:clamp(54px,7.4vw,76px); width:auto; border-radius:2px; }
+
+/* The arc does not go to the phone. Rotated a quarter turn along the
+   bottom it gets a band about 140px tall, which leaves cards under 90px
+   and an ellipse whose depth axis is longer than the band, so the back of
+   the ring lands outside the box in the room the edition mark uses - and
+   portrait and landscape paintings then move that band by different
+   amounts. The rail is flat by nature and scrolls with the thumb.
+
+   Below 900px the reel is display:none, which is also what stops the
+   layout running: the box measures zero and the first guard returns. */
+@media (max-width:900px){
+  .coll .viewer{ display:block; width:100%; }
+  .coll .show{ width:100%; }
+  .coll .show .stage{ justify-content:center; }
+  .coll .show .edition{ justify-content:center; }
+  .coll .reel{ display:none; }
+}
+@media (min-width:901px){
+  .coll .strip{ display:none; }
+}
+
+/* ---------- everything, on demand ---------- */
+.coll .allBtn{
+  display:block; margin:var(--breathe) auto 0;
+  font:inherit; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--coll-muted); background:none; border:0; cursor:pointer;
+  padding:.4rem .2rem; transition:color .3s var(--ease);
+}
+.coll .allBtn:hover{ color:var(--canvas); }
+
+/* Solid, with no backdrop-filter. It is the page while it is open rather
+   than something laid over one, and a screen-blended layer above a
+   filtered backdrop is exactly what turned this site's hero black. */
+/* A class that sets display beats the UA's [hidden]{display:none}, so the
+   sheet would stay laid out while "hidden": invisible at opacity 0, but
+   covering the viewport at z-index 60 and swallowing every pointer event.
+   The site's stylesheet carries this rule too; it is repeated here so the
+   component does not depend on another file to not break the page. */
+.coll-sheet[hidden]{ display:none!important; }
+.coll-sheet{
+  position:fixed; inset:0; z-index:60;
+  --coll-muted:#8b8f96;
+  background:#0c0d10; color:var(--canvas);
+  display:flex; flex-direction:column;
+  font-family:var(--sans);
+  opacity:0; transition:opacity .3s var(--ease);
+}
+.coll-sheet.in{ opacity:1; }
+.coll-sheet__head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:clamp(.9rem,3vw,1.5rem) clamp(1rem,4vw,2.4rem);
+  font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--coll-muted);
+  border-bottom:1px solid rgba(255,255,255,.07); flex:0 0 auto;
+}
+.coll-sheet__head h4{ margin:0; font:inherit; letter-spacing:inherit; font-weight:400; }
+.coll-sheet__head button{
+  font:inherit; font-size:1.5rem; line-height:1; letter-spacing:0;
+  color:var(--coll-muted); background:none; border:0; cursor:pointer; padding:0 .2rem;
+}
+.coll-sheet__head button:hover{ color:var(--canvas); }
+
+/* The scroller has to be the wrapper, not the columns. A multi-column box
+   with a fixed height does not grow downward: it makes more columns and
+   overflows sideways, so overflow-y had nothing to scroll and the far
+   columns were simply cut off. Given auto height it balances and grows,
+   and the wrapper scrolls it. */
+.coll-sheet__scroll{
+  flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  position:relative; z-index:2;
+}
+/* Columns, not grid. These thumbnails are a mix of portrait and landscape,
+   and grid has to size a row track before it can place anything in it: an
+   image at width:100% contributes no height to that pass, because the
+   percentage cannot resolve while the track it depends on is still being
+   sized, so every row collapsed to a 34px sliver and the pictures spilled
+   out of buttons that clipped them. Columns have no track step at all -
+   the column width is definite up front - and they give a masonry flow,
+   which suits a set of mixed shapes better than a ragged grid would. */
+.coll-sheet__grid{
+  column-width:clamp(78px,11vw,124px);
+  column-gap:clamp(.5rem,1.4vw,.85rem);
+  padding:clamp(1rem,3vw,1.8rem) clamp(1rem,4vw,2.4rem) clamp(2rem,5vw,3rem);
+}
+/* display:block, because a button with line-height:0 collapses to no
+   height and then clips its own contents away. */
+.coll-sheet__grid button{
+  display:block; width:100%; position:relative;
+  margin:0 0 clamp(.5rem,1.4vw,.85rem);
+  break-inside:avoid; -webkit-column-break-inside:avoid;
+  padding:0; border:0; background:none;
+  cursor:pointer; line-height:0; border-radius:2px; overflow:hidden;
+  opacity:.82; transition:opacity .25s var(--ease), transform .25s var(--ease);
+  /* Light falls on whole paintings, not through a hole in a sheet of
+     glass. A mask over a backdrop-filter was the obvious way and did not
+     work: mask-composite:intersect would not punch the extra holes, so
+     every point came back within a few percent of every other and there
+     was no falloff at all. Per-painting also reads better - a picture is
+     lit or it is not, rather than a circle cutting across three of them.
+
+     Lit goes past normal rather than back to it: saturation alone is a
+     weak cue, and a card that merely stops being dim does not read as
+     anything passing over it. Brightness is what makes a wave visible. */
+  --lit:0;
+  filter:saturate(calc(.58 + .62 * var(--lit))) brightness(calc(.93 + .19 * var(--lit)));
+}
+.coll-sheet__grid button:hover{ opacity:1; transform:translateY(-2px); }
+.coll-sheet__grid button[aria-current="true"]{ outline:2px solid var(--ochre); outline-offset:1px; }
+/* Each keeps its own shape: cover would crop the landscape ones hard, and
+   cropping the composition is a poor way to ask someone to choose. */
+.coll-sheet__grid img{ display:block; width:100%; height:auto; }
+.coll-sheet__grid b{
+  position:absolute; left:0; right:0; bottom:0;
+  font-size:.58rem; font-weight:400; letter-spacing:.08em; line-height:1;
+  padding:.42rem .3rem .3rem; color:var(--canvas);
+  background:linear-gradient(to top, rgba(0,0,0,.72), transparent);
+  font-variant-numeric:tabular-nums;
+}
+
+/* The stage refuses to scroll the page, because a drag across it is aiming
+   the light. So on a short screen everything has to fit, or the biggest
+   region on the display becomes the one place a swipe does nothing. */
+@media (max-height:760px){
+  .coll .plate canvas{ max-height:min(52svh, calc(100svh - 280px)); }
+  .coll .edition{ margin-top:.85rem; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .coll .plate, .coll .edition, .coll .strip button,
+  .coll .reel button::after, .coll-sheet{ transition:none; }
+}
