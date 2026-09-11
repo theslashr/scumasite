@@ -9,14 +9,6 @@
   },
   "items": [
     {
-      "when": "Dal 24 ottobre al 22 novembre 2025",
-      "title": "L'arte che cura",
-      "paras": [
-        "Un percorso espositivo sul legame fra arte e benessere psicologico, attraverso le opere di artisti che fanno del processo creativo uno strumento di cura, espressione e riflessione."
-      ],
-      "where": "Spazio Brizzolari · Viale Kennedy 188, Scarperia e San Piero (Firenze)"
-    },
-    {
       "when": "Pagina artista",
       "title": "Museo Spazio Brizzolari",
       "paras": [
@@ -24,6 +16,14 @@
       ],
       "href": "https://www.museospaziobrizzolari.it/antonio-burgello/",
       "peek": "museo"
+    },
+    {
+      "when": "Dal 24 ottobre al 22 novembre 2025",
+      "title": "L'arte che cura",
+      "paras": [
+        "Un percorso espositivo sul legame fra arte e benessere psicologico, attraverso le opere di artisti che fanno del processo creativo uno strumento di cura, espressione e riflessione."
+      ],
+      "where": "Spazio Brizzolari · Viale Kennedy 188, Scarperia e San Piero (Firenze)"
     },
     {
       "when": "Pagina artista",
