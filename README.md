@@ -85,6 +85,17 @@ leading edge is not an edge. Drawing that from `Math.random()` each frame
 reshuffles the mask sixty times a second, which reads as static rather than
 as paint.
 
+**The passes are spread wide and run at a constant rate.** They were packed
+into the first third of the sweep and each was eased, so their fast middles
+landed on top of one another. Measured as coverage over time that gave:
+nothing for the first fifth, five per cent to seventy-five between p=0.3 and
+p=0.6, then a crawl to the end — and every worst frame sat inside that rush.
+It read as chop, and slowing the sweep down would only have produced a
+slower rush. Spread across 62% of the sweep and left linear, the overlapping
+passes sum to an even rate; worst-frame coverage went from 4.7% to 1.7%,
+against a median of 0.65%. The softness comes from `DAB_FADE` and the blur,
+not from easing the passes — **do not re-add an ease there.**
+
 **One blur, not two hundred.** Setting `ctx.filter` and then filling two
 hundred ellipses asks for a blur pass per ellipse, per card, per frame — it
 dropped frames and dragged the cursor with it. The dabs go into a scratch

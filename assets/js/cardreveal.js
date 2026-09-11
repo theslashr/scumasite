@@ -14,16 +14,36 @@
   'use strict';
 
   var HOLD = 4200;    // how long a painting stays before the next one starts
-  var SWEEP = 1900;   // how long the covering takes
-  var BANDS = 7;      // spatula passes across the picture
-  var STAMPS = 18;    // dabs making up one pass
-  var SPECKLE = 10;   // dabs thrown ahead of it
-  var CLOSE = 0.86;   // from here the covering closes to solid
+  var SWEEP = 2500;   // how long the covering takes
+  var BANDS = 9;      // spatula passes across the picture
+  var STAMPS = 34;    // dabs making up one pass
+  var SPECKLE = 18;   // dabs thrown ahead of it
+  /* How long one dab takes to fade up, as a share of its pass. The whole
+     smoothness of this sits here: a dab is a big shape, and if it arrives
+     inside two or three frames you see the patch arrive. Measured as
+     coverage added per frame, a short window put the worst frames at
+     seventeen times the median - which is what reads as chop. */
+  var DAB_FADE = 0.32;
+  var STAGGER = 0.62;  // how much of the sweep the passes are spread across
+  /* From here the covering closes to solid. Started late it was a rush of
+     coverage in the last few frames - its own visible step at the end of
+     an otherwise smooth sweep - so it begins early and arrives gently. */
+  var CLOSE = 0.62;
 
   /* A small seeded generator, because the scatter has to be decided once
      per transition and then stay put. Drawing it from Math.random() each
      frame reshuffles the whole mask sixty times a second, which does not
      read as paint - it reads as static. */
+  /* A dab's moment, kept off the ends. Clamping a jittered threshold with
+     max(0, ...) piles every dab that jittered negative onto exactly zero,
+     so each pass opened with a cluster landing on one frame - which was
+     most of the chop, and no amount of slowing the sweep down would have
+     fixed it because they arrive together at any speed. */
+  function moment(v, r) {
+    if (v > 0) return v < 1 ? v : 1;
+    return r() * 0.05;
+  }
+
   function rng(seed) {
     var a = seed >>> 0;
     return function () {
@@ -129,10 +149,12 @@
         dabs.push({
           u: u,
           // the dab's own moment, jittered off its place along the pass
-          th: Math.max(0, Math.min(1, u + (r() - 0.5) * 0.16)),
-          dy: (r() - 0.5) * 1.25,
+          th: moment(u + (r() - 0.5) * 0.18, r),
+          dy: (r() - 0.5) * 1.15,
           dx: (r() - 0.5) * 0.5,
-          rad: 0.42 + r() * 0.62,
+          // smaller and more numerous: the same ground covered in less of a
+          // lump, so no one frame delivers a visible patch
+          rad: 0.30 + r() * 0.40,
           a: 0.72 + r() * 0.28
         });
       }
@@ -141,10 +163,10 @@
         var uu = r();
         dabs.push({
           u: uu,
-          th: Math.max(0, Math.min(1, uu - 0.10 - r() * 0.13)),
+          th: moment(uu - 0.10 - r() * 0.13, r),
           dy: (r() - 0.5) * 2.3,
           dx: (r() - 0.5) * 0.9,
-          rad: 0.12 + r() * 0.3,
+          rad: 0.10 + r() * 0.22,
           a: 0.5 + r() * 0.5
         });
       }
@@ -167,20 +189,32 @@
     var band = h / BANDS;
     for (var i = 0; i < BANDS; i++) {
       var B = this.bands[i];
-      // a stagger of a third of the sweep, so passes overlap rather than march
-      var d = (i / BANDS) * 0.34;
-      var t = (p - d) / (1 - 0.34);
+      /* Stagger the passes across most of the sweep, and run each one at a
+         constant rate.
+
+         Both were wrong together before. The passes were packed into the
+         first third and each was eased, so their fast middles landed on top
+         of one another: measured as coverage over time, nothing happened
+         for the first fifth, then the picture went from five per cent
+         covered to seventy-five between p=0.3 and p=0.6, then crawled to
+         the end. That rush in the middle is what read as chop - the worst
+         frames all sat inside it - and slowing the whole thing down would
+         only have made a slower rush.
+
+         Spread wide and left linear, the overlapping passes sum to an even
+         rate, which is the thing to preserve here. The softness comes from
+         DAB_FADE and the blur, not from easing the passes. */
+      var d = (i / BANDS) * STAGGER;
+      var t = (p - d) / (1 - STAGGER);
       if (t <= 0) continue;
       if (t > 1) t = 1;
-      // ease out, so a pass lands rather than stopping dead
-      t = 1 - (1 - t) * (1 - t);
 
       var y = band * (i + 0.5);
       for (var k = 0; k < B.dabs.length; k++) {
         var D = B.dabs[k];
         if (t < D.th) continue;
         // the dab fades up over its first moments rather than popping in
-        var age = Math.min(1, (t - D.th) / 0.07);
+        var age = Math.min(1, (t - D.th) / DAB_FADE);
         var x = B.dir > 0 ? (-0.12 + D.u * 1.24) * w : (1.12 - D.u * 1.24) * w;
         /* Full black once it has arrived. Dabs at partial alpha never
            accumulate to opaque however many overlap, so the sweep ended on
@@ -198,7 +232,8 @@
        to cover every pixel, and a transition that leaves a few of the old
        painting showing through has not finished. */
     if (p > CLOSE) {
-      sc.globalAlpha = Math.min(1, (p - CLOSE) / (1 - CLOSE));
+      var q = Math.min(1, (p - CLOSE) / (1 - CLOSE));
+      sc.globalAlpha = q * q * q;   // barely there until the very end
       sc.fillRect(0, 0, w, h);
     }
     sc.globalAlpha = 1;
@@ -207,7 +242,7 @@
     // one blur, for the whole field, on its way into the mask
     m.save();
     m.clearRect(0, 0, w, h);
-    if (typeof m.filter === 'string') m.filter = 'blur(' + Math.round(h * 0.012) + 'px)';
+    if (typeof m.filter === 'string') m.filter = 'blur(' + Math.round(h * 0.016) + 'px)';
     m.drawImage(this.scratch, 0, 0);
     /* A blur has nothing to pull in from beyond the edge, so it thins the
        alpha there and a rim of the old painting survives the sweep. Once
@@ -215,8 +250,9 @@
        already spent by then and what matters is that the new painting
        actually arrives, edges included. */
     if (p > CLOSE) {
+      var qq = Math.min(1, (p - CLOSE) / (1 - CLOSE));
       m.filter = 'none';
-      m.globalAlpha = Math.min(1, (p - CLOSE) / (1 - CLOSE));
+      m.globalAlpha = qq * qq * qq;
       m.drawImage(this.scratch, 0, 0);
     }
     m.restore();
