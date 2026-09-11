@@ -1,0 +1,24 @@
+{
+  // The site is a Worker with static assets. Without `main` there is no
+  // Worker at all - Cloudflare just serves the files, which is how /api/*
+  // came to answer 404 while the site itself worked perfectly.
+  //
+  // `name` must match the existing Worker, or a deploy creates a second one
+  // and the live URL keeps pointing at the old.
+  "name": "scumasite",
+  "main": "worker/index.js",
+  "compatibility_date": "2025-01-01",
+
+  "assets": {
+    // the repo root is the site; .assetsignore keeps the sources out
+    "directory": ".",
+    // what worker/index.js hands everything that is not /api/ to
+    "binding": "ASSETS"
+  },
+
+  "observability": {
+    // so a failed save leaves something to read in the dashboard rather
+    // than only a 500 in Antonio's browser
+    "enabled": true
+  }
+}

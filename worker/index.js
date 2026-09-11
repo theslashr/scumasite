@@ -1,9 +1,14 @@
 /* ============================================================
-   /api/* — the small amount of server the admin needs
+   worker/index.js — the small amount of server the admin needs
 
-   A Pages Function rather than a separate Worker: it deploys with the
-   site, sits on the same origin (so there is no CORS to get wrong), and
-   runs in the Cloudflare account that already hosts the site.
+   This site is a Cloudflare **Worker with static assets**, not a Pages
+   project. The distinction cost a deploy: the first version of this file
+   lived in functions/, which is a Pages-only convention, so it was never
+   executed - it was served as a static file and /api/* answered 404.
+
+   Here the Worker sits in front of the asset store. Anything that is not
+   /api/ is handed straight to it, so the site itself is untouched by this
+   file and there is no CORS to get wrong.
 
    It does three things and refuses everything else:
 
@@ -15,8 +20,8 @@
    session token that says "this person typed the password", is signed
    with a secret it cannot see, and expires.
 
-   Secrets, set in the Pages project (Settings > Environment variables,
-   all four marked as secrets):
+   Secrets, set on the Worker (Settings > Variables and secrets), all four
+   as Secret rather than Variable:
 
      ADMIN_PASSWORD   what Antonio types
      SESSION_SECRET   any long random string; signs the session
@@ -134,9 +139,17 @@ async function commitAll(env, files, message) {
 }
 
 /* ---------------- routes ---------------- */
-export async function onRequest(context) {
-  const { request, env, params } = context;
-  const route = (params.route || []).join('/');
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    /* Everything that is not the API is the site. The asset binding does
+       the serving: index.html, the images, the admin page. */
+    if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(request);
+    return handle(url.pathname.slice('/api/'.length), request, env);
+  },
+};
+
+async function handle(route, request, env) {
 
   const missing = ['ADMIN_PASSWORD', 'SESSION_SECRET', 'GITHUB_TOKEN', 'GITHUB_REPO']
     .filter((k) => !env[k]);

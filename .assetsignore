@@ -4,6 +4,8 @@
 .assetsignore
 README.md
 build.py
+wrangler.jsonc
 src
 content
 tools
+worker
