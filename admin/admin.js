@@ -801,11 +801,12 @@
     $('#state').textContent = 'Pubblico…';
 
     api('save', { method: 'POST', body: { files: files, message: 'Modifiche dal pannello' } })
-      .then(function () {
+      .then(function (d) {
         state.images = [];
         setDirty(false);
         $('#app').classList.remove('busy');
-        toast('Pubblicato. Il sito si aggiorna da solo entro un paio di minuti.');
+        // saved is not published: wait for the site to actually be rebuilt
+        waitForPublish(d.sha);
       })
       .catch(function (e) {
         $('#app').classList.remove('busy');
@@ -815,6 +816,51 @@
               ' Le tue modifiche sono ancora qui, riprova fra poco.', true);
       });
   });
+
+  /* Saving commits the content; a workflow then rebuilds the site from it.
+     Until that lands, nothing a visitor sees has changed - so the panel says
+     "in pubblicazione" and only claims success when the rebuild appears.
+
+     If it never appears, that is worth saying plainly. The work is not lost
+     - it is committed - but the site is not showing it, and that is exactly
+     the situation where telling him "Pubblicato" would leave him refreshing
+     a page that is never going to change. */
+  var PUBLISH_TRIES = 26, PUBLISH_EVERY = 6000;   // about two and a half minutes
+
+  function waitForPublish(sha) {
+    var tries = 0;
+    $('#state').textContent = 'In pubblicazione…';
+    $('#state').className = 'bar__state dirty';
+    toast('Salvato. Sto aspettando che il sito si aggiorni…');
+
+    (function poll() {
+      tries++;
+      api('published?since=' + encodeURIComponent(sha || ''))
+        .then(function (p) {
+          if (p.rebuilt) {
+            $('#state').textContent = 'Pubblicato';
+            $('#state').className = 'bar__state';
+            toast('Fatto. Il sito è aggiornato.');
+            return;
+          }
+          if (tries >= PUBLISH_TRIES) return giveUp();
+          setTimeout(poll, PUBLISH_EVERY);
+        })
+        .catch(function () {
+          // a lost connection is not a failed publish; keep trying
+          if (tries >= PUBLISH_TRIES) return giveUp();
+          setTimeout(poll, PUBLISH_EVERY);
+        });
+    })();
+
+    function giveUp() {
+      $('#state').textContent = 'Pubblicazione non confermata';
+      $('#state').className = 'bar__state dirty';
+      toast('Le modifiche sono state salvate, ma il sito non risulta ancora ' +
+            'aggiornato. Ricarica fra qualche minuto; se resta così, avvisa ' +
+            'chi cura il sito — le tue modifiche non sono andate perse.', true);
+    }
+  }
 
   // the browser's own guard, for the tab closed mid-edit
   window.addEventListener('beforeunload', function (e) {

@@ -12,9 +12,10 @@
 
    It does three things and refuses everything else:
 
-     POST /api/login    a password in, a short-lived signed session out
-     GET  /api/load     the current content, straight from the repo
-     POST /api/save     one commit containing every changed file
+     POST /api/login      a password in, a short-lived signed session out
+     GET  /api/load       the current content, straight from the repo
+     POST /api/save       one commit containing every changed file
+     GET  /api/published  whether the site was actually rebuilt after a save
 
    The GitHub token never leaves this file. The browser only ever holds a
    session token that says "this person typed the password", is signed
@@ -184,6 +185,34 @@ async function handle(route, request, env) {
         files['collections/' + c] = await readJSON(env, `content/collections/${c}.json`);
       }
       return json({ files });
+    }
+
+    /* Did the save actually reach the site?
+
+       Committing content is only half of publishing: a workflow then runs
+       build.py and commits the rebuilt index.html. If that fails, the
+       content is in the repository, the site never changes, and the panel
+       had already said "Pubblicato" - which is the worst thing it could
+       say. This lets the panel wait and find out.
+
+       It looks for the rebuild commit rather than asking the Actions API,
+       which would need a permission the token deliberately does not have.
+       The rebuild is the thing that matters anyway: a workflow that ran
+       green but committed nothing has not published anything either. */
+    if (route === 'published' && request.method === 'GET') {
+      const since = new URL(request.url).searchParams.get('since') || '';
+      const commits = await ghJSON(env, '/commits?sha=main&per_page=20');
+      const head = commits[0] ? commits[0].sha.slice(0, 7) : null;
+      const at = since ? commits.findIndex((c) => c.sha.startsWith(since)) : -1;
+      /* If the save is not in this window there is no way to tell which
+         rebuild commits came after it, and answering "published" on the
+         strength of an older one is the single wrong answer this endpoint
+         can give. Say no and let the panel keep waiting: a false alarm
+         costs a message, a false all-clear costs him the change. */
+      if (since && at === -1) return json({ rebuilt: false, unknown: true, head });
+      const newer = at === -1 ? commits : commits.slice(0, at);
+      const rebuilt = newer.some((c) => /Rigenerato il sito/i.test(c.commit.message));
+      return json({ rebuilt, head });
     }
 
     if (route === 'save' && request.method === 'POST') {

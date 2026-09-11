@@ -75,6 +75,11 @@ class Handler(SimpleHTTPRequestHandler):
                 files['collections/' + name] = load(
                     os.path.join('content', 'collections', name + '.json'))
             return self.send_json({'files': files})
+        if self.path.startswith('/api/published'):
+            if not self.authed():
+                return self.send_json({'error': 'Sessione scaduta.'}, 401)
+            # here build.py runs inside the save, so it is already published
+            return self.send_json({'rebuilt': True, 'head': 'locale'})
         if self.path.startswith('/api/'):
             return self.send_json({'error': 'Richiesta sconosciuta.'}, 404)
         return super().do_GET()

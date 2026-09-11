@@ -453,6 +453,29 @@ Adding a cover from the panel means uploading the photograph again — it
 cannot yet pick from paintings already on the site. That is the one rough
 edge left in there.
 
+### Saved is not published
+
+Committing the content is only half of it: a workflow then runs `build.py`
+and commits the rebuilt `index.html`. If that half fails, the content is
+safely in the repository, the site never changes, and the panel has already
+said *"Pubblicato"* — telling him it worked while he refreshes a page that is
+never going to move.
+
+So the panel now waits. After a save it shows **in pubblicazione…**, polls
+`/api/published` every six seconds for about two and a half minutes, and only
+then says *"Fatto. Il sito è aggiornato."* If the rebuild never appears it
+says so plainly, and says that the work is not lost.
+
+It looks for the rebuild **commit**, not the Actions API — which would need a
+permission the token deliberately does not have, and would anyway answer the
+wrong question: a workflow that ran green but committed nothing has not
+published anything either.
+
+**Every uncertain case answers "not yet".** If the save commit has scrolled
+out of the window there is no way to tell which rebuilds came after it, and a
+dropped connection is not a failed publish. A false alarm costs a message; a
+false all-clear costs him the change.
+
 ### Known gaps
 
 - No preview before publishing. He sees the result on the live site about two
