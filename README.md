@@ -388,6 +388,23 @@ time it swaps. A swap only happens after the ground has dried back, which is
 tens of seconds of painting away, so the next one always has time to arrive.
 Measured on a loaded page: **2 of 25 fetched, 292KB.**
 
+### How long a cycle can be
+
+As long as he likes. The opere card cycles all 14 works, the bomboniere card
+the 20 that are landscape — portrait ones cropped to 16:11 read as a band
+through the middle, which is why the other 106 stay out.
+
+It was five each until the loading was fixed. `cardreveal.js` chained its
+loads — n, then n+1, to the end — so the whole cycle arrived the moment the
+page did, on both cards, whether anyone scrolled to them or not. That put a
+real ceiling on cycle length and it was the only reason for five. It now
+holds one ahead and fetches the next as it turns: **34 covers declared, 4
+downloaded.**
+
+Adding a cover from the panel means uploading the photograph again — it
+cannot yet pick from paintings already on the site. That is the one rough
+edge left in there.
+
 ### Known gaps
 
 - No preview before publishing. He sees the result on the live site about two

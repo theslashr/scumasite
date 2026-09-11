@@ -92,8 +92,15 @@
     });
   }
 
-  /* Load one source, then hand back. The rest follow the first so the card
-     shows something as early as it can rather than waiting on the set. */
+  /* One source, and only that one.
+
+     This used to chain - loading n then n+1 and so on to the end - which
+     meant the whole cycle was downloaded the moment the page did, on both
+     cards. At five covers each that was about 1.5MB spent before anyone had
+     scrolled to them, and it put a hard ceiling on how long a cycle could
+     sensibly be. Now the card holds one ahead and fetches the next as it
+     turns, so the length of the cycle costs almost nothing and Antonio can
+     put as many paintings on a card as he likes. */
   CardReveal.prototype._load = function (n, done) {
     if (n >= this.srcs.length) { if (done) done(); return; }
     var self = this, im = new Image();
@@ -101,7 +108,6 @@
     im.onload = function () {
       self.imgs[n] = im;
       if (done) done();
-      else self._load(n + 1);
     };
     im.onerror = function () { if (done) done(); };
     im.src = this.srcs[n];
@@ -300,7 +306,8 @@
       this.t0 = now;
       this._paint(this.imgs[this.i], null, 0);
       // fetch the one after, the first time round
-      if (!this.imgs[this.i + 1] && this.i + 1 < this.srcs.length) this._load(this.i + 1);
+      var after = (this.i + 1) % this.srcs.length;
+      if (!this.imgs[after]) this._load(after);
     }
     this._tick();
   };
