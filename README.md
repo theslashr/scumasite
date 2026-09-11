@@ -212,6 +212,15 @@ than ordering, so moving the blocks around cannot break it again.
 
 ### Numbering
 
+Numbering is **opt-in per collection** (`numbered: true`), and only the
+bomboniere have it. "07 / 126" under a picture is a claim that it is the
+seventh of a hundred and twenty-six unique works — true of that set and of
+nothing else here. The selected works are a *selection*, not an edition, so
+they carry no badge on the grid and no edition mark in the viewer; numbering
+them would be inventing a fact about them. The default is off, so a new
+collection has to ask for numbers rather than get them by accident.
+
+
 Each is `NN / 126`, one of a kind, and the numbers are **not** the ones in the
 original file names. Telegram exported the set in two batches and restarted
 counting in each, so of 126 files there were only 95 distinct numbers, 31 of

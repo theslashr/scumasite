@@ -120,7 +120,8 @@
               '<img src="' + esc(this.o.thumb(it.id)) + '" alt="' + esc(it.alt || '') +
               '" loading="lazy" decoding="async"' +
               ' width="' + it.w + '" height="' + it.h + '">' +
-              '<b>' + (n < 10 ? '0' + n : n) + '</b></button>';
+              (this.o.numbered ? '<b>' + (n < 10 ? '0' + n : n) + '</b>' : '') +
+              '</button>';
     }
     this.sheetGrid.innerHTML = html;
     this.sheetGrid.addEventListener('click', function (e) {
@@ -225,16 +226,23 @@
     this.plate.appendChild(this.sub);
     this.stage.appendChild(this.plate);
 
-    this.edition = el('div', 'edition');
-    this.edition.setAttribute('aria-live', 'polite');
-    this.edNum = el('span', 'n', '—');
-    this.edition.appendChild(this.edNum);
-    this.edition.appendChild(el('span', 'sep', '/'));
-    this.edition.appendChild(el('span', 'tot', String(this.total)));
-    if (o.uniqLabel) this.edition.appendChild(el('span', 'uniq', esc(o.uniqLabel)));
+    /* Only a numbered collection gets a number. "07 / 126" under a picture
+       is a claim that it is the seventh of a hundred and twenty-six unique
+       works, which is true of the bomboniere and of nothing else here - the
+       selected works are a selection, not an edition, and numbering them
+       would be inventing a fact about them. */
+    if (o.numbered) {
+      this.edition = el('div', 'edition');
+      this.edition.setAttribute('aria-live', 'polite');
+      this.edNum = el('span', 'n', '—');
+      this.edition.appendChild(this.edNum);
+      this.edition.appendChild(el('span', 'sep', '/'));
+      this.edition.appendChild(el('span', 'tot', String(this.total)));
+      if (o.uniqLabel) this.edition.appendChild(el('span', 'uniq', esc(o.uniqLabel)));
+    }
 
     show.appendChild(this.stage);
-    show.appendChild(this.edition);
+    if (this.edition) show.appendChild(this.edition);
     viewer.appendChild(this.reel);
     viewer.appendChild(show);
 
@@ -535,12 +543,14 @@
     this._markSheet(i);
     this._syncReel(i);
 
-    var n = i + 1;
-    this.edNum.textContent = n < 10 ? '0' + n : String(n);
-    this.edition.classList.remove('in');
-    var ed = this.edition;
-    // let the removal land before adding it back, so the mark plays again
-    setTimeout(function () { ed.classList.add('in'); }, 30);
+    if (this.edition) {
+      var n = i + 1;
+      this.edNum.textContent = n < 10 ? '0' + n : String(n);
+      this.edition.classList.remove('in');
+      var ed = this.edition;
+      // let the removal land before adding it back, so the mark plays again
+      setTimeout(function () { ed.classList.add('in'); }, 30);
+    }
 
     var it = this.items[i], self = this;
     var warm = !!(this.relief && this.relief.cache[it.id]);

@@ -51,6 +51,8 @@
     thumb: function (id) { return 'assets/img/bomb/thumb/' + id + '.jpg'; },
     full:  function (id) { return 'assets/img/bomb/full/'  + id + '.jpg'; },
     title: 'Bomboniere',
+    // the only set here that is actually an edition: 126 one-offs, numbered
+    numbered: true,
     cover: 'n047',
     itemLabel: 'Bomboniera ',
     chooseLabel: 'Scegli una bomboniera',

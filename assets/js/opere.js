@@ -37,6 +37,9 @@
     thumb: function (id) { return 'assets/img/sm/' + id + '.jpg'; },
     full:  function (id) { return 'assets/img/' + id + '.jpg'; },
     title: 'Opere Sparse',
+    /* No numbers. These are a selection, not an edition - "03 / 14" under
+       one would be inventing a fact about it. */
+    numbered: false,
     cover: 'img54',
     itemLabel: 'Opera ',
     chooseLabel: "Scegli un'opera",
