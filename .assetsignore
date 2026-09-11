@@ -1,7 +1,9 @@
 .git
+.github
 .gitignore
 .assetsignore
 README.md
 build.py
 src
 content
+tools
