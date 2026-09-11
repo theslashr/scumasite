@@ -71,8 +71,45 @@ links to work. The home page loads none of this code — no `relief.js`, no
 *is* the collection. Picking from it builds the viewer, which is where WebGL
 and the relief extraction finally happen.
 
-The cards are small and carry a cover, a count and a name — no description.
-They are a way in, not the work itself.
+The cards carry a name and nothing else. **Each one paints itself**: every
+few seconds `cardreveal.js` lays the next work in the set over the one
+showing, in spatula passes, the way the hero is revealed — only without
+being asked. The hero is *you paint the work*; the card is the same language
+with no hand on it.
+
+Four things there are worth not undoing.
+
+**The scatter is seeded per transition, not per frame.** The passes are runs
+of dabs with their own offsets and moments, plus a few thrown ahead so the
+leading edge is not an edge. Drawing that from `Math.random()` each frame
+reshuffles the mask sixty times a second, which reads as static rather than
+as paint.
+
+**One blur, not two hundred.** Setting `ctx.filter` and then filling two
+hundred ellipses asks for a blur pass per ellipse, per card, per frame — it
+dropped frames and dragged the cursor with it. The dabs go into a scratch
+canvas unblurred and the whole field is blurred once on its way into the
+mask. A full paint costs about 0.5ms.
+
+**Dabs land at full alpha, and the field closes to solid.** Partial-alpha
+dabs never accumulate to opaque however many overlap, so the sweep used to
+end on a blend of the two paintings — measured at 140 of 156 sample points
+still wrong at the end. The last 14% closes with a fill.
+
+**The closing fill is laid in again unblurred.** A blur has nothing to pull
+in from beyond the canvas edge, so it thins the alpha there and a rim of the
+old painting survived. That was the difference between a max channel error
+of 35 and of 10 (mean 0.96) against the destination image.
+
+The cards also take turns — the second is offset by half a cycle, so two
+sweeps never run at once.
+
+Covers are **full-size sources, not thumbnails**. A card is 400–650px wide
+on a desktop and half again on a retina screen; the bomboniere thumbnails
+are 220px, and at nearly three times their size they were visibly grainy.
+There is no w800 derivative to reach for yet, so this pays in bytes for
+sharpness — making one would get most of those bytes back, and is the
+obvious next thing to do here.
 
 The viewer is an overlay and it is dark. The relief highlight is a small
 bright thing on a dark surface, and on primed linen it has almost no contrast
