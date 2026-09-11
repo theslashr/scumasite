@@ -24,6 +24,8 @@ def rd(p):
 def rj(p):
     return json.loads(rd(p))
 
+COLLECTIONS = ['opere', 'bomboniere']
+
 def wr(p, s):
     io.open(os.path.join(ROOT, p), 'w', encoding='utf-8', newline='').write(s)
 
@@ -106,6 +108,33 @@ def hero():
                    % (attr, extra, im['width'], im['height']))
     return '\n'.join(out)
 
+def colls():
+    """The two cards in Opere.
+
+       Rendered from the collection files so the covers are editable, and
+       because the card is the only place a cycle list appears. The <img> is
+       the still frame that stands in without JS and under reduced motion;
+       cardreveal.js takes over from data-cycle when it can, which is why
+       the first cover is named twice."""
+    out = []
+    for key in COLLECTIONS:
+        c = rj('content/collections/%s.json' % key)
+        cycle = [p for p in c.get('cycle', []) if p]
+        if not cycle:
+            continue
+        b = []
+        b.append(('      ' if out else '') +
+                 '<a class="coll-card" href="collezione.html?c=%s" data-reveal>' % key)
+        b.append('        <span class="coll-card__media" data-cycle="%s">' % ','.join(cycle))
+        b.append('          <img src="%s" alt="" loading="lazy" decoding="async">' % cycle[0])
+        b.append('        </span>')
+        b.append('        <span class="coll-card__body">')
+        b.append('          <span class="coll-card__title">%s</span>' % c['title'])
+        b.append('        </span>')
+        b.append('      </a>')
+        out.append('\n'.join(b))
+    return '\n\n'.join(out)
+
 def gallerie():
     g = rj('content/gallerie.json')
     b = ['<article class="gal__feature" data-reveal>',
@@ -169,6 +198,7 @@ def sechead(sec):
 
 REGIONS = {
     'hero': hero,
+    'colls': colls,
     'frammenti': frammenti,
     'progetti': progetti,
     'gallerie': gallerie,
@@ -242,7 +272,6 @@ def collection(key):
         'config': ',\n'.join(cfg),
     }
 
-COLLECTIONS = ['opere', 'bomboniere']
 
 def main():
     html = rd('src/index.html')

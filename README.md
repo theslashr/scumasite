@@ -366,8 +366,9 @@ files. Same technique the panel uses for new paintings.
   minutes later, and every version is recoverable.
 - One password for one person. If more than one person ever edits, this wants
   real accounts rather than a shared secret.
-- Card covers are not editable from the panel — they are named in
-  `src/index.html`. The hero, the projects and everything else are.
+- Nothing is left that the panel cannot reach. The covers, the first screen,
+  the projects, the collections, the text and the headings all come from
+  `content/`.
 
 ## Things to replace before this goes live
 

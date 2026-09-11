@@ -641,5 +641,12 @@
       "w": 220,
       "h": 331
     }
+  ],
+  "cycle": [
+    "assets/img/bomb/card/n047.jpg",
+    "assets/img/bomb/card/n005.jpg",
+    "assets/img/bomb/card/n083.jpg",
+    "assets/img/bomb/card/n112.jpg",
+    "assets/img/bomb/card/n036.jpg"
   ]
 }

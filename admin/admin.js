@@ -289,6 +289,54 @@
     }));
   }
 
+  /* ---------------- the cover that cycles on the card ----------------
+     Shared by both collections, because the card is the same object in
+     each: a handful of paintings that lay themselves over one another. */
+  function coverEditor(main, key) {
+    var coll = state.files['collections/' + key];
+    coll.cycle = coll.cycle || [];
+    var dirty = 'collections/' + key;
+    var bomb = key === 'bomboniere';
+
+    main.appendChild(el('h3', null, 'Copertina della card'));
+    main.appendChild(el('p', 'lead',
+      'I quadri che si dipingono uno sull’altro sulla card in homepage. Il primo è quello che si vede appena la pagina si apre.'));
+
+    var grid = el('div', 'grid');
+    coll.cycle.forEach(function (src, i) {
+      var card = el('div', 'pic');
+      var im = el('img');
+      im.src = '../' + src;
+      im.alt = ''; im.loading = 'lazy';
+      card.appendChild(im);
+      var bar = el('div', 'pic__bar');
+      bar.appendChild(el('span', 'pic__n', i === 0 ? 'in apertura' : String(i + 1)));
+      bar.appendChild(tools(
+        i > 0 ? function () { move(coll.cycle, i, -1, dirty); } : null,
+        i < coll.cycle.length - 1 ? function () { move(coll.cycle, i, 1, dirty); } : null,
+        // one has to stay: an empty cycle leaves the card with no picture
+        coll.cycle.length > 1 ? function () {
+          coll.cycle.splice(i, 1); setDirty(true, dirty); render();
+        } : null,
+        'Togliere questo quadro dalla copertina?'
+      ));
+      card.appendChild(bar);
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+
+    main.appendChild(uploader(function (added) {
+      added.forEach(function (a) { coll.cycle.push(a.card); });
+      setDirty(true, dirty);
+      render();
+    }, {
+      card: true,
+      label: '+ Aggiungi un quadro alla copertina',
+      hint: 'Ritagliato automaticamente nella forma della card, quindi scegli quadri che reggono un taglio largo. ' +
+            (bomb ? 'Le bomboniere sono quasi tutte verticali: sulla card se ne vede una fascia centrale.' : '')
+    }));
+  }
+
   /* ---------------- opere ---------------- */
   function renderOpere(main) {
     var coll = state.files['collections/opere'];
@@ -338,6 +386,8 @@
       setDirty(true, 'collections/opere');
       render();
     }));
+
+    coverEditor(main, 'opere');
   }
 
   /* ---------------- bomboniere: shown, not edited ---------------- */
@@ -378,6 +428,8 @@
       grid.appendChild(card);
     });
     main.appendChild(grid);
+
+    coverEditor(main, 'bomboniere');
   }
 
   /* ---------------- gallerie ---------------- */
@@ -559,11 +611,16 @@
      whatever comes off his phone, which also keeps a 6MB photo from being
      committed as-is. */
   var FULL_MAX = 1600, THUMB_W = 550;
+  /* The card's own shape. Its canvas reaches 911px, so 1000 wide is enough,
+     and anything outside the 16:11 crop is pixels the card never draws. */
+  var CARD_W = 1000, CARD_H = Math.round(1000 * 11 / 16);
 
-  function uploader(onDone) {
+  function uploader(onDone, opts) {
+    opts = opts || {};
     var wrap = el('div', 'field');
     var label = el('label', 'addbtn');
-    label.textContent = '+ Aggiungi quadri (puoi sceglierne più di uno)';
+    var idle = opts.label || '+ Aggiungi quadri (puoi sceglierne più di uno)';
+    label.textContent = idle;
     label.style.display = 'block';
     label.style.textAlign = 'center';
     var input = el('input');
@@ -573,7 +630,7 @@
     input.hidden = true;
     label.appendChild(input);
     wrap.appendChild(label);
-    wrap.appendChild(el('p', 'hint',
+    wrap.appendChild(el('p', 'hint', opts.hint ||
       'Foto alla luce del giorno, quadro dritto e senza flash. Il file originale, non quello passato da WhatsApp: la compressione cancella proprio la trama che fa funzionare la luce.'));
 
     input.addEventListener('change', function () {
@@ -583,7 +640,7 @@
       var done = [], i = 0;
       (function next() {
         if (i >= files.length) {
-          label.textContent = '+ Aggiungi quadri (puoi sceglierne più di uno)';
+          label.textContent = idle;
           label.appendChild(input);
           input.value = '';
           if (done.length) {
@@ -596,7 +653,7 @@
         prepare(files[i++], function (res) {
           if (res) done.push(res);
           next();
-        });
+        }, opts);
       })();
     });
     return wrap;
@@ -644,7 +701,8 @@
     return wrap;
   }
 
-  function prepare(file, cb) {
+  function prepare(file, cb, opts) {
+    opts = opts || {};
     if (!/^image\//.test(file.type)) {
       toast('"' + file.name + '" non è un’immagine.', true);
       return cb(null);
@@ -659,6 +717,14 @@
         return cb(null);
       }
       var id = newId();
+      if (opts.card) {
+        // one file, cut to the card and nothing else
+        var cardImg = crop(img, CARD_W, CARD_H);
+        state.images.push({ path: 'assets/img/card/' + id + '.jpg', base64: cardImg.b64 });
+        setDirty(true, 'images');
+        cb({ id: id, card: 'assets/img/card/' + id + '.jpg' });
+        return;
+      }
       var full = draw(img, Math.min(img.naturalWidth, FULL_MAX));
       var thumb = draw(img, Math.min(img.naturalWidth, THUMB_W));
       state.images.push({ path: 'assets/img/' + id + '.jpg', base64: full.b64 });
@@ -672,6 +738,19 @@
       cb(null);
     };
     img.src = url;
+  }
+
+  /* Fill the box and crop the overflow, exactly as the card itself does, so
+     what gets stored is what gets drawn and no pixel is sent unused. */
+  function crop(img, w, h) {
+    var c = $('#scratch');
+    c.width = w; c.height = h;
+    var ctx = c.getContext('2d');
+    var s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+    var dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    var data = c.toDataURL('image/jpeg', 0.82);
+    return { w: w, h: h, b64: data.slice(data.indexOf(',') + 1) };
   }
 
   function draw(img, w) {
