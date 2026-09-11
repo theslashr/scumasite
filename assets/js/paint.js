@@ -229,11 +229,24 @@
       sats.push([x + Math.cos(a) * d, y + Math.sin(a) * d, R * (0.34 + Math.random() * 0.42)]);
     }
 
-    // ---- reveal ----
+    /* ---- reveal ----
+       A touch lifts more ground than a hover does. On a desktop the pointer
+       is painting continuously, so 0.26 a dab compounds quickly; on a phone
+       a tap is often the whole gesture, and one dab at 0.26 took a quarter
+       of the ground off the very centre and less everywhere else - a broad,
+       faint lift rather than paint going on. The ground also floods back
+       nearly four times faster on touch, so a single tap was half undone
+       before a second one arrived.
+
+       It can be raised without the copy suffering because the type on a
+       phone carries its own tight shadow rather than relying on the scrim,
+       which is display:none there. */
+    var lift = coarse ? 0.46 : 0.26;
+    var satLift = coarse ? 0.30 : 0.17;
     gesso.globalCompositeOperation = 'destination-out';
     gesso.globalAlpha = 1;
-    pool(gesso, x, y, R * 1.22, 0.26, null);
-    for (i = 0; i < sats.length; i++) pool(gesso, sats[i][0], sats[i][1], sats[i][2] * 1.2, 0.17, null);
+    pool(gesso, x, y, R * 1.22, lift, null);
+    for (i = 0; i < sats.length; i++) pool(gesso, sats[i][0], sats[i][1], sats[i][2] * 1.2, satLift, null);
 
     // ---- pigment ----
     paint.globalCompositeOperation = 'source-over';

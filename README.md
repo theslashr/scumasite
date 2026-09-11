@@ -31,6 +31,27 @@ assets/img/bomb/         the bomboniere: 126 full (~32 MB) + 126 thumbs
 
 ## The hero
 
+### A tap on a phone
+
+A touch lifts more ground than a hover does — `0.46` against `0.26`, with the
+satellites at `0.30` against `0.17`.
+
+The two are not comparable gestures. A pointer paints continuously, so a
+small lift per dab compounds in a second; on a phone a tap is often the whole
+gesture, and the ground floods back nearly four times faster there
+(`0.0034` a frame against `0.0009`) because there is no scrim to keep the
+copy readable. A single tap was being half undone before a second arrived.
+
+Measured on a 375x812 viewport, tapping directly behind the headline: one tap
+now leaves the ground at **0.478**, so the painting is **52%** through. The
+copy survives it because the type on a phone carries its own tight
+`text-shadow` rather than relying on the scrim, which is `display:none`
+there — and the dry-back closes the gap within a couple of seconds anyway.
+
+Raise it further and the body copy over a dark passage of a painting stops
+being comfortable. `0.46` is about the ceiling; the lever is this alpha, not
+the dry-back rate, which is what keeps the copy readable at all.
+
 ### Why the ground is not brown
 
 The toned ground has to read as *primed linen*, and keeping it there is a
