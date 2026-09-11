@@ -31,6 +31,33 @@ assets/img/bomb/         the bomboniere: 126 full (~32 MB) + 126 thumbs
 
 ## The hero
 
+### Why the ground is not brown
+
+The toned ground has to read as *primed linen*, and keeping it there is a
+matter of saturation, not hue. It drifted to sepia once, and the fix is worth
+recording because every ingredient looked reasonable on its own:
+
+| | was | now |
+|---|---|---|
+| base | `233,224,206` | `240,235,226` |
+| linear gradient end | `196,186,168` | `220,213,201` |
+| vignette edge | `146,134,116` @ .42 | `199,191,178` @ .30 |
+| mottling | `196,174,140` / `178,160,132` | `198,189,174` / `190,183,171` |
+| weave threads | `.13/.10/.07` @ .5 | `.15/.14/.125` @ .38 |
+
+Five warm layers compounding into tea stain. Measured on the rendered canvas
+it sat at **RGB spread 27**; it is now **14.7** at luminance 227 — the same
+spread as the site's own `--canvas`, which is what it should have matched all
+along.
+
+Judge it by **RGB spread, not HSL saturation**. This light, the HSL number is
+close to useless: the base colour alone scores 32% while being a warm white,
+and it read 25% both before and after a change that plainly worked.
+
+It shows worst on a phone, where there is no hover to paint the ground away,
+so it is most of what a visitor sees. The desktop hides the problem behind
+whatever has already been uncovered.
+
 Three stacked layers:
 
 1. `.hero__art` — a painting, waiting.
