@@ -39,6 +39,8 @@ const WRITABLE = [
   /^content\/collections\/[\w-]+\.json$/,
   /^assets\/img\/[\w-]+\.jpg$/,
   /^assets\/img\/sm\/[\w-]+\.jpg$/,
+  /^assets\/img\/card\/[\w-]+\.jpg$/,
+  /^assets\/img\/bomb\/card\/[\w-]+\.jpg$/,
 ];
 
 const json = (obj, status = 200) =>
@@ -175,7 +177,7 @@ async function handle(route, request, env) {
 
     if (route === 'load' && request.method === 'GET') {
       const files = {};
-      for (const p of ['frammenti', 'progetti', 'gallerie', 'contatti', 'sections']) {
+      for (const p of ['hero', 'frammenti', 'progetti', 'gallerie', 'contatti', 'sections']) {
         files[p] = await readJSON(env, `content/${p}.json`);
       }
       for (const c of ['opere', 'bomboniere']) {

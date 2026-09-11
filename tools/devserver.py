@@ -30,9 +30,11 @@ WRITABLE = [
     re.compile(r'^content/collections/[\w-]+\.json$'),
     re.compile(r'^assets/img/[\w-]+\.jpg$'),
     re.compile(r'^assets/img/sm/[\w-]+\.jpg$'),
+    re.compile(r'^assets/img/card/[\w-]+\.jpg$'),
+    re.compile(r'^assets/img/bomb/card/[\w-]+\.jpg$'),
 ]
 
-CONTENT = ['frammenti', 'progetti', 'gallerie', 'contatti', 'sections']
+CONTENT = ['hero', 'frammenti', 'progetti', 'gallerie', 'contatti', 'sections']
 COLLECTIONS = ['opere', 'bomboniere']
 
 

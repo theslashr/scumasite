@@ -342,14 +342,32 @@ weave does not survive and the light stops working.
 New paintings are named by the moment they arrived (`q20260911…`), so they
 cannot collide with `img01`–`img54`.
 
+### Card covers
+
+The covers cycling on the collection cards are cut for that card and nothing
+else: **1000x688**, the card's own 16:11, at the 911px the canvas actually
+reaches (607 CSS px at the wrapper's max width, times the 1.5 DPR cap).
+
+Getting there took two wrong turns worth recording. The thumbnails were far
+too small — 220px drawn at three times that was the graininess. The
+full-size originals were the opposite mistake: the card *crops* to 16:11, so
+a portrait was shipping 1280px of height to draw 688 of it. **Capping the
+width alone saved nothing for the portraits**, because they were already
+under 1000px wide; cropping to the card's ratio first is what did it. 2.24MB
+to 1.52MB, a third off the home page.
+
+They were generated in a browser, since there is no image tooling on any
+machine here — a canvas, then `tools/devserver.py`'s save route writing the
+files. Same technique the panel uses for new paintings.
+
 ### Known gaps
 
-- The hero paintings and the project photographs are not editable yet; the
-  text around them is.
 - No preview before publishing. He sees the result on the live site about two
   minutes later, and every version is recoverable.
 - One password for one person. If more than one person ever edits, this wants
   real accounts rather than a shared secret.
+- Card covers are not editable from the panel — they are named in
+  `src/index.html`. The hero, the projects and everything else are.
 
 ## Things to replace before this goes live
 

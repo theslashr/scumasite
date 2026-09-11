@@ -107,6 +107,7 @@
 
   /* ---------------- sections ---------------- */
   var SECTIONS = [
+    { id: 'hero',       label: 'Prima schermata' },
     { id: 'opere',      label: 'Opere Sparse' },
     { id: 'bomboniere', label: 'Bomboniere' },
     { id: 'gallerie',   label: 'Mostre e gallerie' },
@@ -145,6 +146,7 @@
     var main = $('#main');
     main.innerHTML = '';
     ({
+      hero: renderHero,
       opere: renderOpere,
       bomboniere: renderBomboniere,
       gallerie: renderGallerie,
@@ -241,6 +243,50 @@
     });
     wrap.appendChild(add);
     return wrap;
+  }
+
+  /* ---------------- the first screen ----------------
+     The paintings hiding under the primed canvas. The first is the one
+     showing when the page opens; the rest arrive as the ground dries back
+     and the next stroke uncovers a different picture. Order is what he is
+     really editing here, so it leads. */
+  function renderHero(main) {
+    var list = state.files.hero;
+    head(main, 'Prima schermata',
+      'I quadri nascosti sotto la tela. Il primo è quello che si vede aprendo il sito; gli altri compaiono man mano che si dipinge sopra.');
+
+    var grid = el('div', 'grid');
+    list.forEach(function (im, i) {
+      var card = el('div', 'pic');
+      var pic = el('img');
+      pic.src = '../' + im.src;
+      pic.alt = ''; pic.loading = 'lazy';
+      card.appendChild(pic);
+
+      var bar = el('div', 'pic__bar');
+      bar.appendChild(el('span', 'pic__n', i === 0 ? 'in apertura' : String(i + 1)));
+      bar.appendChild(tools(
+        i > 0 ? function () { move(list, i, -1, 'hero'); } : null,
+        i < list.length - 1 ? function () { move(list, i, 1, 'hero'); } : null,
+        // one has to remain, or the first screen has nothing under the canvas
+        list.length > 1 ? function () {
+          list.splice(i, 1); setDirty(true, 'hero'); render();
+        } : null,
+        'Togliere questo quadro dalla prima schermata?'
+      ));
+      card.appendChild(bar);
+      grid.appendChild(card);
+    });
+    main.appendChild(grid);
+
+    main.appendChild(uploader(function (added) {
+      added.forEach(function (a) {
+        list.push({ src: 'assets/img/' + a.id + '.jpg',
+                    width: String(a.fullW), height: String(a.fullH) });
+      });
+      setDirty(true, 'hero');
+      render();
+    }));
   }
 
   /* ---------------- opere ---------------- */
@@ -444,6 +490,12 @@
       r.appendChild(field('Titolo', c.title, function (v) { c.title = v; setDirty(true, 'progetti'); render(); }));
       box.appendChild(r);
       box.appendChild(paraEditor(c, 'paras', 'progetti', 'Descrizione'));
+      if (c.image) {
+        box.appendChild(field('Descrizione della foto', c.image.alt || '',
+          function (v) { c.image.alt = v; setDirty(true, 'progetti'); },
+          { hint: 'Per chi non può vederla. Non compare sulla pagina.' }));
+        box.appendChild(photoSwap(c, 'progetti'));
+      }
       main.appendChild(box);
     });
   }
@@ -645,6 +697,7 @@
 
   /* ---------------- saving ---------------- */
   var PATHS = {
+    hero: 'content/hero.json',
     frammenti: 'content/frammenti.json',
     progetti: 'content/progetti.json',
     gallerie: 'content/gallerie.json',

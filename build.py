@@ -90,6 +90,22 @@ def progetti():
         out.append('\n'.join(b))
     return '\n\n'.join(out)
 
+def hero():
+    """The paintings waiting under the primed canvas.
+
+       The first is loaded normally and carries is-current; the rest use
+       data-src so paint.js can bring them in when they are needed rather
+       than making the first screen wait on five paintings. That split is
+       the reason this is rendered rather than left as a list."""
+    out = []
+    for n, im in enumerate(rj('content/hero.json')):
+        attr = 'src="%s" class="is-current"' % im['src'] if n == 0 else 'data-src="%s"' % im['src']
+        extra = ' id="heroArt" decoding="async" fetchpriority="high"' if n == 0 else ' decoding="async"'
+        out.append(('    ' if n else '') +
+                   '<img %s alt=""%s width="%s" height="%s">'
+                   % (attr, extra, im['width'], im['height']))
+    return '\n'.join(out)
+
 def gallerie():
     g = rj('content/gallerie.json')
     b = ['<article class="gal__feature" data-reveal>',
@@ -152,6 +168,7 @@ def sechead(sec):
     return render
 
 REGIONS = {
+    'hero': hero,
     'frammenti': frammenti,
     'progetti': progetti,
     'gallerie': gallerie,
