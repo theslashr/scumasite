@@ -248,8 +248,11 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
    warp, once for weft. */
 .hero__weave{
   position:absolute; inset:0; z-index:2; pointer-events:none;
-  opacity:.5;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .13 0 0 0 0 .10 0 0 0 0 .07 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Cfilter id='wf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .13 0 0 0 0 .10 0 0 0 0 .07 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23wp)'/%3E%3Crect width='150' height='150' filter='url(%23wf)'/%3E%3C/svg%3E");
+  /* The threads are a shadow, not a stain. They used to be brown (.13/.10/
+     .07) at half opacity across the whole hero, which is warmth the ground
+     was already supplying - two sepias on top of one another. */
+  opacity:.38;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='wp'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .02' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .15 0 0 0 0 .14 0 0 0 0 .125 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Cfilter id='wf'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .15 0 0 0 0 .14 0 0 0 0 .125 .30 .30 .30 0 -.20'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23wp)'/%3E%3Crect width='150' height='150' filter='url(%23wf)'/%3E%3C/svg%3E");
   background-size:150px 150px;
 }
 

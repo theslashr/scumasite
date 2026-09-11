@@ -32,9 +32,16 @@
   /* The canvases overhang the hero so the CSS blur never exposes an edge. */
   var MARGIN = 60;
 
-  // Primed linen: a warm off-white, the colour of gesso over cloth. Pigment
-  // multiplies onto it the way it does on a real primed canvas.
-  var GESSO_RGB = [233, 224, 206];
+  /* Primed linen: a warm off-white, the colour of gesso over cloth. Pigment
+     multiplies onto it the way it does on a real primed canvas.
+
+     Warm, not tan. Measured on screen the ground used to composite around
+     hue 40 at 19-30% saturation and 78-84% lightness, against the site's own
+     --canvas at 93% - which reads as sepia rather than as cloth, and reads
+     that way most on a phone, where there is no hover to paint it away and
+     the ground is nearly all you see. The warmth is in the hue; the brown
+     was in the saturation and the missing light. */
+  var GESSO_RGB = [240, 235, 226];
 
   var PALETTE = [
     [42, 166, 196],   // cyan
@@ -116,16 +123,19 @@
     ground.fillStyle = 'rgb(' + GESSO_RGB.join(',') + ')';
     ground.fillRect(0, 0, W, H);
 
+    /* The unevenness of a ground brushed by hand, kept - but as changes in
+       light rather than in colour. Every stop below sits within a few points
+       of the base hue; it is only the lightness that moves. */
     var g = ground.createLinearGradient(0, 0, W, H);
-    g.addColorStop(0,    'rgba(255,250,238,.55)');
-    g.addColorStop(0.45, 'rgba(228,218,198,.30)');
-    g.addColorStop(1,    'rgba(196,186,168,.45)');
+    g.addColorStop(0,    'rgba(255,252,246,.55)');
+    g.addColorStop(0.45, 'rgba(238,232,222,.30)');
+    g.addColorStop(1,    'rgba(220,213,201,.38)');
     ground.fillStyle = g;
     ground.fillRect(0, 0, W, H);
 
     var v = ground.createRadialGradient(W * .5, H * .45, 0, W * .5, H * .45, Math.max(W, H) * .75);
-    v.addColorStop(0, 'rgba(255,252,244,.28)');
-    v.addColorStop(1, 'rgba(146,134,116,.42)');
+    v.addColorStop(0, 'rgba(255,253,249,.26)');
+    v.addColorStop(1, 'rgba(199,191,178,.30)');
     ground.fillStyle = v;
     ground.fillRect(0, 0, W, H);
 
@@ -145,7 +155,9 @@
     for (i = 0; i < 30; i++) {
       var x = Math.random() * W, y = Math.random() * H;
       var r = Math.max(W, H) * (0.05 + Math.random() * 0.17);
-      var col = Math.random() < 0.55 ? '196,174,140' : '156,152,144';
+      // near-neutral, so the patches read as unevenly drunk primer rather
+      // than as tea stains: the mottling was most of the remaining sepia
+      var col = Math.random() < 0.55 ? '198,189,174' : '168,166,162';
       var a = (0.05 + Math.random() * 0.085).toFixed(3);
       var rg = ground.createRadialGradient(x, y, 0, x, y, r);
       rg.addColorStop(0, 'rgba(' + col + ',' + a + ')');
@@ -158,9 +170,9 @@
       var hh = H * (0.02 + Math.random() * 0.06);
       var la = (0.028 + Math.random() * 0.035).toFixed(3);
       var lg = ground.createLinearGradient(0, yy, 0, yy + hh);
-      lg.addColorStop(0,  'rgba(178,160,132,0)');
-      lg.addColorStop(.5, 'rgba(178,160,132,' + la + ')');
-      lg.addColorStop(1,  'rgba(178,160,132,0)');
+      lg.addColorStop(0,  'rgba(190,183,171,0)');
+      lg.addColorStop(.5, 'rgba(190,183,171,' + la + ')');
+      lg.addColorStop(1,  'rgba(190,183,171,0)');
       ground.fillStyle = lg;
       ground.fillRect(0, yy, W, hh);
     }
