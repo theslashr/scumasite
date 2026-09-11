@@ -376,6 +376,9 @@
     next.style.zIndex = ++artZ;
     next.classList.add('is-current');
 
+    // and start fetching the one after, so it is there when its turn comes
+    preloadArt(artIndex + 1);
+
     // drop the old one only once the new one has fully arrived
     clearTimeout(next._fadeT);
     next._fadeT = setTimeout(function () {
@@ -403,15 +406,24 @@
       var t = artFrames[i]; artFrames[i] = artFrames[j]; artFrames[j] = t;
     }
 
-    // the first is already loading; fetch the rest once the page has settled
+    /* Only ever the next one. This used to fetch every painting in the pool
+       once the page had settled, which was fine at five and is not at
+       twenty-five: the whole pool was paid for on every visit whether a
+       visitor uncovered two paintings or none.
+
+       One ahead is enough. A swap only happens after the ground has dried
+       back over the picture, which is tens of seconds of painting away, so
+       there is always time for the next one to arrive. */
     window.addEventListener('load', function () {
-      setTimeout(function () {
-        artFrames.forEach(function (img) {
-          var src = img.getAttribute('data-src');
-          if (src && !img.getAttribute('src')) img.setAttribute('src', src);
-        });
-      }, 900);
+      setTimeout(function () { preloadArt(artIndex + 1); }, 900);
     });
+  }
+
+  function preloadArt(n) {
+    if (!artFrames.length) return;
+    var img = artFrames[((n % artFrames.length) + artFrames.length) % artFrames.length];
+    var src = img.getAttribute('data-src');
+    if (src && !img.getAttribute('src')) img.setAttribute('src', src);
   }
 
   /* ============================================================

@@ -372,13 +372,21 @@ with a real `src` and `fetchpriority="high"`, and it is this page's largest
 contentful paint — shuffling it would make load time vary by visit and could
 never be previewed.
 
-Bomboniere can go in the pool, but choose them by eye in the panel rather
-than feeding all 126 in. The hero is a wide band and `object-fit: cover` on a
-portrait source crops away the top and bottom, so a vertical painting shows
-as a horizontal slice through its middle. The landscape ones survive it; most
-do not. There is also a hard constraint against a large pool: `paint.js`
-loads *every* hero image after the page settles, whether it is shown or not,
-so the pool is paid for in full on each visit.
+The pool holds 25 paintings: the five it always had, plus the twenty
+bomboniere that are landscape. The hero is `min-height:100svh`, so on a
+1400x900 desktop it is **1.56** — and those twenty sit at 1.43–1.55, which
+is a closer fit than `img54` (1.97) that was already there. They were looked
+at first, cropped to that ratio: all twenty are seascapes and harbours that
+survive it. The other 106 are portrait and would show as a horizontal band
+through their middle.
+
+**Only the next painting is ever fetched.** `paint.js` used to load the whole
+pool once the page settled, which was fine at five and impossible at
+twenty-five — 5.58MB paid on every visit whether a visitor uncovered two
+paintings or none. It now loads one ahead, and loads the following one each
+time it swaps. A swap only happens after the ground has dried back, which is
+tens of seconds of painting away, so the next one always has time to arrive.
+Measured on a loaded page: **2 of 25 fetched, 292KB.**
 
 ### Known gaps
 
