@@ -282,6 +282,75 @@ defines the design*. The bomboniere numbering is deliberately explicit data
 now rather than a loop index — `n047` being the forty-seventh of 126 is a
 claim about a unique object, and a claim should be visible.
 
+## Il pannello — the admin at /admin
+
+Antonio edits the site himself at `/admin`: paintings, exhibitions, the
+Frammenti text, the projects, contacts and section headings. Add, edit,
+reorder, delete. It is in Italian and never shows him a file, a field name
+or a tag.
+
+```
+admin/           the tool (a page, a stylesheet, a script)
+functions/api/   the only server-side code: login, load, save
+.github/workflows/build.yml   regenerates the site after he saves
+```
+
+**How a save travels.** He presses *Salva e pubblica* → the Function commits
+every changed file to `main` in **one commit** → the Action runs `build.py`
+and commits the regenerated `index.html` → Cloudflare deploys. About two
+minutes end to end.
+
+One commit, not one per file: saving five files a call at a time can leave
+the site half-updated if the fourth fails, so the save builds a git tree and
+a single commit that either lands or does not.
+
+### Setting it up
+
+1. **A GitHub token.** Fine-grained, this repository only, **Contents: Read
+   and write**. Nothing else. It never reaches the browser.
+2. **Four secrets** in the Cloudflare Pages project (Settings → Environment
+   variables, all four as *secrets*, Production):
+   `ADMIN_PASSWORD` (what he types) · `SESSION_SECRET` (any long random
+   string) · `GITHUB_TOKEN` · `GITHUB_REPO` (`theslashr/scumasite`).
+3. Nothing else. Pages picks `functions/` up on its own.
+
+Until those exist `/api/*` answers "Configurazione incompleta" and the
+password is refused — it fails closed, so deploying this before setting them
+up is harmless.
+
+### What it refuses to do
+
+**The bomboniere cannot be added to or removed from.** They are a closed
+edition of 126 and the numbers are printed on work people already own; the
+panel shows them, lets their descriptions be edited, and will not let anyone
+change how many there are. A generic CMS would happily let him break that,
+which is the main reason this one is not a generic CMS.
+
+The Function also refuses to write anywhere except `content/**` and
+`assets/img/**`, so nothing reachable from the panel can touch the code that
+builds the site.
+
+### Photographs
+
+The browser does the resizing. The relief viewer needs a full-size picture to
+recover the surface from and the grid needs a small one, and there is no
+image tool on any machine here — but a canvas makes both from whatever comes
+off his phone, which also stops a 6MB photo being committed as-is. Anything
+under 1200px wide is refused with the reason, because below that the canvas
+weave does not survive and the light stops working.
+
+New paintings are named by the moment they arrived (`q20260911…`), so they
+cannot collide with `img01`–`img54`.
+
+### Known gaps
+
+- The hero paintings and the project photographs are not editable yet; the
+  text around them is.
+- No preview before publishing. He sees the result on the live site about two
+  minutes later, and every version is recoverable.
+- One password for one person. If more than one person ever edits, this wants
+  real accounts rather than a shared secret.
+
 ## Things to replace before this goes live
 
 - **Work titles and techniques** in the `WORKS` array at the top of `main.js`

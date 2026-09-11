@@ -27,6 +27,16 @@ def rj(p):
 def wr(p, s):
     io.open(os.path.join(ROOT, p), 'w', encoding='utf-8', newline='').write(s)
 
+def texts(seq):
+    """Paragraphs with something in them.
+
+       The admin lets a paragraph be added and left blank - mid-thought, or
+       deleted by emptying it - and a blank one used to reach the page as
+       <p></p>, which is a visible gap nobody asked for. Filtering here
+       rather than forbidding it there: he should not have to tidy up after
+       himself for the page to be right."""
+    return [t for t in (seq or []) if str(t).strip()]
+
 def img_tag(im, indent):
     """An <img> with its attributes in the order the markup has always used,
        so a rebuild is a no-op rather than a diff."""
@@ -51,7 +61,7 @@ def frammenti():
         b.append('          <h3>%s</h3>' % e['title'])
         if e.get('lede'):
             b.append('          <p class="tl__lede">%s</p>' % e['lede'])
-        for p in e['paras']:
+        for p in texts(e['paras']):
             b.append('          <p>%s</p>' % p)
         if e.get('meta'):
             b.append('          <p class="tl__meta">%s</p>' % e['meta'])
@@ -73,7 +83,7 @@ def progetti():
         b.append('        <div class="card__body">')
         b.append('          <p class="card__tag">%s</p>' % c['tag'])
         b.append('          <h3>%s</h3>' % c['title'])
-        for p in c['paras']:
+        for p in texts(c['paras']):
             b.append('          <p>%s</p>' % p)
         b.append('        </div>')
         b.append('      </article>')
@@ -105,7 +115,7 @@ def gallerie():
         k.append(h3)
         if it.get('where'):
             k.append('          <p class="gal__where">%s</p>' % it['where'])
-        for p in it['paras']:
+        for p in texts(it['paras']):
             k.append('          <p>%s</p>' % p)
         k.append(close)
         items.append('\n'.join(k))

@@ -1,0 +1,51 @@
+name: Rigenera il sito
+
+# The admin commits content/*.json. index.html and the collection scripts
+# are generated from that content and are committed too, so something has to
+# run the build in between - otherwise Antonio saves a change, the JSON
+# updates, and the page he is looking at never moves.
+#
+# Only content/** triggers this, and the job only ever writes index.html and
+# assets/js/*.js. Those are not in the trigger list, so the commit this makes
+# cannot set the workflow off again.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'src/index.html'
+      - 'build.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  # two saves in quick succession: let the later one win rather than race
+  group: build-site
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build
+        run: python build.py
+
+      - name: Commit what changed
+        run: |
+          git config user.name  "Scuma Lab"
+          git config user.email "noreply@users.noreply.github.com"
+          git add index.html assets/js/opere.js assets/js/bomboniere.js
+          if git diff --staged --quiet; then
+            echo "Niente da rigenerare."
+            exit 0
+          fi
+          git commit -m "Rigenerato il sito dai contenuti"
+          git push
