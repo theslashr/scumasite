@@ -10,13 +10,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Inter:wght@300;350;400&display=swap">
-<link rel="stylesheet" href="assets/css/style.css?v=80">
-<link rel="stylesheet" href="assets/css/collection.css?v=80">
+<link rel="stylesheet" href="assets/css/style.css?v=81">
+<link rel="stylesheet" href="assets/css/collection.css?v=81">
 <style>
   /* The page is the collection. Nothing sits behind the grid, so the body
      is just the ground it stands on. */
   body{ background:#0c0d10; color:var(--canvas); min-height:100svh; }
+
+  /* What the card opens into. It carries the name the card carried, so the
+     browser reshapes the one into the other instead of crossing the whole
+     screen over. It has to be in the markup before the first paint for the
+     browser to have anything to match, which is why it is here and not
+     something collection.js builds - the grid arrives a moment later. */
+  .coll-page__ground{
+    position:fixed; inset:0; z-index:0; background:#0c0d10; pointer-events:none;
+  }
+  html[data-c="opere"] .coll-page__ground{ view-transition-name:coll-opere; }
+  html[data-c="bomboniere"] .coll-page__ground{ view-transition-name:coll-bomboniere; }
+
+  /* For browsers without view transitions: the page arrives rather than
+     appearing. Plain CSS, no script, and it does not delay the navigation
+     the way a fade-out on click would. */
+  @keyframes coll-page-in{ from{ opacity:0; } }
+  body{ animation:coll-page-in .32s cubic-bezier(.22,.61,.36,1) both; }
+  @media (prefers-reduced-motion:reduce){ body{ animation:none; } }
   .coll-page__fallback{
+    /* above the ground, which is fixed and would otherwise paint over it */
+    position:relative; z-index:1;
     max-width:38rem; margin:0 auto; padding:22vh 1.5rem;
     text-align:center; color:#8b8f96; font-family:var(--sans);
   }
@@ -29,6 +49,19 @@
 </head>
 <body>
 
+<script>
+/* Before the first paint, so the ground is already named when the browser
+   looks for something matching the card that was clicked. Reading the
+   parameter twice is cheaper than making the transition wait for the
+   script at the end of the body. */
+(function () {
+  var c = (location.search.match(/[?&]c=([\w-]+)/) || [])[1] || 'bomboniere';
+  document.documentElement.setAttribute('data-c', c);
+})();
+</script>
+
+<div class="coll-page__ground" aria-hidden="true"></div>
+
 <!-- Shown only if the collection in the URL is not one we have, and
      replaced by the grid otherwise. Without JS it is what remains, which is
      why it carries a way back rather than an error. -->
@@ -37,10 +70,10 @@
   <p><a href="index.html#opere">Torna alle opere</a></p>
 </div>
 
-<script src="assets/js/relief.js?v=80"></script>
-<script src="assets/js/collection.js?v=80"></script>
-<script src="assets/js/opere.js?v=80"></script>
-<script src="assets/js/bomboniere.js?v=80"></script>
+<script src="assets/js/relief.js?v=81"></script>
+<script src="assets/js/collection.js?v=81"></script>
+<script src="assets/js/opere.js?v=81"></script>
+<script src="assets/js/bomboniere.js?v=81"></script>
 <script>
 (function () {
   'use strict';

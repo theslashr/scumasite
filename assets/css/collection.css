@@ -17,6 +17,40 @@
    redefined here.
    ============================================================ */
 
+/* ---------- card to grid ----------
+   Opening a collection used to be a plain navigation: the page simply
+   swapped. These are two views of the same thing - a card and what is
+   behind it - so the browser is asked to animate between them.
+
+   Cross-document view transitions need the opt-in on BOTH documents, and
+   both are same-origin, which is the only place this works. Where it is
+   not supported nothing is announced and the navigation is what it always
+   was, so there is no fallback to maintain - only the fade-in below, which
+   is plain CSS and runs everywhere. */
+@view-transition{ navigation:auto; }
+
+/* The page under the card: out quickly, in a little slower, so the arrival
+   leads. Scale is tiny on purpose - at more than a percent or two it reads
+   as a zoom effect rather than as one view becoming another. */
+::view-transition-old(root){ animation:coll-vt-out .30s var(--ease) both; }
+::view-transition-new(root){ animation:coll-vt-in .42s var(--ease) both; }
+@keyframes coll-vt-out{ to{ opacity:0; transform:scale(.994); } }
+@keyframes coll-vt-in{ from{ opacity:0; transform:scale(1.012); } }
+
+/* The card itself is the thing that opens, so it is named and the page it
+   opens into carries the same name. The browser then moves and reshapes
+   one into the other rather than crossing the whole screen over. */
+.coll-card[href*="c=opere"] .coll-card__media{ view-transition-name:coll-opere; }
+.coll-card[href*="c=bomboniere"] .coll-card__media{ view-transition-name:coll-bomboniere; }
+::view-transition-group(coll-opere),
+::view-transition-group(coll-bomboniere){ animation-duration:.46s; }
+
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*){ animation:none!important; }
+}
+
 /* ---------- the cards in the page ----------
    Opere is a shelf of collections rather than a wall of paintings. Each
    card is a door into one, and it has to carry the section on its own now

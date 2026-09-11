@@ -66,6 +66,21 @@ link and to share, the back button behaves, and no script has to run for the
 links to work. The home page loads none of this code — no `relief.js`, no
 `collection.js`, no data — and the only canvases in it are the hero's two.
 
+Opening a card **animates into the grid** rather than swapping pages.
+Cross-document view transitions need `@view-transition { navigation: auto; }`
+on both documents — they are same-origin, which is the only place this
+works. The card's cover carries a `view-transition-name`, and
+`collezione.html` has a full-bleed ground element carrying the same one, so
+the browser reshapes the card into the page instead of crossing the whole
+screen over. That ground is in the markup with its name set by an inline
+script in the body, because the browser looks for a match at the first
+paint and the grid itself arrives a moment later.
+
+Where view transitions are not supported the navigation is what it always
+was, so there is nothing to maintain — except the plain CSS fade-in on
+`collezione.html`, which runs everywhere and does not delay the navigation
+the way a fade-out on click would.
+
 `collezione.html` reads the `c=` parameter, looks the set up in
 `window.COLLECTIONS`, and lands on the grid, because on that page the grid
 *is* the collection. Picking from it builds the viewer, which is where WebGL
