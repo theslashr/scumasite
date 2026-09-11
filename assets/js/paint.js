@@ -389,6 +389,20 @@
     artFrames = Array.prototype.slice.call(wrap.querySelectorAll('img'));
     artIndex = Math.max(0, artFrames.indexOf(wrap.querySelector('.is-current')));
 
+    /* Shuffle the ones after the current painting, so two visits do not
+       uncover the same sequence. Only the order of this array changes and
+       never the DOM: which painting is on top is decided by the z-index
+       nextArtwork assigns, so the markup can stay as it was rendered.
+
+       The painting already showing keeps its place at the front. It is the
+       one with a real src and fetchpriority, and it is this page's largest
+       contentful paint - shuffling that would make the load time vary by
+       visit and could never be previewed. Everything after it is fair game. */
+    for (var i = artFrames.length - 1; i > artIndex + 1; i--) {
+      var j = artIndex + 1 + Math.floor(Math.random() * (i - artIndex));
+      var t = artFrames[i]; artFrames[i] = artFrames[j]; artFrames[j] = t;
+    }
+
     // the first is already loading; fetch the rest once the page has settled
     window.addEventListener('load', function () {
       setTimeout(function () {

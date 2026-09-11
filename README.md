@@ -360,6 +360,26 @@ They were generated in a browser, since there is no image tooling on any
 machine here — a canvas, then `tools/devserver.py`'s save route writing the
 files. Same technique the panel uses for new paintings.
 
+### The hero order
+
+The paintings after the first are shuffled on every visit, so two people do
+not uncover the same sequence. Only the order of the array changes, never the
+DOM: which painting sits on top is decided by the z-index `nextArtwork`
+assigns, so the markup stays exactly as it was rendered.
+
+**The painting already showing keeps its place at the front.** It is the one
+with a real `src` and `fetchpriority="high"`, and it is this page's largest
+contentful paint — shuffling it would make load time vary by visit and could
+never be previewed.
+
+Bomboniere can go in the pool, but choose them by eye in the panel rather
+than feeding all 126 in. The hero is a wide band and `object-fit: cover` on a
+portrait source crops away the top and bottom, so a vertical painting shows
+as a horizontal slice through its middle. The landscape ones survive it; most
+do not. There is also a hard constraint against a large pool: `paint.js`
+loads *every* hero image after the page settles, whether it is shown or not,
+so the pool is paid for in full on each visit.
+
 ### Known gaps
 
 - No preview before publishing. He sees the result on the live site about two
