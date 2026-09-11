@@ -2,3 +2,6 @@
 .gitignore
 .assetsignore
 README.md
+build.py
+src
+content

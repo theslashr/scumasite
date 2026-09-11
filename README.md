@@ -229,6 +229,59 @@ numbered 98 to 126. Calling a piece "11 / 126" on that basis would be a false
 claim about a unique work. The files are `n001`–`n126`, so the file name *is*
 the edition number and there is no table to keep in step.
 
+## Content
+
+The prose and the collections live in `content/`, not in the markup. `build.py`
+renders `index.html` from `src/index.html` plus that content, and generates
+`assets/js/opere.js` and `assets/js/bomboniere.js` from the collection data.
+
+```bash
+py -3 build.py
+```
+
+```
+content/frammenti.json      the timeline — 6 entries, ~950 words, most of the prose
+content/progetti.json       4 project cards
+content/gallerie.json       exhibitions and artist pages
+content/contatti.json       email, phone, socials, studio address
+content/sections.json       kicker / title / sub for each section
+content/collections/*.json  the paintings in each collection
+src/index.html              the template: structure, with <!--{{markers}}-->
+```
+
+**Nothing on the server runs this.** `index.html` and the generated JS are
+committed, Cloudflare serves them as-is, and the build is not part of the
+deploy. If this script is never run again the site keeps working exactly as
+it does now — which is the point of doing it this way. The content became
+editable without the deployment becoming something that can fail.
+
+Run it after editing anything under `content/`, and commit both the JSON and
+what it produced.
+
+### How the split was made
+
+Derived, not transcribed. Fifteen hundred words of someone's autobiography
+retyped by hand is fifteen hundred chances to quietly change what he wrote,
+so a one-shot script read the markup and wrote both sides from it. The check
+that mattered was that a rebuild produced the committed `index.html`
+**byte for byte** — which it does, across all eight regions.
+
+That check earned its keep immediately: the first pass silently dropped a
+`<p class="tl__lede">` because the extractor only matched bare `<p>`. Reading
+the output would not have caught it; a diff did. If these renderers are ever
+changed, keep a way to prove the output is unchanged.
+
+The collections could not be byte-checked the same way, because their shape
+changed — so they were verified against a snapshot of what the page actually
+produced before the split: same 14 and 126 items, same ids, sizes and alt
+text, same paths, same labels.
+
+Structure stays in the template: the nav, the hero's canvas layers, the
+lightbox, the footer. The line is *content that changes* versus *markup that
+defines the design*. The bomboniere numbering is deliberately explicit data
+now rather than a loop index — `n047` being the forty-seventh of 126 is a
+claim about a unique object, and a claim should be visible.
+
 ## Things to replace before this goes live
 
 - **Work titles and techniques** in the `WORKS` array at the top of `main.js`

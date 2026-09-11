@@ -1,0 +1,47 @@
+[
+  {
+    "label": "Scrivimi",
+    "blocks": [
+      {
+        "type": "link",
+        "href": "mailto:burgello.artist@gmail.com",
+        "text": "burgello.artist@gmail.com"
+      },
+      {
+        "type": "link",
+        "href": "tel:+393280287606",
+        "text": "+39 328 028 7606"
+      }
+    ]
+  },
+  {
+    "label": "Seguimi",
+    "blocks": [
+      {
+        "type": "link",
+        "href": "https://www.instagram.com/burgello_artist/",
+        "text": "Instagram · @burgello_artist",
+        "external": true
+      },
+      {
+        "type": "link",
+        "href": "https://www.facebook.com/scuma.art",
+        "text": "Facebook · scuma.art",
+        "external": true
+      }
+    ]
+  },
+  {
+    "label": "Lo studio",
+    "blocks": [
+      {
+        "type": "addr",
+        "html": "Scuma Lab<br>Sellia Marina (CZ)<br>Calabria, Italia"
+      },
+      {
+        "type": "note",
+        "html": "Per collaborazioni, murales su commissione, workshop e progetti di rigenerazione urbana."
+      }
+    ]
+  }
+]

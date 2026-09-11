@@ -1,0 +1,62 @@
+[
+  {
+    "tag": "Su commissione",
+    "title": "Murales",
+    "paras": [
+      "Dei miei murales sempre in diverso stile, ricerca iconografica e storica."
+    ],
+    "image": {
+      "src": "assets/img/img14.jpg",
+      "alt": "Locandina dei murales di Antonio Burgello: un murale marino con tartaruga e pesci, e murales su scuole e spazi pubblici",
+      "width": "1024",
+      "height": "1498",
+      "srcset": "assets/img/sm/img14.jpg 550w, assets/img/img14.jpg 1024w",
+      "sizes": "(max-width:860px) 100vw, 50vw"
+    }
+  },
+  {
+    "tag": "Progetto itinerante",
+    "title": "Porte d'Artista",
+    "paras": [
+      "Rigenerazione urbana nei vecchi borghi in decadenza: le porte in disuso vengono recuperate, ammodernate e trasformate in opera d'arte."
+    ],
+    "image": {
+      "src": "assets/img/img21.jpg",
+      "alt": "Locandina del Sentiero Porte d'Artista, Vena di Maida, con Antonio “Scuma” Burgello come guest artist",
+      "width": "733",
+      "height": "1070",
+      "srcset": "assets/img/sm/img21.jpg 550w, assets/img/img21.jpg 733w",
+      "sizes": "(max-width:860px) 100vw, 50vw"
+    }
+  },
+  {
+    "tag": "Progetto personale",
+    "title": "Cromie nei Borghi",
+    "paras": [
+      "Un'analisi in stile antico dei borghi visitati: studio e produzione <em>en plein air</em> sul posto, workshop, e a chiusura una mostra personale con le opere che raccontano l'identità del paese."
+    ],
+    "image": {
+      "src": "assets/img/img19.jpg",
+      "alt": "Vicolo notturno dipinto a spatola, con lanterna accesa e muri ocra",
+      "width": "1080",
+      "height": "1440",
+      "srcset": "assets/img/sm/img19.jpg 550w, assets/img/img19.jpg 1080w",
+      "sizes": "(max-width:860px) 100vw, 50vw"
+    }
+  },
+  {
+    "tag": "Curatela",
+    "title": "Burgello's Exhibition",
+    "paras": [
+      "Oltre che artista mi cimento nell'organizzazione e nella cura degli eventi: mostre collettive, estemporanee, workshop, interviste e dirette."
+    ],
+    "image": {
+      "src": "assets/img/img09.jpg",
+      "alt": "Veduta dall'alto dell'artista seduto al centro di centinaia di piccoli dipinti disposti in cerchi concentrici",
+      "width": "1086",
+      "height": "1436",
+      "srcset": "assets/img/sm/img09.jpg 550w, assets/img/img09.jpg 1086w",
+      "sizes": "(max-width:860px) 100vw, 50vw"
+    }
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "opere": {
+    "kicker": "Opere",
+    "title": "Scuma production",
+    "sub": "Olio a spatola, acrilico, acquerello. Paesaggi che ho attraversato, notturni che non mi hanno lasciato dormire, oggetti che hanno insistito per essere dipinti."
+  },
+  "frammenti": {
+    "kicker": "Frammenti di vita",
+    "title": "Come si arriva a dipingere",
+    "sub": "Nessun racconto fiabesco. Soltanto ciò che il vortice della vita ha portato, finché la pittura non è diventata il modo migliore per parlare col mondo."
+  },
+  "progetti": {
+    "kicker": "Progetti ed eventi",
+    "title": "Quando l'opera incontra il mondo"
+  },
+  "gallerie": {
+    "kicker": "Gallerie",
+    "title": "Dove trovarmi"
+  }
+}

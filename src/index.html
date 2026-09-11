@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antonio Burgello · Artista, Pittore, Muralista</title>
+<meta name="description" content="Luoghi, incontri e materia diventano arte. Opere, murales e progetti di Antonio “Scuma” Burgello · pittura a spatola, acrilico e acquerello dallo Scuma Lab, Calabria.">
+<meta name="theme-color" content="#0E2438">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Antonio Burgello · Artista, Pittore, Muralista">
+<meta property="og:description" content="Luoghi, incontri e materia diventano arte.">
+<meta property="og:image" content="assets/img/logo.jpg">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230E2438'/><path d='M20 70 Q40 20 50 45 T80 30' stroke='%23D9A227' stroke-width='12' fill='none' stroke-linecap='round'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300..700&family=Cormorant+Garamond:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/style.css?v=82">
+<link rel="stylesheet" href="assets/css/collection.css?v=82">
+</head>
+<body>
+
+<a class="skip" href="#main">Salta al contenuto</a>
+
+<!-- ══════════ CURSOR ══════════ -->
+<div class="brush-cursor" id="brushCursor" aria-hidden="true">
+  <svg viewBox="0 0 40 40" width="40" height="40">
+    <circle class="bc-ring" cx="20" cy="20" r="14"/>
+  </svg>
+</div>
+<div class="brush-dot" id="brushDot" aria-hidden="true">
+  <svg viewBox="0 0 12 12" width="12" height="12">
+    <circle class="bc-dot" cx="6" cy="6" r="3.5"/>
+  </svg>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#top">
+    <span class="nav__name">Antonio&nbsp;Burgello</span>
+  </a>
+
+  <nav class="nav__links" aria-label="Principale">
+    <a href="#opere">Opere</a>
+    <a href="#frammenti">Frammenti</a>
+    <a href="#progetti">Progetti</a>
+    <a href="#gallerie">Gallerie</a>
+    <a href="#contatti" class="nav__cta">Contatti</a>
+  </nav>
+
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span>
+    <em class="sr-only">Apri il menu</em>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="#opere">Opere</a>
+  <a href="#frammenti">Frammenti di vita</a>
+  <a href="#progetti">Progetti ed eventi</a>
+  <a href="#gallerie">Gallerie</a>
+  <a href="#contatti">Contatti</a>
+</div>
+
+<main id="main">
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" id="top">
+
+  <!-- layer 0 : the paintings waiting underneath. Each time the ground dries
+       back, the next one quietly takes its place, so the following strokes
+       uncover a different picture. -->
+  <div class="hero__art" aria-hidden="true">
+    <img src="assets/img/img54.jpg" class="is-current" alt="" id="heroArt" decoding="async" fetchpriority="high" width="1100" height="558">
+    <img data-src="assets/img/img10.jpg" alt="" decoding="async" width="1100" height="649">
+    <img data-src="assets/img/img16.jpg" alt="" decoding="async" width="1100" height="904">
+    <img data-src="assets/img/img37.jpg" alt="" decoding="async" width="1080" height="851">
+    <img data-src="assets/img/img11.jpg" alt="" decoding="async" width="559" height="397">
+  </div>
+
+  <!-- layer 1 : primed canvas the visitor scrapes away -->
+  <canvas class="hero__canvas hero__canvas--gesso" id="gessoCanvas" aria-hidden="true"></canvas>
+  <!-- layer 2 : the colour the brush leaves behind -->
+  <canvas class="hero__canvas hero__canvas--paint" id="paintCanvas" aria-hidden="true"></canvas>
+
+  <!-- layer 2 : the weave of the cloth -->
+  <div class="hero__weave" aria-hidden="true"></div>
+
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <!-- layer 4 : a veil of ground held back over the copy, so the words stay
+       readable whatever painting happens to be uncovered behind them -->
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <p class="hero__eyebrow" data-reveal>Luoghi, incontri e materia diventano arte.</p>
+
+    <h1 class="hero__title" data-split>Antonio Burgello</h1>
+
+    <p class="hero__lead" data-reveal>
+      <span class="lead-1">Parto dalla pittura, ma è la materia a decidere dove andare.</span><br>
+      Ogni idea cerca il proprio linguaggio: sulla tela, nel muro, negli oggetti, nello spazio.
+    </p>
+
+    <div class="hero__actions" data-reveal>
+      <a class="btn btn--solid" href="#opere">Guarda le opere</a>
+      <a class="btn btn--ghost" href="#contatti">Lavoriamo insieme</a>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ MANIFESTO ══════════ -->
+<section class="manifesto" id="manifesto">
+  <!-- the balloon painting bleeds in from the left and dissolves across the
+       section; the veil above it keeps the copy readable -->
+  <div class="manifesto__bg" aria-hidden="true">
+    <img src="assets/img/img244.jpg" alt="" loading="lazy" decoding="async" width="1100" height="768"
+         srcset="assets/img/sm/img244.jpg 550w, assets/img/img244.jpg 1100w" sizes="100vw">
+  </div>
+
+  <div class="wrap">
+    <p class="kicker" data-reveal>Un viaggio dentro il mio mondo</p>
+
+    <div class="manifesto__grid">
+      <div class="manifesto__body">
+        <p class="lede" data-reveal>Non troverai soltanto opere da guardare.<br><em>Troverai ciò che le ha fatte nascere.</em></p>
+        <p data-reveal>Un luogo, un incontro, un'esperienza, una ricerca possono diventare un'idea.<br>
+        L'idea diventa materia, la materia diventa opera, e l'opera torna poi nel mondo, attraverso una mostra, una strada, un borgo, un progetto o un incontro.</p>
+        <p data-reveal><strong>Puoi seguire questo viaggio attraverso le diverse sezioni del mio mondo.</strong></p>
+        <p data-reveal>Non è un archivio di ciò che ho fatto.</p>
+        <p data-reveal>È la traccia di ciò che sta diventando.</p>
+      </div>
+
+      <div class="manifesto__social" data-reveal>
+        <!-- /embed/ overlays the caption and track on the video; embed.js
+             builds the v2 player, which stacks them underneath and is far
+             taller. The wrapper crops TikTok's bottom bar off cleanly rather
+             than letting it be sliced in half, and carries the rounding. -->
+        <div class="tt-frame">
+          <iframe class="tt-embed"
+                  src="https://www.tiktok.com/embed/7617205469656059159"
+                  title="Video di @scuma_art su TikTok"
+                  loading="lazy" scrolling="no" allowfullscreen
+                  allow="encrypted-media; picture-in-picture; fullscreen"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <ul class="stats" data-reveal>
+      <li><b>2007</b><span>nasce la baracca</span></li>
+      <li><b>2012–19</b><span>gli anni di Londra</span></li>
+      <li><b>∞</b><span>Scuma Lab, tuttora aperto</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ OPERE ══════════ -->
+<section class="works" id="opere">
+  <div class="wrap">
+    <!--{{sechead-opere}}-->
+
+    <!-- Opere is a shelf of collections rather than a wall of paintings.
+         Each is a page of its own, so it has a URL to link and to share,
+         and these are plain links: no script has to run for them to work.
+
+         The card paints itself: cardreveal.js lays the next work in the set
+         over the one showing, in spatula passes, the way the hero is
+         revealed - only without being asked. data-cycle carries the set;
+         the <img> is what remains without JS or under reduced motion.
+
+         Full-size sources, not thumbnails. A card is 400-650px wide on a
+         desktop and twice that on a retina screen, and the bomboniere
+         thumbnails are 220px: at nearly three times their size they were
+         visibly grainy. There is no w800 derivative to reach for yet, so
+         this pays in bytes for sharpness; making one would get most of
+         those bytes back. -->
+    <div class="colls" id="colls">
+      <a class="coll-card" href="collezione.html?c=opere" data-reveal>
+        <span class="coll-card__media" data-cycle="assets/img/img54.jpg,assets/img/img02.jpg,assets/img/img19.jpg,assets/img/img16.jpg,assets/img/img13.jpg">
+          <img src="assets/img/img54.jpg" alt="" loading="lazy" decoding="async">
+        </span>
+        <span class="coll-card__body">
+          <span class="coll-card__title">Opere Sparse</span>
+        </span>
+      </a>
+      <a class="coll-card" href="collezione.html?c=bomboniere" data-reveal>
+        <span class="coll-card__media" data-cycle="assets/img/bomb/full/n047.jpg,assets/img/bomb/full/n005.jpg,assets/img/bomb/full/n083.jpg,assets/img/bomb/full/n112.jpg,assets/img/bomb/full/n036.jpg">
+          <img src="assets/img/bomb/full/n047.jpg" alt="" loading="lazy" decoding="async">
+        </span>
+        <span class="coll-card__body">
+          <span class="coll-card__title">Bomboniere</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FRAMMENTI ══════════ -->
+<section class="frag" id="frammenti">
+  <div class="wrap">
+    <!--{{sechead-frammenti}}-->
+
+    <div class="frag__layout">
+      <!-- filled by JS from the figures below, so without it the images stay
+           inline with their entries and nothing is lost -->
+      <div class="tl-media" aria-hidden="true"></div>
+
+    <ol class="timeline" id="timeline">
+
+      <!--{{frammenti}}-->
+
+    </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PROGETTI ══════════ -->
+<section class="projects" id="progetti">
+  <div class="wrap">
+    <!--{{sechead-progetti}}-->
+
+    <div class="cards">
+
+      <!--{{progetti}}-->
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GALLERIE ══════════ -->
+<section class="galleries" id="gallerie">
+  <div class="wrap">
+    <!--{{sechead-gallerie}}-->
+
+    <div class="gal">
+      <!--{{gallerie}}-->
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONTATTI ══════════ -->
+<section class="contact" id="contatti">
+  <div class="marquee" aria-hidden="true"><div class="marquee__track" id="marqueeTrack"></div></div>
+
+  <div class="wrap contact__wrap">
+    <p class="kicker" data-reveal>Contatti</p>
+    <h2 class="contact__title" data-split>Ogni luogo ha una storia. Raccontiamola a colori.</h2>
+
+    <div class="contact__grid">
+      <!--{{contatti}}-->
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p>© <span id="year"></span> Antonio Burgello · Scuma Lab · Arte · Sperimentazione · Identità</p>
+    <a href="#top">Torna su ↑</a>
+  </footer>
+</section>
+
+</main>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div class="peek" id="peek" aria-hidden="true">
+  <div class="peek__bar"><i></i><i></i><i></i><span id="peekHost"></span></div>
+  <img id="peekImg" src="" alt="" decoding="async" width="680" height="400">
+</div>
+
+<div class="lb" id="lightbox" hidden>
+  <button class="lb__close" id="lbClose" aria-label="Chiudi">&times;</button>
+  <button class="lb__nav lb__nav--prev" id="lbPrev" aria-label="Precedente">&#8249;</button>
+  <button class="lb__nav lb__nav--next" id="lbNext" aria-label="Successiva">&#8250;</button>
+  <figure class="lb__fig">
+    <img id="lbImg" src="" alt="">
+  </figure>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="assets/js/paint.js?v=82"></script>
+<script src="assets/js/main.js?v=82"></script>
+<script src="assets/js/cardreveal.js?v=82"></script>
+</body>
+</html>
