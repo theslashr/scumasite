@@ -31,6 +31,35 @@ assets/img/bomb/         the bomboniere: 126 full (~32 MB) + 126 thumbs
 
 ## The hero
 
+### The words are taped off
+
+On a phone the copy sits straight on the ground that is being erased. Every
+earlier answer was a patch laid over the problem — a scrim (a smudge at that
+size, so it went), a halo on the letters (soft, and never enough), steering
+the idle brush below the words. None of them stopped paint arriving behind a
+letter; they only argued with it afterwards.
+
+`paint.js` now does what a painter does with masking fluid: a **riserva**.
+The ground behind each line of text is never lifted and no pigment stays on
+it, while everything around is worked as before. The shapes are measured from
+the text's own line boxes, not the paragraph's box, so paint still comes up
+at the ends of short lines; they are feathered with a canvas shadow (not
+`ctx.filter`, which older iOS Safari lacks) plus a solid core, because a thin
+line's own shadow never reaches full opacity in its middle. Once that is
+running, the page gets `html.hero-reserve` and the halo is dropped.
+
+Measured on 375x812, three taps directly behind a line of the lead: without
+the riserva the ground there fell to **0.07** — the painting 93% through the
+letters — with pigment at 0.27. With it, the ground is **1.00** and pigment
+**0.00**, while open ground just below the copy still fell to 0.23.
+
+It follows what it protects: the copy's mask moves and fades with
+`.hero__inner` as the hero scrolls away, the bar's with the fixed `.nav`. And
+it is re-measured after the webfonts land and the headline has finished
+rising in, since both move the lines. Touch only — the desktop keeps its
+scrim, where the pointer is continuous and the copy is a small part of a
+wide screen.
+
 ### A tap on a phone
 
 A touch lifts more ground than a hover does — `0.46` against `0.26`, with the

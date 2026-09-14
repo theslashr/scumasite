@@ -145,6 +145,8 @@
     gesso.globalAlpha = 1;
     gesso.clearRect(0, 0, W, H);
     gesso.drawImage(groundC, 0, 0, W, H);
+
+    bakeReserve();
   }
 
   /* Scumbled patches and a few broad drags. Smooth gradients were what made
@@ -176,6 +178,173 @@
       ground.fillStyle = lg;
       ground.fillRect(0, yy, W, hh);
     }
+  }
+
+  /* ============================================================
+     RISERVA - the words are taped off
+     ============================================================ */
+  /* On a phone the copy sits straight on the ground that is being erased,
+     and every earlier answer to that was a patch over the top: a scrim that
+     read as a smudge at this size, then a halo on the letters, then steering
+     the idle brush below them. A painter does not rescue text from paint;
+     they mask it before painting - masking fluid, tape, a riserva - so that
+     area stays clean primer while everything around it is worked.
+
+     So here the ground behind each line of text is never lifted and no
+     pigment is left on it. The shapes follow the lines, not the paragraph's
+     box, so the painting still comes up at the ends of short lines, and they
+     are feathered so the paint stops softly at the words rather than at a
+     rectangle. Desktop keeps its scrim: there the pointer is continuous and
+     the copy is a small part of a wide screen. */
+  var RESERVE = coarse;
+  var FEATHER = 22;            // CSS px of soft falloff outside each line
+  var reserveGroups = [];
+
+  // how far each kind of text is held clear, in CSS px [across, up/down]
+  var RESERVE_PAD = {
+    '.hero__eyebrow': [16, 9],
+    '.hero__title':   [10, 8],
+    '.hero__lead':    [12, 5],
+    '.nav__name':     [10, 7],
+    '.nav__toggle':   [8, 8]
+  };
+
+  /* The boxes of the text itself, line by line. An element's own box spans
+     the whole column even when its line is short and centred, which would
+     tape off paint that never touched a letter. */
+  function lineRects(el) {
+    var out = [], range = document.createRange(), n;
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    while ((n = walker.nextNode())) {
+      if (!n.nodeValue.trim()) continue;
+      if (n.parentNode.closest && n.parentNode.closest('.sr-only')) continue;
+      range.selectNodeContents(n);
+      var rs = range.getClientRects();
+      for (var i = 0; i < rs.length; i++) {
+        if (rs[i].width > 1 && rs[i].height > 1) out.push(rs[i]);
+      }
+    }
+    // a control with no visible text (the menu button) is just its box
+    if (!out.length) out.push(el.getBoundingClientRect());
+    return out;
+  }
+
+  function rounded(c, x, y, w, h, r) {
+    if (c.roundRect) { c.beginPath(); c.roundRect(x, y, w, h, r); return; }
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+
+  /* One group per thing that moves independently: the copy scrolls and
+     fades with .hero__inner, the bar is fixed to the viewport. Each keeps
+     where its anchor sat when it was baked, so the mask can follow it. */
+  function bakeGroup(anchorSel, sels, hr) {
+    var anchor = document.querySelector(anchorSel);
+    if (!anchor || !groundC.width) return null;
+    var cw = groundC.width, ch = groundC.height;
+
+    var m = document.createElement('canvas');
+    m.width = cw; m.height = ch;
+    var mc = m.getContext('2d');
+    var rects = [];
+    sels.forEach(function (sel) {
+      var el = document.querySelector(sel);
+      if (!el) return;
+      var pad = RESERVE_PAD[sel] || [10, 6];
+      lineRects(el).forEach(function (r) {
+        rects.push([
+          (r.left - hr.left + MARGIN - pad[0]) * RES,
+          (r.top  - hr.top  + MARGIN - pad[1]) * RES,
+          (r.width  + pad[0] * 2) * RES,
+          (r.height + pad[1] * 2) * RES
+        ]);
+      });
+    });
+    if (!rects.length) return null;
+
+    /* The feather, from a shadow rather than ctx.filter: the shape is drawn
+       well off the canvas and only its blurred shadow lands in place. Canvas
+       filters are missing on older iOS Safari, which is exactly where this
+       runs; shadowBlur has been everywhere for a decade. */
+    var OFF = cw + ch + 500;
+    mc.fillStyle = '#000';
+    mc.shadowColor = '#000';
+    mc.shadowOffsetX = OFF;
+    mc.shadowBlur = Math.max(2, FEATHER * RES);
+    rects.forEach(function (q) {
+      rounded(mc, q[0] - OFF, q[1], q[2], q[3], 10 * RES);
+      mc.fill();
+    });
+    // and a solid core: a thin line's own shadow never reaches full opacity
+    // in its middle, so the letters would still be half exposed without it
+    mc.shadowColor = 'transparent';
+    mc.shadowOffsetX = 0;
+    mc.shadowBlur = 0;
+    rects.forEach(function (q) {
+      rounded(mc, q[0], q[1], q[2], q[3], 10 * RES);
+      mc.fill();
+    });
+
+    // the ground as it is under the mask, so a held area matches what is
+    // around it exactly - the mottling is random, and a stale copy would show
+    var g = document.createElement('canvas');
+    g.width = cw; g.height = ch;
+    var gc = g.getContext('2d');
+    gc.drawImage(m, 0, 0);
+    gc.globalCompositeOperation = 'source-in';
+    gc.drawImage(groundC, 0, 0);
+
+    var ar = anchor.getBoundingClientRect();
+    return { anchor: anchor, mask: m, ground: g, ax: ar.left - hr.left, ay: ar.top - hr.top };
+  }
+
+  function bakeReserve() {
+    if (!RESERVE || !W || !H) return;
+    var hr = hero.getBoundingClientRect();
+    if (hr.width < 2) return;
+    reserveGroups = [
+      bakeGroup('.hero__inner', ['.hero__eyebrow', '.hero__title', '.hero__lead'], hr),
+      bakeGroup('.nav', ['.nav__name', '.nav__toggle'], hr)
+    ].filter(Boolean);
+    // the CSS drops the halo only once something is actually holding the words
+    document.documentElement.classList.toggle('hero-reserve', reserveGroups.length > 0);
+  }
+
+  /* Every frame, after the strokes and the dry-back: primer back under the
+     words, pigment lifted off them. Strokes from a finger land between
+     frames and this runs before the frame is painted, so nothing laid over
+     a letter is ever seen. */
+  function holdReserve() {
+    if (!reserveGroups.length) return;
+    var hr = hero.getBoundingClientRect();
+    if (hr.bottom < 0) return;
+    for (var i = 0; i < reserveGroups.length; i++) {
+      var rg = reserveGroups[i];
+      var ar = rg.anchor.getBoundingClientRect();
+      var dx = (ar.left - hr.left) - rg.ax;
+      var dy = (ar.top - hr.top) - rg.ay;
+      // the copy fades as the hero scrolls away; let the paint in as it goes
+      var fade = parseFloat(rg.anchor.style.opacity);
+      if (isNaN(fade)) fade = 1;
+      if (fade <= 0.01) continue;
+
+      gesso.globalCompositeOperation = 'source-over';
+      gesso.globalAlpha = fade;
+      gesso.drawImage(rg.ground, dx, dy, W, H);
+
+      paint.globalCompositeOperation = 'destination-out';
+      paint.globalAlpha = fade;
+      paint.drawImage(rg.mask, dx, dy, W, H);
+    }
+    gesso.globalAlpha = 1;
+    paint.globalAlpha = 1;
+    gesso.globalCompositeOperation = 'source-over';
+    paint.globalCompositeOperation = 'source-over';
   }
 
   /* ============================================================
@@ -381,6 +550,7 @@
 
     bleed();
     dryBack(settling);
+    holdReserve();
     requestAnimationFrame(frame);
   }
 
@@ -573,4 +743,15 @@
   requestAnimationFrame(frame);
 
   window.addEventListener('load', function () { setTimeout(size, 60); });
+
+  /* The lines have to be measured where they finally sit: after the
+     webfonts land, which rewraps the lead, and after the headline's words
+     have finished rising in. */
+  if (RESERVE) {
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(bakeReserve);
+    window.addEventListener('load', function () {
+      setTimeout(bakeReserve, 900);
+      setTimeout(bakeReserve, 2400);
+    });
+  }
 })();

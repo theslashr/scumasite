@@ -353,6 +353,14 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
      .nav.is-stuck outranks this, so that still wins. */
   .nav{ text-shadow:0 0 6px rgba(247,243,235,.6); }
 
+  /* Once paint.js is holding the words clear of the paint (the riserva,
+     which adds this class), the halo has nothing left to do, and it is the
+     thing that looked soft. If the script never runs, the painting under the
+     copy never appears either, so there is nothing to lose by dropping it. */
+  html.hero-reserve .hero__inner,
+  html.hero-reserve .hero__title,
+  html.hero-reserve .nav{ text-shadow:none; }
+
   /* a button, not a glowing lozenge */
   .btn--ghost{
     background:var(--canvas);
