@@ -40,6 +40,15 @@
   var N = items.length;
   var S = (window.Relief && window.Relief.SETTINGS) || { relief: 3.2, gloss: 91, spec: 0.52 };
 
+  /* How much of the viewer's relief a room takes, 0-1. The Bomboniere were
+     photographed flat and evenly lit, so their surface maps are mostly
+     brushwork. The Opere Sparse were not: glare, grain and the camera's own
+     sharpening all come through the same filter as texture, and at full
+     strength the lamp turns that into an embossed crust. The page says how
+     much its collection can take. */
+  var TAME = parseFloat(stage.getAttribute('data-relief'));
+  if (isNaN(TAME)) TAME = 1;
+
   /* ---------------- the room ---------------- */
   var vw = 0, vh = 0, dpr = 1;
   var L = 0;          // long side of every painting, CSS px
@@ -675,9 +684,9 @@
     bindQuad(artProg);
     gl.uniform2f(UA.uView, vw, vh);
     gl.uniform1f(UA.uDepth, DEPTH);
-    gl.uniform1f(UA.uRelief, S.relief);
+    gl.uniform1f(UA.uRelief, S.relief * TAME);
     gl.uniform1f(UA.uGloss, S.gloss);
-    gl.uniform1f(UA.uSpec, S.spec);
+    gl.uniform1f(UA.uSpec, S.spec * TAME);
     gl.uniform3f(UA.uLamp, lamp.x, lamp.y, lampZ);
     gl.uniform1i(UA.uCol, 0);
     gl.uniform1i(UA.uNrm, 1);
@@ -747,6 +756,7 @@
     lamp: function (x, y) { lamp.x = lampT.x = x; lamp.y = lampT.y = y; draw(); },
     go: function (i) { goTo(i, true); draw(); },
     art: art,
+    tame: function (v) { TAME = v; draw(); },
     state: function () { return { cam: cam, lamp: lamp, L: L, CY: CY, vw: vw, vh: vh, slots: slots }; }
   };
 })();
