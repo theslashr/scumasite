@@ -1,7 +1,7 @@
 /* ============================================================
    museo.js — one wall, one lamp
 
-   A prototype. The Bomboniere hang in a single row along a dark wall and
+   A prototype. The Opere Sparse hang in a single row along a dark wall and
    the visitor walks it, carrying the light. Everything on screen is one
    WebGL canvas, lit by one point lamp:
 
@@ -23,8 +23,9 @@
 (function () {
   'use strict';
 
-  var data = window.COLLECTIONS && window.COLLECTIONS.bomboniere;
   var stage = document.getElementById('museo');
+  var which = stage && stage.getAttribute('data-collection');
+  var data = window.COLLECTIONS && window.COLLECTIONS[which];
   var canvas = document.getElementById('museoWall');
   if (!data || !stage || !canvas) return;
 
@@ -517,16 +518,20 @@
   /* ---------------- labels, rail, where you are ---------------- */
   var labelLayer = document.getElementById('museoLabels');
   var labels = {};
-  function numberOf(i) { return parseInt(items[i].id.replace(/\D/g, ''), 10) || (i + 1); }
+  /* No titles yet, so a painting is named by where it hangs - the order
+     the collection has now, not a catalogue number. */
+  function nameOf(i) { return 'Dipinto n. ' + (i + 1); }
 
   function labelFor(i) {
     if (labels[i]) return labels[i];
     var el = document.createElement('div');
     el.className = 'museo-label';
     el.innerHTML =
-      '<p class="museo-label__artist">Antonio “Scuma” Burgello</p>' +
-      '<p class="museo-label__title">Bomboniera n. ' + numberOf(i) + '</p>' +
-      '<p class="museo-label__meta">' + (data.uniqLabel || 'pezzo unico') + '</p>';
+      '<p class="museo-label__artist">Antonio Burgello</p>' +
+      '<p class="museo-label__title">' + nameOf(i) + '</p>' +
+      (data.uniqLabel ? '<p class="museo-label__meta">' + data.uniqLabel + '</p>' : '') +
+      // what the painting shows, for anyone who cannot see the wall
+      (items[i].alt ? '<p class="sr-only">' + items[i].alt.replace(/</g, '&lt;') + '</p>' : '');
     labelLayer.appendChild(el);
     labels[i] = el;
     return el;
@@ -557,10 +562,10 @@
     count.textContent = (i + 1) + ' / ' + N;
     railMark.style.left = (N > 1 ? i / (N - 1) * 100 : 0) + '%';
     rail.setAttribute('aria-valuenow', String(i + 1));
-    rail.setAttribute('aria-valuetext', 'Bomboniera n. ' + numberOf(i) + ', ' + (i + 1) + ' di ' + N);
+    rail.setAttribute('aria-valuetext', nameOf(i) + ', ' + (i + 1) + ' di ' + N);
     clearTimeout(where.t);
     where.t = setTimeout(function () {
-      live.textContent = 'Bomboniera n. ' + numberOf(shown) + ', ' + (shown + 1) + ' di ' + N;
+      live.textContent = nameOf(shown) + ', ' + (shown + 1) + ' di ' + N;
       try { history.replaceState(null, '', '#' + items[shown].id); } catch (e) {}
     }, 600);
   }

@@ -103,6 +103,12 @@
 
     var head = el('div', 'coll-sheet__head');
     head.appendChild(el('h4', null, esc(this.o.sheetTitle || this.o.title || '')));
+    // a collection that has a room on the wall offers the way in
+    if (this.o.museumHref) {
+      var room = el('a', 'coll-sheet__room', 'Entra nella sala');
+      room.href = this.o.museumHref;
+      head.appendChild(room);
+    }
     var close = el('button', null, '&times;');
     close.type = 'button';
     close.setAttribute('aria-label', 'Chiudi');

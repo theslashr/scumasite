@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Museo · Antonio Burgello</title>
-<meta name="description" content="Le Bomboniere di Antonio “Scuma” Burgello appese su una parete, con una lampada da portare con sé.">
+<meta name="description" content="Le Opere Sparse di Antonio Burgello appese su una parete, con una lampada da portare con sé.">
 <!-- a prototype: kept out of search until it is part of the site -->
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,29 +81,29 @@
 </head>
 <body>
 
-<main class="museo" id="museo">
+<main class="museo" id="museo" data-collection="opere">
   <canvas class="museo__wall" id="museoWall" aria-hidden="true"></canvas>
   <div class="museo__labels" id="museoLabels"></div>
 
   <header class="museo__bar">
-    <a href="collezione.html?c=bomboniere">← Collezione</a>
-    <p class="museo__room" style="margin:0">Bomboniere<span>Sala I</span></p>
+    <a href="collezione.html?c=opere">← Collezione</a>
+    <p class="museo__room" style="margin:0">Opere Sparse<span>Sala I</span></p>
   </header>
 
   <div class="museo__foot">
     <p class="museo__hint" id="museoHint">Muovi la luce col mouse · scorri per camminare lungo la parete</p>
     <div class="museo__railrow">
       <div class="museo__rail" id="museoRail" role="slider" tabindex="0"
-           aria-label="Posizione lungo la parete" aria-valuemin="1" aria-valuemax="126" aria-valuenow="1">
+           aria-label="Posizione lungo la parete" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1">
         <span class="museo__railmark" id="museoRailMark"></span>
       </div>
-      <span class="museo__count" id="museoCount">1 / 126</span>
+      <span class="museo__count" id="museoCount"></span>
     </div>
   </div>
 
   <div class="museo__nogl">
     <p>Questo browser non riesce a illuminare la sala.</p>
-    <p><a href="collezione.html?c=bomboniere">Guarda le Bomboniere nella collezione</a></p>
+    <p><a href="collezione.html?c=opere">Guarda le Opere Sparse nella collezione</a></p>
   </div>
 
   <p class="sr-only" id="museoLive" aria-live="polite"></p>
@@ -115,7 +115,7 @@
   }
 </script>
 <script src="assets/js/relief.js?v=95"></script>
-<script src="assets/js/bomboniere.js?v=95"></script>
+<script src="assets/js/opere.js?v=95"></script>
 <script src="assets/js/museo.js?v=95"></script>
 </body>
 </html>

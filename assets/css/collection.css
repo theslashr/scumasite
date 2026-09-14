@@ -400,6 +400,14 @@
   color:var(--coll-muted); background:none; border:0; cursor:pointer; padding:0 .2rem;
 }
 .coll-sheet__head button:hover{ color:var(--canvas); }
+/* The way into the room on the wall, where a collection has one. It sits
+   between the title and the close button, so the head keeps its ends. */
+.coll-sheet__room{
+  margin-left:auto; margin-right:1.4rem; white-space:nowrap;
+  color:var(--ochre); text-decoration:none;
+  border-bottom:1px solid rgba(217,162,39,.35); padding-bottom:.1rem;
+}
+.coll-sheet__room:hover, .coll-sheet__room:focus-visible{ color:var(--canvas); border-color:var(--canvas); }
 
 /* The scroller has to be the wrapper, not the columns. A multi-column box
    with a fixed height does not grow downward: it makes more columns and
