@@ -220,7 +220,7 @@
   var reserveGroups = [];
 
   var RESERVE_STRENGTH = {
-    '.hero__eyebrow': 0.55,
+    '.hero__eyebrow': 0.42,
     '.hero__title':   0.42,
     '.hero__lead':    0.62
   };
@@ -247,54 +247,54 @@
     };
   }
 
-  // a round dab of primer: solid out to half its radius, then falling away
-  function primerDab(c, x, y, R) {
-    var g = c.createRadialGradient(x, y, 0, x, y, R);
-    g.addColorStop(0,    'rgba(0,0,0,1)');
-    g.addColorStop(0.5,  'rgba(0,0,0,1)');
-    g.addColorStop(0.78, 'rgba(0,0,0,.42)');
-    g.addColorStop(1,    'rgba(0,0,0,0)');
-    c.fillStyle = g;
-    c.beginPath();
-    c.arc(x, y, R, 0, 6.2832);
-    c.fill();
-  }
+  /* How far the soft edge reaches beyond a line's solid shape, in CSS px -
+     fixed, not scaled to the type. Scaling it made a large line's wash
+     broad and every other wash bigger with it, and a broad soft edge is
+     exactly what reads as a smudge. */
+  var EDGE = 11;
 
-  /* One line's wash, laid the way the hero lays paint: overlapping round
-     dabs travelling along the line, with a few loose ones above and below.
+  /* One line's wash: a pill around the line - round ends, so no corners -
+     built from overlapping round dabs so its top and bottom edges wobble a
+     little instead of running dead straight.
 
-     It replaces a rounded rectangle with a fixed 16px feather, which read
-     as a soft band on a small line and as a pale block behind the name -
-     the name's two lines merged into one box, and a feather that thin on
-     type that large is nearly a hard edge. The dabs scale with the line:
-     a dab's radius is the line's own height, so a big line gets a broad,
-     uneven edge and a small one a narrow edge, and nothing anywhere has a
-     corner.
+     Two earlier shapes, both wrong in a way worth remembering. A rounded
+     rectangle with a fixed feather was the right size but square: the
+     name's two lines merged into a pale block. Round dabs sized to the
+     line's height, with loose ones off the long edges, took the corners
+     away but grew every wash - the clearly visible share of the hero went
+     from 18.2% to 21.8%, most of it solid - and read as a smudge. This
+     keeps the first one's size and the second one's lack of corners.
 
-     Under the letters it is still a solid core, so the measured strengths
-     hold: the dabs only ever add outside it, and their solid middle reaches
-     past the core's edge so that edge is never seen. */
+     A solid core sits under the letters, so the measured strengths hold. */
   function primerStroke(c, q, rnd) {
-    var x = q[0], y = q[1], w = q[2], h = q[3];
+    var h = q[3], r = h / 2;
+    // stretch the ends a little so a rounded end still covers the first and
+    // last letters rather than cutting across their corners
+    var x = q[0] - h * 0.15, w = q[2] + h * 0.3, y = q[1];
+    var cy = y + r, F = EDGE * RES;
+
     c.fillStyle = '#000';
-    rounded(c, x, y, w, h, Math.min(h / 2, 4 * RES));
+    rounded(c, x, y, w, h, r);
     c.fill();
 
-    var cy = y + h / 2, from = x + h * 0.2, to = x + w - h * 0.2;
-    var step = h * 0.38;
-    for (var cx = from; cx <= to + 0.01; cx += step) {
-      primerDab(c,
-        cx + (rnd() - 0.5) * step * 0.4,
-        cy + (rnd() - 0.5) * h * 0.22,
-        h * (0.95 + rnd() * 0.3));
-    }
-    // loose dabs off the long edges, so neither is a straight line
-    var loose = Math.max(2, Math.round(w / (h * 1.6)));
-    for (var k = 0; k < loose; k++) {
-      primerDab(c,
-        from + rnd() * Math.max(1, to - from),
-        cy + (rnd() < 0.5 ? -1 : 1) * h * (0.35 + rnd() * 0.25),
-        h * (0.55 + rnd() * 0.35));
+    var from = x + r, to = x + w - r;
+    if (to < from) from = to = x + w / 2;
+    var step = Math.max(1.5, r * 0.9);
+    for (var cx = from; ; cx += step) {
+      if (cx > to) cx = to;
+      var solid = r * (0.97 + rnd() * 0.07);
+      var R = solid + F * (0.8 + rnd() * 0.4);
+      var yy = cy + (rnd() - 0.5) * h * 0.08;
+      var g = c.createRadialGradient(cx, yy, 0, cx, yy, R);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(solid / R, 'rgba(0,0,0,1)');
+      g.addColorStop((solid + (R - solid) * 0.5) / R, 'rgba(0,0,0,.38)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = g;
+      c.beginPath();
+      c.arc(cx, yy, R, 0, 6.2832);
+      c.fill();
+      if (cx >= to) break;
     }
   }
 

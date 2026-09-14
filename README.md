@@ -60,7 +60,7 @@ the worst backdrop that line could land on, at the WCAG AA ratio for its size:
 | line | standard | least needed | used |
 |---|---|---|---|
 | paragraph | 4.5:1 over **pure black** | 0.585 | 0.62 |
-| tagline | 4.5:1 over the darkest painting | 0.55 | 0.55 |
+| tagline | 3:1 over the darkest painting — short, not read for long | 0.415 | 0.42 |
 | name | 3:1 (large text), same painting | 0.415 | 0.42 |
 
 "The darkest painting" is `n111`, the night seascape: its darkest 5% sits at
@@ -82,21 +82,26 @@ text node and its element are taken back out, so the shape lands on the resting
 position whenever the measurement runs. Verified with the headline still frozen
 mid-rise: cores at 0.549 / 0.42 / 0.62.
 
-The shapes come from the text's own line boxes, and **each line's wash is laid
-the way the hero lays paint**: overlapping round dabs travelling along the line,
-with a few loose ones off its long edges, over a solid core under the letters.
-It replaced a rounded rectangle with a fixed 16px feather, which read as a soft
-band on a small line but as a pale block behind the name once the painting was
-worked up around it — the name's two lines merged into one box, and 16px on
-type that size is nearly a hard edge. A dab's radius is its line's own height,
-so large type gets a broad uneven edge and small type a narrow one, and nothing
-has a corner: just outside the name the wash measures 0.55 off the middle of
-its top edge and 0.29 off its corner, where a rectangle reads the same at both.
+The shapes come from the text's own line boxes. **Each line's wash is a pill**:
+round ends, so no corners, built from overlapping dabs so its top and bottom
+edges wobble slightly instead of running dead straight, over a solid core under
+the letters. The soft edge is a fixed 11px, not scaled to the type.
 
-The dabs are **seeded per line**, not drawn from `Math.random()`. The lines are
-re-measured several times on the way in, and a stroke redrawn at random each
-time would change shape under the words; two consecutive re-measures now differ
-by zero in every channel.
+It took two wrong shapes to get there, measured by how much of the hero carries
+a clearly visible wash (over 20%) at 340px wide, where the name wraps to two
+lines:
+
+| shape | visible wash | problem |
+|---|---|---|
+| rounded rectangle, 16px feather | 18.2% | right size, but square — the name's two lines merged into a pale block |
+| dabs sized to the line, loose dabs off the edges | 21.8% | no corners, but a fifth bigger, most of it solid — a smudge |
+| **pill, fixed edge** | **18.1%** | the first one's size, without its corners |
+
+Just outside the name's line the pill's wash is 0.31 off its edge and 0 off its
+corner, where a rectangle reads about the same at both. The first and last
+letters of every line still sit under full wash. The dabs are **seeded per
+line**, so re-measuring while the page loads cannot reshape them; once the text
+has settled, a re-measure is byte-identical.
 
 **Lines replace rather than stack.** They are laid lightest first, and each one
 takes out what is beneath it in proportion to its own mask before going in. The
