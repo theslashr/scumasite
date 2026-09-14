@@ -363,8 +363,9 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
      thing that looked soft. If the script never runs, the painting under the
      copy never appears either, so there is nothing to lose by dropping it. */
   html.hero-reserve .hero__inner,
-  html.hero-reserve .hero__title,
-  html.hero-reserve .nav{ text-shadow:none; }
+  html.hero-reserve .hero__title{ text-shadow:none; }
+  /* The bar is not in the riserva and keeps its small glow: a wash behind
+     the logo and the menu button read as patches up there. */
 
   /* a button, not a glowing lozenge */
   .btn--ghost{

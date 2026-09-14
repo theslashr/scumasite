@@ -54,12 +54,33 @@ the layer only moves, by transform, when the copy scrolls or fades, and writes
 nothing on a still page. Checked: forty strokes across the hero plus sixty
 frames left its pixels, transform and opacity identical.
 
-**`VEIL = 0.62` is not a taste number.** It is the least primer that keeps the
-ink at 4.5:1 — WCAG AA for body text — over a *pure black* painting: 0.58 just
-reaches it, 0.62 clears it at 5.1. Over the darkest painting actually in the
-set, the night-blue `n076`, 0.55 would already pass. So legibility is
-guaranteed rather than hoped for, and up to 38% of the painting still shows
-through behind a letter.
+**How much primer each line gets is measured, not chosen** — the ink against
+the worst backdrop that line could land on, at the WCAG AA ratio for its size:
+
+| line | standard | least needed | used |
+|---|---|---|---|
+| paragraph | 4.5:1 over **pure black** | 0.585 | 0.62 |
+| tagline | 4.5:1 over the darkest painting | 0.55 | 0.55 |
+| name | 3:1 (large text), same painting | 0.415 | 0.42 |
+
+"The darkest painting" is `n111`, the night seascape: its darkest 5% sits at
+`rgb(0,17,64)`, measured across all 25 hero paintings. The paragraph is held to
+pure black on top of that because it is the text that has to be read; the name
+is display type, so it lets most of the painting through. **The bar is left
+out**: a wash behind the logo and the menu button read as patches, and its
+small glow does the job up there.
+
+Each kind of line is drawn into its own mask at full opacity and laid into the
+layer at its own strength. Drawing the feather and core passes straight in at
+partial alpha would compound where they overlap and miss the measured number.
+
+**Lines are measured where they come to rest.** The headline's words rise into
+place and the other lines ease in; measuring during that put the name's shape
+68px low, on top of the paragraph, and the two washes stacked to 0.78 —
+`1 − (1−0.42)(1−0.62)`, which is how it was spotted. Transforms between each
+text node and its element are taken back out, so the shape lands on the resting
+position whenever the measurement runs. Verified with the headline still frozen
+mid-rise: cores at 0.549 / 0.42 / 0.62.
 
 The shapes come from the text's own line boxes, padded tightly, feathered with a
 canvas shadow (not `ctx.filter`, which older iOS Safari lacks) over a solid

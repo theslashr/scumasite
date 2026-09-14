@@ -202,29 +202,64 @@
      strength. The simulation runs untouched, and this only moves when the
      copy does.
 
-     VEIL is not a taste number. It is the least primer that keeps the ink
-     at 4.5:1 - WCAG AA for body text - over a pure black painting: 0.58
-     just reaches it and 0.62 clears it at 5.1. Over the darkest painting in
-     the set (the night-blue n076) 0.55 would already pass, so this is a
-     guarantee rather than a hope, and up to 38% of the painting still shows
-     through behind a letter. */
+     How much primer each line gets is measured, not chosen, and each line
+     gets only what it needs - the ink against the worst backdrop it could
+     land on, at the WCAG AA ratio for its size:
+
+       the paragraph  4.5:1 over pure black             0.585 -> 0.62
+       the tagline    4.5:1 over the darkest painting   0.55
+       the name       3:1, large text, same painting    0.415 -> 0.42
+
+     "The darkest painting" is n111, the night seascape: its darkest 5% sits
+     at rgb(0,17,64), measured across all 25 hero paintings. The paragraph is
+     held to pure black on top of that because it is the text that has to be
+     read; the name is display type, where AA asks 3:1, so it can let most of
+     the painting through. The bar is left out entirely: its small glow reads
+     better up there than a patch behind the logo and the menu button. */
   var RESERVE = coarse;
-  var VEIL = 0.62;
   var FEATHER = 16;            // CSS px of soft falloff outside each line
   var reserveGroups = [];
+
+  var RESERVE_STRENGTH = {
+    '.hero__eyebrow': 0.55,
+    '.hero__title':   0.42,
+    '.hero__lead':    0.62
+  };
 
   // how far each kind of text is held, in CSS px [across, up/down] - tight,
   // because every pixel of this is painting nobody sees
   var RESERVE_PAD = {
     '.hero__eyebrow': [10, 6],
     '.hero__title':   [8, 4],
-    '.hero__lead':    [8, 3],
-    '.nav__name':     [8, 5],
-    '.nav__toggle':   [6, 6]
+    '.hero__lead':    [8, 3]
   };
 
-  /* The boxes of the text itself, line by line. An element's own box spans
-     the whole column even when its line is short and centred. */
+  /* How far a node is currently pushed by transforms between it and the
+     element being measured. The headline's words rise into place and the
+     other lines ease in, so measuring while any of that is under way puts
+     the shape where the text is passing through rather than where it
+     settles - the name's words were caught 68px low, on top of the
+     paragraph, and the two washes stacked to 0.78. Taking the transform
+     back out gives the resting position whatever moment this runs at. */
+  function travel(node, el) {
+    var x = 0, y = 0, cur = node.nodeType === 1 ? node : node.parentNode;
+    while (cur && cur.nodeType === 1) {
+      var tf = getComputedStyle(cur).transform;
+      var m = tf && tf !== 'none' && tf.match(/matrix(3d)?\(([^)]+)\)/);
+      if (m) {
+        var v = m[2].split(',').map(parseFloat);
+        x += m[1] ? v[12] : v[4];
+        y += m[1] ? v[13] : v[5];
+      }
+      if (cur === el) break;
+      cur = cur.parentNode;
+    }
+    return [x, y];
+  }
+
+  /* The boxes of the text itself, line by line, where they come to rest.
+     An element's own box spans the whole column even when its line is short
+     and centred. */
   function lineRects(el) {
     var out = [], range = document.createRange(), n;
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
@@ -232,13 +267,18 @@
       if (!n.nodeValue.trim()) continue;
       if (n.parentNode.closest && n.parentNode.closest('.sr-only')) continue;
       range.selectNodeContents(n);
-      var rs = range.getClientRects();
+      var rs = range.getClientRects(), off = travel(n, el);
       for (var i = 0; i < rs.length; i++) {
-        if (rs[i].width > 1 && rs[i].height > 1) out.push(rs[i]);
+        if (rs[i].width > 1 && rs[i].height > 1) {
+          out.push({ left: rs[i].left - off[0], top: rs[i].top - off[1],
+                     width: rs[i].width, height: rs[i].height });
+        }
       }
     }
-    // a control with no visible text (the menu button) is just its box
-    if (!out.length) out.push(el.getBoundingClientRect());
+    if (!out.length) {
+      var r = el.getBoundingClientRect(), o = travel(el, el);
+      out.push({ left: r.left - o[0], top: r.top - o[1], width: r.width, height: r.height });
+    }
     return out;
   }
 
@@ -275,41 +315,56 @@
     if (!anchor || !groundC.width) return null;
     var cw = groundC.width, ch = groundC.height;
 
-    var rects = [];
+    var c = veilFor(key);
+    c.width = cw; c.height = ch;
+    var vc = c.getContext('2d');
+    var any = false;
+
+    /* Each kind of text is drawn into its own mask at full opacity and laid
+       into the layer at its own strength, so a line's core is exactly the
+       measured amount - drawing the passes straight in at partial alpha
+       would compound where the feather and the core overlap. */
+    var tmp = document.createElement('canvas');
+    tmp.width = cw; tmp.height = ch;
+    var tc = tmp.getContext('2d');
+    var OFF = cw + ch + 500;
+
     sels.forEach(function (sel) {
       var el = document.querySelector(sel);
       if (!el) return;
       var pad = RESERVE_PAD[sel] || [8, 5];
-      lineRects(el).forEach(function (r) {
-        rects.push([
+      var rects = lineRects(el).map(function (r) {
+        return [
           (r.left - hr.left + MARGIN - pad[0]) * RES,
           (r.top  - hr.top  + MARGIN - pad[1]) * RES,
           (r.width  + pad[0] * 2) * RES,
           (r.height + pad[1] * 2) * RES
-        ]);
+        ];
       });
+      if (!rects.length) return;
+      any = true;
+
+      /* The feather comes from a shadow rather than ctx.filter: the shape
+         is drawn well off the canvas and only its blurred shadow lands in
+         place. Canvas filters are missing on older iOS Safari, which is
+         exactly where this runs. A solid core goes on top, because a thin
+         line's own shadow never reaches full opacity in its middle. */
+      tc.clearRect(0, 0, cw, ch);
+      tc.fillStyle = '#000';
+      tc.shadowColor = '#000';
+      tc.shadowOffsetX = OFF;
+      tc.shadowBlur = Math.max(2, FEATHER * RES);
+      rects.forEach(function (q) { rounded(tc, q[0] - OFF, q[1], q[2], q[3], 8 * RES); tc.fill(); });
+      tc.shadowColor = 'transparent';
+      tc.shadowOffsetX = 0;
+      tc.shadowBlur = 0;
+      rects.forEach(function (q) { rounded(tc, q[0], q[1], q[2], q[3], 8 * RES); tc.fill(); });
+
+      vc.globalAlpha = RESERVE_STRENGTH[sel] != null ? RESERVE_STRENGTH[sel] : 0.62;
+      vc.drawImage(tmp, 0, 0);
+      vc.globalAlpha = 1;
     });
-    if (!rects.length) return null;
-
-    var c = veilFor(key);
-    c.width = cw; c.height = ch;
-    var vc = c.getContext('2d');
-
-    /* The feather comes from a shadow rather than ctx.filter: the shape is
-       drawn well off the canvas and only its blurred shadow lands in place.
-       Canvas filters are missing on older iOS Safari, which is exactly where
-       this runs. A solid core goes on top, because a thin line's own shadow
-       never reaches full opacity in its middle. */
-    var OFF = cw + ch + 500;
-    vc.fillStyle = '#000';
-    vc.shadowColor = '#000';
-    vc.shadowOffsetX = OFF;
-    vc.shadowBlur = Math.max(2, FEATHER * RES);
-    rects.forEach(function (q) { rounded(vc, q[0] - OFF, q[1], q[2], q[3], 8 * RES); vc.fill(); });
-    vc.shadowColor = 'transparent';
-    vc.shadowOffsetX = 0;
-    vc.shadowBlur = 0;
-    rects.forEach(function (q) { rounded(vc, q[0], q[1], q[2], q[3], 8 * RES); vc.fill(); });
+    if (!any) return null;
 
     // the live ground, cut to that shape - the mottling is random per
     // resize, and a stale copy would show as a patch that does not match
@@ -327,8 +382,7 @@
     var hr = hero.getBoundingClientRect();
     if (hr.width < 2) return;
     reserveGroups = [
-      bakeGroup('copy', '.hero__inner', ['.hero__eyebrow', '.hero__title', '.hero__lead'], hr),
-      bakeGroup('nav', '.nav', ['.nav__name', '.nav__toggle'], hr)
+      bakeGroup('copy', '.hero__inner', ['.hero__eyebrow', '.hero__title', '.hero__lead'], hr)
     ].filter(Boolean);
     document.documentElement.classList.toggle('hero-reserve', reserveGroups.length > 0);
     holdReserve();
@@ -347,11 +401,10 @@
       var dy = (ar.top - hr.top) - rg.ay;
       var fade = parseFloat(rg.anchor.style.opacity);
       if (isNaN(fade)) fade = 1;
-      // the bar takes a solid background once it sticks; nothing to hold then
-      if (rg.key === 'nav' && rg.anchor.classList.contains('is-stuck')) fade = 0;
 
       var t = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
-      var o = (VEIL * Math.max(0, Math.min(1, fade))).toFixed(3);
+      // the strengths are baked into the pixels; this only fades with the copy
+      var o = Math.max(0, Math.min(1, fade)).toFixed(3);
       if (t !== rg.t) { rg.canvas.style.transform = t; rg.t = t; }
       if (o !== rg.o) { rg.canvas.style.opacity = o; rg.o = o; }
     }
