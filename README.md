@@ -82,11 +82,31 @@ text node and its element are taken back out, so the shape lands on the resting
 position whenever the measurement runs. Verified with the headline still frozen
 mid-rise: cores at 0.549 / 0.42 / 0.62.
 
-The shapes come from the text's own line boxes, padded tightly, feathered with a
-canvas shadow (not `ctx.filter`, which older iOS Safari lacks) over a solid
-core. They are re-measured after the webfonts land and the headline finishes
-rising in. With the layer running the page gets `html.hero-reserve` and the halo
-is dropped. Touch only; the desktop keeps its scrim.
+The shapes come from the text's own line boxes, and **each line's wash is laid
+the way the hero lays paint**: overlapping round dabs travelling along the line,
+with a few loose ones off its long edges, over a solid core under the letters.
+It replaced a rounded rectangle with a fixed 16px feather, which read as a soft
+band on a small line but as a pale block behind the name once the painting was
+worked up around it — the name's two lines merged into one box, and 16px on
+type that size is nearly a hard edge. A dab's radius is its line's own height,
+so large type gets a broad uneven edge and small type a narrow one, and nothing
+has a corner: just outside the name the wash measures 0.55 off the middle of
+its top edge and 0.29 off its corner, where a rectangle reads the same at both.
+
+The dabs are **seeded per line**, not drawn from `Math.random()`. The lines are
+re-measured several times on the way in, and a stroke redrawn at random each
+time would change shape under the words; two consecutive re-measures now differ
+by zero in every channel.
+
+**Lines replace rather than stack.** They are laid lightest first, and each one
+takes out what is beneath it in proportion to its own mask before going in. The
+name's broad stroke reaches down over the paragraph's first line, and laid with
+plain source-over the two compounded — the paragraph measured 0.671. Now every
+line's core is exactly its number: tagline 0.549 twice, name 0.42 twice, all
+five lines of the paragraph 0.62.
+
+With the layer running the page gets `html.hero-reserve` and the halo is dropped
+from the copy; the bar keeps its own. Touch only — the desktop keeps its scrim.
 
 ### A tap on a phone
 

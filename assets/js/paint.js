@@ -217,7 +217,6 @@
      the painting through. The bar is left out entirely: its small glow reads
      better up there than a patch behind the logo and the menu button. */
   var RESERVE = coarse;
-  var FEATHER = 16;            // CSS px of soft falloff outside each line
   var reserveGroups = [];
 
   var RESERVE_STRENGTH = {
@@ -226,13 +225,78 @@
     '.hero__lead':    0.62
   };
 
-  // how far each kind of text is held, in CSS px [across, up/down] - tight,
-  // because every pixel of this is painting nobody sees
+  /* The solid part, held tight to the letters in CSS px [across, up/down].
+     Everything outside it is the soft primer stroke, sized to the type. */
   var RESERVE_PAD = {
-    '.hero__eyebrow': [10, 6],
-    '.hero__title':   [8, 4],
-    '.hero__lead':    [8, 3]
+    '.hero__eyebrow': [4, 2],
+    '.hero__title':   [4, 0],
+    '.hero__lead':    [4, 1]
   };
+
+  /* Seeded, so a shape is decided once per layout and stays put. The lines
+     are re-measured several times on the way in - fonts, the headline's
+     rise - and a stroke redrawn from Math.random() each time would visibly
+     change shape under the words. */
+  function seeded(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // a round dab of primer: solid out to half its radius, then falling away
+  function primerDab(c, x, y, R) {
+    var g = c.createRadialGradient(x, y, 0, x, y, R);
+    g.addColorStop(0,    'rgba(0,0,0,1)');
+    g.addColorStop(0.5,  'rgba(0,0,0,1)');
+    g.addColorStop(0.78, 'rgba(0,0,0,.42)');
+    g.addColorStop(1,    'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.beginPath();
+    c.arc(x, y, R, 0, 6.2832);
+    c.fill();
+  }
+
+  /* One line's wash, laid the way the hero lays paint: overlapping round
+     dabs travelling along the line, with a few loose ones above and below.
+
+     It replaces a rounded rectangle with a fixed 16px feather, which read
+     as a soft band on a small line and as a pale block behind the name -
+     the name's two lines merged into one box, and a feather that thin on
+     type that large is nearly a hard edge. The dabs scale with the line:
+     a dab's radius is the line's own height, so a big line gets a broad,
+     uneven edge and a small one a narrow edge, and nothing anywhere has a
+     corner.
+
+     Under the letters it is still a solid core, so the measured strengths
+     hold: the dabs only ever add outside it, and their solid middle reaches
+     past the core's edge so that edge is never seen. */
+  function primerStroke(c, q, rnd) {
+    var x = q[0], y = q[1], w = q[2], h = q[3];
+    c.fillStyle = '#000';
+    rounded(c, x, y, w, h, Math.min(h / 2, 4 * RES));
+    c.fill();
+
+    var cy = y + h / 2, from = x + h * 0.2, to = x + w - h * 0.2;
+    var step = h * 0.38;
+    for (var cx = from; cx <= to + 0.01; cx += step) {
+      primerDab(c,
+        cx + (rnd() - 0.5) * step * 0.4,
+        cy + (rnd() - 0.5) * h * 0.22,
+        h * (0.95 + rnd() * 0.3));
+    }
+    // loose dabs off the long edges, so neither is a straight line
+    var loose = Math.max(2, Math.round(w / (h * 1.6)));
+    for (var k = 0; k < loose; k++) {
+      primerDab(c,
+        from + rnd() * Math.max(1, to - from),
+        cy + (rnd() < 0.5 ? -1 : 1) * h * (0.35 + rnd() * 0.25),
+        h * (0.55 + rnd() * 0.35));
+    }
+  }
 
   /* How far a node is currently pushed by transforms between it and the
      element being measured. The headline's words rise into place and the
@@ -327,12 +391,21 @@
     var tmp = document.createElement('canvas');
     tmp.width = cw; tmp.height = ch;
     var tc = tmp.getContext('2d');
-    var OFF = cw + ch + 500;
 
-    sels.forEach(function (sel) {
+    /* Lightest first, and each one replaces rather than stacks. The name's
+       stroke is broad now and reaches down over the paragraph's first line;
+       laid on top of each other with plain source-over they compounded, and
+       the paragraph's core measured 0.671 instead of 0.62. */
+    var order = sels.map(function (sel, si) { return { sel: sel, si: si }; })
+      .sort(function (a, b) {
+        return (RESERVE_STRENGTH[a.sel] || 0.62) - (RESERVE_STRENGTH[b.sel] || 0.62);
+      });
+
+    order.forEach(function (o) {
+      var sel = o.sel, si = o.si;
       var el = document.querySelector(sel);
       if (!el) return;
-      var pad = RESERVE_PAD[sel] || [8, 5];
+      var pad = RESERVE_PAD[sel] || [4, 1];
       var rects = lineRects(el).map(function (r) {
         return [
           (r.left - hr.left + MARGIN - pad[0]) * RES,
@@ -344,22 +417,22 @@
       if (!rects.length) return;
       any = true;
 
-      /* The feather comes from a shadow rather than ctx.filter: the shape
-         is drawn well off the canvas and only its blurred shadow lands in
-         place. Canvas filters are missing on older iOS Safari, which is
-         exactly where this runs. A solid core goes on top, because a thin
-         line's own shadow never reaches full opacity in its middle. */
+      /* Each kind of line into its own mask at full opacity, then laid into
+         the layer at its own strength - so the solid core under the letters
+         is exactly the measured amount, however the dabs overlap. */
       tc.clearRect(0, 0, cw, ch);
-      tc.fillStyle = '#000';
-      tc.shadowColor = '#000';
-      tc.shadowOffsetX = OFF;
-      tc.shadowBlur = Math.max(2, FEATHER * RES);
-      rects.forEach(function (q) { rounded(tc, q[0] - OFF, q[1], q[2], q[3], 8 * RES); tc.fill(); });
-      tc.shadowColor = 'transparent';
-      tc.shadowOffsetX = 0;
-      tc.shadowBlur = 0;
-      rects.forEach(function (q) { rounded(tc, q[0], q[1], q[2], q[3], 8 * RES); tc.fill(); });
+      rects.forEach(function (q, li) {
+        primerStroke(tc, q, seeded((si + 1) * 7919 + li * 104729 + Math.round(q[2] * 10)));
+      });
 
+      /* Take out what is already there in proportion to this mask, then lay
+         this line in: inside its core the result is exactly its own
+         strength, outside its stroke nothing changes, and across the soft
+         edge one blends into the other instead of adding up. */
+      vc.globalCompositeOperation = 'destination-out';
+      vc.globalAlpha = 1;
+      vc.drawImage(tmp, 0, 0);
+      vc.globalCompositeOperation = 'source-over';
       vc.globalAlpha = RESERVE_STRENGTH[sel] != null ? RESERVE_STRENGTH[sel] : 0.62;
       vc.drawImage(tmp, 0, 0);
       vc.globalAlpha = 1;
