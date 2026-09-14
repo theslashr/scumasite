@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Museo · Antonio Burgello</title>
+<meta name="description" content="Le Bomboniere di Antonio “Scuma” Burgello appese su una parete, con una lampada da portare con sé.">
+<!-- a prototype: kept out of search until it is part of the site -->
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Inter:wght@300;350;400&display=swap">
+<link rel="stylesheet" href="assets/css/style.css?v=95">
+<style>
+  html, body{ height:100%; overflow:hidden; background:#07090b; }
+  body{ color:#d9d2c5; overscroll-behavior:none; }
+
+  .museo{ position:fixed; inset:0; }
+  .museo__wall{
+    position:absolute; inset:0; width:100%; height:100%; display:block;
+    touch-action:none; cursor:none;
+  }
+  .museo.is-dragging .museo__wall{ cursor:grabbing; }
+
+  /* Labels are text over the canvas, positioned by museo.js each frame. */
+  .museo__labels{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .museo-label{
+    position:absolute; left:0; top:0; width:12.5rem;
+    transform-origin:0 100%; margin-top:0;
+    translate:0 -100%;
+    font-family:var(--sans); font-size:.72rem; line-height:1.45; color:#cfc7b9;
+    will-change:transform, opacity;
+  }
+  .museo-label.is-below{ translate:0 0; }
+  .museo-label p{ margin:0; }
+  .museo-label__artist{ font-weight:400; letter-spacing:.01em; }
+  .museo-label__title{ font-family:var(--display); font-style:italic; font-weight:300; font-size:.98rem; line-height:1.3; margin:.1rem 0 .15rem !important; color:#ebe4d7; }
+  .museo-label__meta{ color:#8f8a80; text-transform:uppercase; letter-spacing:.12em; font-size:.6rem; }
+
+  .museo__bar{
+    position:absolute; left:0; right:0; top:0; z-index:3;
+    display:flex; align-items:baseline; justify-content:space-between; gap:1rem;
+    padding:max(1.1rem, env(safe-area-inset-top)) var(--pad) 1rem;
+    font-family:var(--sans); font-size:.78rem; letter-spacing:.04em; color:#8f8a80;
+    pointer-events:none;
+  }
+  .museo__bar a{ pointer-events:auto; color:#d9d2c5; text-decoration:none; }
+  .museo__bar a:hover, .museo__bar a:focus-visible{ color:var(--ochre); }
+  .museo__room{ font-family:var(--display); font-weight:300; font-size:1.05rem; color:#d9d2c5; letter-spacing:0; }
+  .museo__room span{ color:#8f8a80; font-family:var(--sans); font-size:.72rem; letter-spacing:.08em; margin-left:.6rem; text-transform:uppercase; }
+
+  .museo__foot{
+    position:absolute; left:0; right:0; bottom:0; z-index:3;
+    padding:0 var(--pad) max(1.25rem, env(safe-area-inset-bottom));
+    display:grid; gap:.7rem; justify-items:center;
+    font-family:var(--sans); font-size:.74rem; color:#8f8a80;
+  }
+  .museo__hint{ margin:0; text-align:center; transition:opacity .8s var(--ease) 1.2s; }
+  html.museo-used .museo__hint{ opacity:0; }
+  .museo__railrow{ display:flex; align-items:center; gap:1rem; width:min(36rem, 100%); }
+  .museo__rail{
+    position:relative; flex:1; height:28px; cursor:pointer; touch-action:none;
+  }
+  .museo__rail::before{
+    content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(217,210,197,.22);
+  }
+  .museo__railmark{
+    position:absolute; top:50%; width:9px; height:9px; margin:-4.5px 0 0 -4.5px;
+    border-radius:50%; background:var(--ochre); box-shadow:0 0 12px rgba(217,162,39,.55);
+  }
+  .museo__rail:focus-visible{ outline:1px solid var(--ochre); outline-offset:4px; }
+  .museo__count{ font-variant-numeric:tabular-nums; min-width:4.5rem; text-align:right; }
+
+  .museo__nogl{ display:none; position:absolute; inset:0; place-content:center; text-align:center; padding:2rem; font-family:var(--sans); }
+  html.museo-nogl .museo__nogl{ display:grid; }
+  html.museo-nogl .museo__wall, html.museo-nogl .museo__foot{ display:none; }
+  .museo__nogl a{ color:var(--ochre); }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<main class="museo" id="museo">
+  <canvas class="museo__wall" id="museoWall" aria-hidden="true"></canvas>
+  <div class="museo__labels" id="museoLabels"></div>
+
+  <header class="museo__bar">
+    <a href="collezione.html?c=bomboniere">← Collezione</a>
+    <p class="museo__room" style="margin:0">Bomboniere<span>Sala I</span></p>
+  </header>
+
+  <div class="museo__foot">
+    <p class="museo__hint" id="museoHint">Muovi la luce col mouse · scorri per camminare lungo la parete</p>
+    <div class="museo__railrow">
+      <div class="museo__rail" id="museoRail" role="slider" tabindex="0"
+           aria-label="Posizione lungo la parete" aria-valuemin="1" aria-valuemax="126" aria-valuenow="1">
+        <span class="museo__railmark" id="museoRailMark"></span>
+      </div>
+      <span class="museo__count" id="museoCount">1 / 126</span>
+    </div>
+  </div>
+
+  <div class="museo__nogl">
+    <p>Questo browser non riesce a illuminare la sala.</p>
+    <p><a href="collezione.html?c=bomboniere">Guarda le Bomboniere nella collezione</a></p>
+  </div>
+
+  <p class="sr-only" id="museoLive" aria-live="polite"></p>
+</main>
+
+<script>
+  if (matchMedia('(hover: none)').matches) {
+    document.getElementById('museoHint').textContent = 'Trascina per camminare · la luce segue il dito';
+  }
+</script>
+<script src="assets/js/relief.js?v=95"></script>
+<script src="assets/js/bomboniere.js?v=95"></script>
+<script src="assets/js/museo.js?v=95"></script>
+</body>
+</html>

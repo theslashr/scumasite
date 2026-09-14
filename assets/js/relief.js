@@ -471,5 +471,30 @@
     this.gl = null;
   };
 
+  /* The extraction on its own, for a page that wants surface maps without
+     this viewer attached - the museum lights a whole wall of paintings with
+     a shader of its own. Same worker source, same inline fallback, so there
+     is still exactly one copy of the algorithm.
+
+       Relief.extract(img, function (nm) { nm.canvas, nm.w, nm.h })  */
+  var sharedExtractor = null;
+  Relief.extract = function (img, done) {
+    if (!sharedExtractor) {
+      sharedExtractor = { worker: makeWorker(), jobs: {}, jobId: 0 };
+      if (sharedExtractor.worker) {
+        sharedExtractor.worker.onmessage = function (e) {
+          var job = sharedExtractor.jobs[e.data.id];
+          delete sharedExtractor.jobs[e.data.id];
+          if (job) job(e.data);
+        };
+        sharedExtractor.worker.onerror = function () { sharedExtractor.worker = null; };
+      }
+    }
+    Relief.prototype._extract.call(sharedExtractor, img, done);
+  };
+
+  // what the viewer settled on across the set, so another surface can match it
+  Relief.SETTINGS = { relief: RELIEF, gloss: GLOSS, spec: SPEC };
+
   root.Relief = Relief;
 })(window);
