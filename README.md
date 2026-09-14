@@ -31,34 +31,41 @@ assets/img/bomb/         the bomboniere: 126 full (~32 MB) + 126 thumbs
 
 ## The hero
 
-### The words are taped off
+### A wash of primer under the words
 
-On a phone the copy sits straight on the ground that is being erased. Every
-earlier answer was a patch laid over the problem — a scrim (a smudge at that
-size, so it went), a halo on the letters (soft, and never enough), steering
-the idle brush below the words. None of them stopped paint arriving behind a
-letter; they only argued with it afterwards.
+On a phone the copy sits straight on the ground being erased, so when a
+painting comes through, the words go with it. The fixes before were all soft —
+a scrim (a smudge at phone size), a halo on the letters, steering the idle
+brush below them.
 
-`paint.js` now does what a painter does with masking fluid: a **riserva**.
-The ground behind each line of text is never lifted and no pigment stays on
-it, while everything around is worked as before. The shapes are measured from
-the text's own line boxes, not the paragraph's box, so paint still comes up
-at the ends of short lines; they are feathered with a canvas shadow (not
-`ctx.filter`, which older iOS Safari lacks) plus a solid core, because a thin
-line's own shadow never reaches full opacity in its middle. Once that is
-running, the page gets `html.hero-reserve` and the halo is dropped.
+The first *riserva* masked the words completely, and both halves of that were
+wrong. At full strength it hid most of the painting, because on a narrow phone
+the copy is most of the hero's height. And it wrote into the simulation every
+frame to keep the ground under each line, which meant fighting it at the
+feathered edge — ground growing back underneath, strokes eroding, pigment
+spreading outward and being cut off at a fixed line, all on a canvas at 45%
+resolution — so the edge visibly crawled.
 
-Measured on 375x812, three taps directly behind a line of the lead: without
-the riserva the ground there fell to **0.07** — the painting 93% through the
-letters — with pigment at 0.27. With it, the ground is **1.00** and pigment
-**0.00**, while open ground just below the copy still fell to 0.23.
+It is now a **separate still layer**: `.hero__canvas--veil`, one per thing that
+moves on its own (the copy, the bar), placed after the pigment and before the
+weave so the cloth texture still runs over it. It holds the primer cut to the
+shape of each line of text, at partial strength. The simulation is untouched;
+the layer only moves, by transform, when the copy scrolls or fades, and writes
+nothing on a still page. Checked: forty strokes across the hero plus sixty
+frames left its pixels, transform and opacity identical.
 
-It follows what it protects: the copy's mask moves and fades with
-`.hero__inner` as the hero scrolls away, the bar's with the fixed `.nav`. And
-it is re-measured after the webfonts land and the headline has finished
-rising in, since both move the lines. Touch only — the desktop keeps its
-scrim, where the pointer is continuous and the copy is a small part of a
-wide screen.
+**`VEIL = 0.62` is not a taste number.** It is the least primer that keeps the
+ink at 4.5:1 — WCAG AA for body text — over a *pure black* painting: 0.58 just
+reaches it, 0.62 clears it at 5.1. Over the darkest painting actually in the
+set, the night-blue `n076`, 0.55 would already pass. So legibility is
+guaranteed rather than hoped for, and up to 38% of the painting still shows
+through behind a letter.
+
+The shapes come from the text's own line boxes, padded tightly, feathered with a
+canvas shadow (not `ctx.filter`, which older iOS Safari lacks) over a solid
+core. They are re-measured after the webfonts land and the headline finishes
+rising in. With the layer running the page gets `html.hero-reserve` and the halo
+is dropped. Touch only; the desktop keeps its scrim.
 
 ### A tap on a phone
 

@@ -240,6 +240,11 @@ body.has-cursor.painting .bc-ring{ opacity:1; }
 }
 .hero__canvas--gesso{ filter:blur(5px); }
 .hero__canvas--paint{ z-index:2; mix-blend-mode:multiply; filter:blur(9px); }
+/* The riserva's wash of primer under the words (paint.js adds it on touch).
+   Same overhang and the same blur as the gesso so it lines up with the
+   ground around it; after the pigment and before the weave in the markup,
+   so the cloth texture still runs over it. */
+.hero__canvas--veil{ z-index:2; filter:blur(5px); opacity:0; will-change:transform; }
 
 /* The cloth. A transparent texture whose alpha is driven by the turbulence,
    so it lays down thread shadow and nothing else. The previous version was

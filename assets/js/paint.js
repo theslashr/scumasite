@@ -181,37 +181,50 @@
   }
 
   /* ============================================================
-     RISERVA - the words are taped off
+     RISERVA - a wash of primer under the words
      ============================================================ */
-  /* On a phone the copy sits straight on the ground that is being erased,
-     and every earlier answer to that was a patch over the top: a scrim that
-     read as a smudge at this size, then a halo on the letters, then steering
-     the idle brush below them. A painter does not rescue text from paint;
-     they mask it before painting - masking fluid, tape, a riserva - so that
-     area stays clean primer while everything around it is worked.
+  /* On a phone the copy sits straight on the ground being erased, so when a
+     painting comes through, the words go with it. The fixes before this were
+     all soft: a scrim that read as a smudge at phone size, then a halo on
+     the letters, then steering the idle brush below them.
 
-     So here the ground behind each line of text is never lifted and no
-     pigment is left on it. The shapes follow the lines, not the paragraph's
-     box, so the painting still comes up at the ends of short lines, and they
-     are feathered so the paint stops softly at the words rather than at a
-     rectangle. Desktop keeps its scrim: there the pointer is continuous and
-     the copy is a small part of a wide screen. */
+     The first riserva masked the words completely, rewriting the simulation
+     every frame so the ground under each line was never lifted. Both halves
+     of that were wrong. At full strength it hid most of the painting on a
+     narrow phone, where the copy is most of the hero's height. And writing
+     into the simulation meant fighting it at the feathered edge - ground
+     growing back under, strokes eroding, pigment spreading outward and being
+     cut back at a fixed line, on a canvas at 45% resolution - so the edge
+     visibly crawled.
+
+     So now it is a separate still layer, above the paint and below the weave
+     and the words: the primer, cut to the shape of the lines, at partial
+     strength. The simulation runs untouched, and this only moves when the
+     copy does.
+
+     VEIL is not a taste number. It is the least primer that keeps the ink
+     at 4.5:1 - WCAG AA for body text - over a pure black painting: 0.58
+     just reaches it and 0.62 clears it at 5.1. Over the darkest painting in
+     the set (the night-blue n076) 0.55 would already pass, so this is a
+     guarantee rather than a hope, and up to 38% of the painting still shows
+     through behind a letter. */
   var RESERVE = coarse;
-  var FEATHER = 22;            // CSS px of soft falloff outside each line
+  var VEIL = 0.62;
+  var FEATHER = 16;            // CSS px of soft falloff outside each line
   var reserveGroups = [];
 
-  // how far each kind of text is held clear, in CSS px [across, up/down]
+  // how far each kind of text is held, in CSS px [across, up/down] - tight,
+  // because every pixel of this is painting nobody sees
   var RESERVE_PAD = {
-    '.hero__eyebrow': [16, 9],
-    '.hero__title':   [10, 8],
-    '.hero__lead':    [12, 5],
-    '.nav__name':     [10, 7],
-    '.nav__toggle':   [8, 8]
+    '.hero__eyebrow': [10, 6],
+    '.hero__title':   [8, 4],
+    '.hero__lead':    [8, 3],
+    '.nav__name':     [8, 5],
+    '.nav__toggle':   [6, 6]
   };
 
   /* The boxes of the text itself, line by line. An element's own box spans
-     the whole column even when its line is short and centred, which would
-     tape off paint that never touched a letter. */
+     the whole column even when its line is short and centred. */
   function lineRects(el) {
     var out = [], range = document.createRange(), n;
     var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
@@ -240,22 +253,33 @@
     c.closePath();
   }
 
-  /* One group per thing that moves independently: the copy scrolls and
-     fades with .hero__inner, the bar is fixed to the viewport. Each keeps
-     where its anchor sat when it was baked, so the mask can follow it. */
-  function bakeGroup(anchorSel, sels, hr) {
+  /* One layer per thing that moves on its own: the copy scrolls and fades
+     with .hero__inner, the bar is fixed to the viewport. Each canvas sits
+     exactly over the gesso canvas (same class, same overhang, same blur), so
+     the primer drawn into it lines up with the ground around it. */
+  function veilFor(key) {
+    var id = 'heroVeil-' + key, c = document.getElementById(id);
+    if (!c) {
+      c = document.createElement('canvas');
+      c.id = id;
+      c.className = 'hero__canvas hero__canvas--veil';
+      c.setAttribute('aria-hidden', 'true');
+      // after the pigment, before the weave: the cloth texture stays on top
+      paintC.parentNode.insertBefore(c, paintC.nextSibling);
+    }
+    return c;
+  }
+
+  function bakeGroup(key, anchorSel, sels, hr) {
     var anchor = document.querySelector(anchorSel);
     if (!anchor || !groundC.width) return null;
     var cw = groundC.width, ch = groundC.height;
 
-    var m = document.createElement('canvas');
-    m.width = cw; m.height = ch;
-    var mc = m.getContext('2d');
     var rects = [];
     sels.forEach(function (sel) {
       var el = document.querySelector(sel);
       if (!el) return;
-      var pad = RESERVE_PAD[sel] || [10, 6];
+      var pad = RESERVE_PAD[sel] || [8, 5];
       lineRects(el).forEach(function (r) {
         rects.push([
           (r.left - hr.left + MARGIN - pad[0]) * RES,
@@ -267,40 +291,35 @@
     });
     if (!rects.length) return null;
 
-    /* The feather, from a shadow rather than ctx.filter: the shape is drawn
-       well off the canvas and only its blurred shadow lands in place. Canvas
-       filters are missing on older iOS Safari, which is exactly where this
-       runs; shadowBlur has been everywhere for a decade. */
-    var OFF = cw + ch + 500;
-    mc.fillStyle = '#000';
-    mc.shadowColor = '#000';
-    mc.shadowOffsetX = OFF;
-    mc.shadowBlur = Math.max(2, FEATHER * RES);
-    rects.forEach(function (q) {
-      rounded(mc, q[0] - OFF, q[1], q[2], q[3], 10 * RES);
-      mc.fill();
-    });
-    // and a solid core: a thin line's own shadow never reaches full opacity
-    // in its middle, so the letters would still be half exposed without it
-    mc.shadowColor = 'transparent';
-    mc.shadowOffsetX = 0;
-    mc.shadowBlur = 0;
-    rects.forEach(function (q) {
-      rounded(mc, q[0], q[1], q[2], q[3], 10 * RES);
-      mc.fill();
-    });
+    var c = veilFor(key);
+    c.width = cw; c.height = ch;
+    var vc = c.getContext('2d');
 
-    // the ground as it is under the mask, so a held area matches what is
-    // around it exactly - the mottling is random, and a stale copy would show
-    var g = document.createElement('canvas');
-    g.width = cw; g.height = ch;
-    var gc = g.getContext('2d');
-    gc.drawImage(m, 0, 0);
-    gc.globalCompositeOperation = 'source-in';
-    gc.drawImage(groundC, 0, 0);
+    /* The feather comes from a shadow rather than ctx.filter: the shape is
+       drawn well off the canvas and only its blurred shadow lands in place.
+       Canvas filters are missing on older iOS Safari, which is exactly where
+       this runs. A solid core goes on top, because a thin line's own shadow
+       never reaches full opacity in its middle. */
+    var OFF = cw + ch + 500;
+    vc.fillStyle = '#000';
+    vc.shadowColor = '#000';
+    vc.shadowOffsetX = OFF;
+    vc.shadowBlur = Math.max(2, FEATHER * RES);
+    rects.forEach(function (q) { rounded(vc, q[0] - OFF, q[1], q[2], q[3], 8 * RES); vc.fill(); });
+    vc.shadowColor = 'transparent';
+    vc.shadowOffsetX = 0;
+    vc.shadowBlur = 0;
+    rects.forEach(function (q) { rounded(vc, q[0], q[1], q[2], q[3], 8 * RES); vc.fill(); });
+
+    // the live ground, cut to that shape - the mottling is random per
+    // resize, and a stale copy would show as a patch that does not match
+    vc.globalCompositeOperation = 'source-in';
+    vc.drawImage(groundC, 0, 0);
+    vc.globalCompositeOperation = 'source-over';
 
     var ar = anchor.getBoundingClientRect();
-    return { anchor: anchor, mask: m, ground: g, ax: ar.left - hr.left, ay: ar.top - hr.top };
+    return { key: key, canvas: c, anchor: anchor,
+             ax: ar.left - hr.left, ay: ar.top - hr.top, t: '', o: '' };
   }
 
   function bakeReserve() {
@@ -308,43 +327,34 @@
     var hr = hero.getBoundingClientRect();
     if (hr.width < 2) return;
     reserveGroups = [
-      bakeGroup('.hero__inner', ['.hero__eyebrow', '.hero__title', '.hero__lead'], hr),
-      bakeGroup('.nav', ['.nav__name', '.nav__toggle'], hr)
+      bakeGroup('copy', '.hero__inner', ['.hero__eyebrow', '.hero__title', '.hero__lead'], hr),
+      bakeGroup('nav', '.nav', ['.nav__name', '.nav__toggle'], hr)
     ].filter(Boolean);
-    // the CSS drops the halo only once something is actually holding the words
     document.documentElement.classList.toggle('hero-reserve', reserveGroups.length > 0);
+    holdReserve();
   }
 
-  /* Every frame, after the strokes and the dry-back: primer back under the
-     words, pigment lifted off them. Strokes from a finger land between
-     frames and this runs before the frame is painted, so nothing laid over
-     a letter is ever seen. */
+  /* Once a frame: follow the words if they have moved and fade with them.
+     Nothing is drawn here - only a transform and an opacity, and only when
+     they change - so a still page makes no writes at all. */
   function holdReserve() {
     if (!reserveGroups.length) return;
     var hr = hero.getBoundingClientRect();
-    if (hr.bottom < 0) return;
     for (var i = 0; i < reserveGroups.length; i++) {
       var rg = reserveGroups[i];
       var ar = rg.anchor.getBoundingClientRect();
       var dx = (ar.left - hr.left) - rg.ax;
       var dy = (ar.top - hr.top) - rg.ay;
-      // the copy fades as the hero scrolls away; let the paint in as it goes
       var fade = parseFloat(rg.anchor.style.opacity);
       if (isNaN(fade)) fade = 1;
-      if (fade <= 0.01) continue;
+      // the bar takes a solid background once it sticks; nothing to hold then
+      if (rg.key === 'nav' && rg.anchor.classList.contains('is-stuck')) fade = 0;
 
-      gesso.globalCompositeOperation = 'source-over';
-      gesso.globalAlpha = fade;
-      gesso.drawImage(rg.ground, dx, dy, W, H);
-
-      paint.globalCompositeOperation = 'destination-out';
-      paint.globalAlpha = fade;
-      paint.drawImage(rg.mask, dx, dy, W, H);
+      var t = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px)';
+      var o = (VEIL * Math.max(0, Math.min(1, fade))).toFixed(3);
+      if (t !== rg.t) { rg.canvas.style.transform = t; rg.t = t; }
+      if (o !== rg.o) { rg.canvas.style.opacity = o; rg.o = o; }
     }
-    gesso.globalAlpha = 1;
-    paint.globalAlpha = 1;
-    gesso.globalCompositeOperation = 'source-over';
-    paint.globalCompositeOperation = 'source-over';
   }
 
   /* ============================================================
