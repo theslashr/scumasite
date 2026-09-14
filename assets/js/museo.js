@@ -451,8 +451,8 @@
 
   canvas.addEventListener('pointerdown', function (e) {
     onInput();
-    canvas.setPointerCapture(e.pointerId);
-    dragging = { id: e.pointerId, x: e.clientX, t: now(), moved: 0 };
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    dragging = { id: e.pointerId, x: e.clientX, t: now(), down: now(), moved: 0 };
     vel = 0; seek = null;
     aimLamp(e.clientX, e.clientY);
     stage.classList.add('is-dragging');
@@ -470,8 +470,38 @@
     kick();
   });
 
+  // the painting under a point on screen, if there is one
+  function paintingAt(x, y) {
+    var wx = x + cam;
+    for (var i = 0; i < N; i++) {
+      var s = slots[i];
+      if (Math.abs(wx - s.x) <= s.w / 2 && Math.abs(y - CY) <= s.h / 2) return i;
+    }
+    return -1;
+  }
+  function centred() { return seek != null ? nearest(seek) : nearest(cam); }
+
+  /* The lamp is the cursor, so there is none over the wall - except over a
+     neighbour, which can be clicked to walk to it. */
+  canvas.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse' || dragging) return;
+    var i = paintingAt(e.clientX, e.clientY);
+    canvas.style.cursor = (i !== -1 && i !== centred()) ? 'pointer' : '';
+  });
+
   function endDrag(e) {
     if (!dragging || e.pointerId !== dragging.id) return;
+    // a click or a tap, not a drag: on a painting either side, walk to it
+    if (dragging.moved < 6 && now() - dragging.down < 500) {
+      var hit = paintingAt(e.clientX, e.clientY);
+      if (hit !== -1 && hit !== centred()) {
+        dragging = null;
+        stage.classList.remove('is-dragging');
+        canvas.style.cursor = '';
+        goTo(hit);
+        return;
+      }
+    }
     // a finger that stopped before lifting should not be flung
     if (now() - dragging.t > 90) vel = 0;
     if (reduced) vel = 0;
@@ -717,6 +747,6 @@
     lamp: function (x, y) { lamp.x = lampT.x = x; lamp.y = lampT.y = y; draw(); },
     go: function (i) { goTo(i, true); draw(); },
     art: art,
-    state: function () { return { cam: cam, lamp: lamp, L: L, CY: CY, vw: vw, vh: vh }; }
+    state: function () { return { cam: cam, lamp: lamp, L: L, CY: CY, vw: vw, vh: vh, slots: slots }; }
   };
 })();

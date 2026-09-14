@@ -133,7 +133,10 @@
     this.sheetGrid.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('button') : null;
       if (!b) return;
-      self.openViewer(parseInt(b.dataset.i, 10));
+      var i = parseInt(b.dataset.i, 10);
+      // a collection hung in the room opens there, at that painting
+      if (self.o.itemHref) { location.href = self.o.itemHref(self.items[i], i); return; }
+      self.openViewer(i);
     });
 
     scroll.appendChild(this.sheetGrid);

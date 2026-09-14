@@ -85,8 +85,12 @@
   document.title = data.title + ' · Antonio Burgello';
 
   var opts = { page: true, backHref: 'index.html#opere' };
-  // only the Opere Sparse have a room so far
-  if (which === 'opere') opts.museumHref = 'museo.html';
+  /* Only the Opere Sparse have a room so far. For them the room replaces
+     the viewer: a painting picked in the grid is where the visit starts. */
+  if (which === 'opere') {
+    opts.museumHref = 'museo.html';
+    opts.itemHref = function (it) { return 'museo.html#' + encodeURIComponent(it.id); };
+  }
   for (var k in data) opts[k] = data[k];
   new window.Collection(opts);
 })();
